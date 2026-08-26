@@ -1,0 +1,26 @@
+{
+  "name": "learn-it-hcl",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "clean": "turbo run clean",
+    "generate:api-client": "turbo run generate:api-client",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.10",
+    "husky": "^9.1.0",
+    "turbo": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

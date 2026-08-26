@@ -1,0 +1,115 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL with pgvector ────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: learnit-postgres
+    environment:
+      POSTGRES_USER: learnit
+      POSTGRES_PASSWORD: learnit_dev
+      POSTGRES_DB: learnit
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U learnit"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ───────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: learnit-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── etcd (required by APISIX) ───────────────────────────
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: learnit-etcd
+    environment:
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    ports:
+      - "2379:2379"
+    volumes:
+      - etcd_data:/bitnami/etcd
+
+  # ── Apache APISIX API Gateway ───────────────────────────
+  apisix:
+    image: apache/apisix:3.18.0-debian
+    container_name: learnit-apisix
+    depends_on:
+      etcd:
+        condition: service_started
+    ports:
+      - "9080:9080"   # HTTP proxy
+      - "9443:9443"   # HTTPS proxy
+      - "9180:9180"   # Admin API
+    volumes:
+      - ../apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9080/apisix/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend (FastAPI) ───────────────────────────────────
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: ../infra/docker/Dockerfile.backend
+    container_name: learnit-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://learnit:learnit_dev@postgres:5432/learnit"
+      DATABASE_URL_SYNC: "postgresql://learnit:learnit_dev@postgres:5432/learnit"
+      REDIS_URL: "redis://redis:6379/0"
+      APP_ENV: development
+      APP_DEBUG: "true"
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:9080"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ── Frontend (Next.js) ──────────────────────────────────
+  frontend:
+    build:
+      context: ../../apps/web
+      dockerfile: ../../infra/docker/Dockerfile.frontend
+    container_name: learnit-frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:9080/api/v1"
+      NEXT_PUBLIC_APP_NAME: "Learn-it HCL"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    command: pnpm dev
+
+volumes:
+  postgres_data:
+  redis_data:
+  etcd_data:

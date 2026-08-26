@@ -1,0 +1,46 @@
+# Apache APISIX Configuration
+# API Gateway for Learn-it HCL
+
+apisix:
+  node_listen: 9080
+  enable_admin: true
+  admin_listen:
+    ip: 0.0.0.0
+    port: 9180
+
+deployment:
+  admin:
+    admin_key:
+      - name: admin
+        key: learn-it-hcl-apisix-admin-key-change-in-prod
+        role: admin
+  etcd:
+    host:
+      - "http://etcd:2379"
+
+plugin_attr:
+  prometheus:
+    export_addr:
+      ip: 0.0.0.0
+      port: 9091
+
+plugins:
+  - cors
+  - limit-req
+  - limit-count
+  - proxy-rewrite
+  - response-rewrite
+  - request-id
+  - real-ip
+  - ip-restriction
+  - consumer-restriction
+  - key-auth
+  - jwt-auth
+  - prometheus
+  - zipkin
+  - redirect
+
+# Default route configuration will be set up via Admin API
+# Routes:
+# /api/v1/*  -> backend:8000
+# /*         -> frontend:3000
