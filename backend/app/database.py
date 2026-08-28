@@ -2,15 +2,14 @@
 Learn-it HCL — Database Configuration
 
 SQLAlchemy async engine, session factory, and base model.
-All models inherit from Base which includes tenant_id support.
+Supports PostgreSQL (production) and SQLite (demo/hackathon).
 """
 
 import uuid
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 
-from sqlalchemy import MetaData, DateTime, String, Boolean, text
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy import MetaData, DateTime, String, Boolean, text, event
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -37,13 +36,32 @@ convention = {
 
 metadata = MetaData(naming_convention=convention)
 
-engine = create_async_engine(
-    settings.database_url,
-    pool_size=settings.db_pool_size,
-    max_overflow=settings.db_max_overflow,
-    pool_recycle=settings.db_pool_recycle,
-    echo=settings.app_debug,
-)
+is_sqlite = settings.database_url.startswith("sqlite")
+
+engine_kwargs: dict = {}
+if is_sqlite:
+    engine_kwargs = {
+        "echo": settings.app_debug,
+        "connect_args": {"check_same_thread": False},
+    }
+else:
+    engine_kwargs = {
+        "pool_size": settings.db_pool_size,
+        "max_overflow": settings.db_max_overflow,
+        "pool_recycle": settings.db_pool_recycle,
+        "echo": settings.app_debug,
+    }
+
+engine = create_async_engine(settings.database_url, **engine_kwargs)
+
+# Enable WAL mode and foreign keys for SQLite
+if is_sqlite:
+    @event.listens_for(engine.sync_engine, "connect")
+    def set_sqlite_pragma(dbapi_conn, connection_record):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 async_session_factory = async_sessionmaker(
     engine,
@@ -64,13 +82,11 @@ class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        server_default=text("NOW()"),
         nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        server_default=text("NOW()"),
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
@@ -79,8 +95,8 @@ class TimestampMixin:
 class TenantMixin:
     """Mixin that adds tenant_id for row-level multi-tenancy."""
 
-    tenant_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True),
+    tenant_id: Mapped[str] = mapped_column(
+        String(36),
         nullable=False,
         index=True,
     )

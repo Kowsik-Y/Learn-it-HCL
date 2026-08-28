@@ -2,11 +2,11 @@
 Skills Module — Models
 
 Skill graph with ontology, prerequisite relationships, career roles.
+Compatible with SQLite and PostgreSQL.
 """
 
 import uuid
-from sqlalchemy import String, Float, ForeignKey, Text, Integer, Boolean, Index
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+from sqlalchemy import String, Float, ForeignKey, Text, Integer, Boolean, Index, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base, TimestampMixin, TenantMixin
@@ -17,17 +17,17 @@ class Skill(Base, TimestampMixin, TenantMixin):
 
     __tablename__ = "skills"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     category: Mapped[str] = mapped_column(String(100), nullable=False, default="general")
-    parent_skill_id: Mapped[uuid.UUID | None] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("skills.id"), nullable=True
+    parent_skill_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("skills.id"), nullable=True
     )
     difficulty_level: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_: Mapped[dict | None] = mapped_column("metadata", JSON, nullable=True)
 
     # Relationships
     children: Mapped[list["Skill"]] = relationship("Skill", back_populates="parent")
@@ -44,12 +44,12 @@ class SkillRelationship(Base, TenantMixin):
 
     __tablename__ = "skill_relationships"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    source_skill_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("skills.id"), nullable=False
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    source_skill_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("skills.id"), nullable=False
     )
-    target_skill_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("skills.id"), nullable=False
+    target_skill_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("skills.id"), nullable=False
     )
     relationship_type: Mapped[str] = mapped_column(String(50), nullable=False)
     strength: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
@@ -66,7 +66,7 @@ class CareerRole(Base, TimestampMixin, TenantMixin):
 
     __tablename__ = "career_roles"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -83,12 +83,12 @@ class RoleSkill(Base, TenantMixin):
 
     __tablename__ = "role_skills"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    career_role_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("career_roles.id"), nullable=False
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    career_role_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("career_roles.id"), nullable=False
     )
-    skill_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("skills.id"), nullable=False
+    skill_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("skills.id"), nullable=False
     )
     importance: Mapped[str] = mapped_column(String(50), default="important", nullable=False)
     minimum_mastery: Mapped[float] = mapped_column(Float, default=0.7, nullable=False)

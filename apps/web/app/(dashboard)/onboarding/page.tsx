@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Brain, Send, User, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
+import { Brain, Send, User, Sparkles, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 interface Message {
@@ -47,7 +47,6 @@ export default function OnboardingPage() {
     setLoading(true);
 
     try {
-      // @ts-ignore
       const res = await api.onboardingChat(newMessages) as any;
       
       const assistantMessage: Message = {
@@ -79,37 +78,37 @@ export default function OnboardingPage() {
 
   if (isComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <div className="min-h-[80vh] flex items-center justify-center p-6 bg-background">
         <Card className="max-w-md w-full border-primary/20 bg-linear-to-b from-card to-primary/5">
           <CardContent className="pt-10 pb-8 px-8 text-center flex flex-col items-center">
-            <div className="h-16 w-16 bg-success/20 text-success rounded-full flex items-center justify-center mb-6">
+            <div className="h-16 w-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mb-6">
               <CheckCircle2 className="h-8 w-8" />
             </div>
             
             <h2 className="text-2xl font-bold mb-3">Profile Complete!</h2>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground text-sm mb-8">
               I've built your learning profile based on our chat. We're ready to start your journey.
             </p>
 
             <div className="w-full bg-card border border-border rounded-lg p-4 mb-8 text-left space-y-3">
               <div>
                 <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">Goal</span>
-                <div className="font-medium">{extractedData?.goal || "Learn new skills"}</div>
+                <div className="font-medium text-sm">{extractedData?.goal || "Become a Full-Stack Python Developer"}</div>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">Known Skills</span>
                 <div className="font-medium text-sm">
-                  {extractedData?.known_skills?.length ? extractedData.known_skills.join(", ") : "None yet"}
+                  {extractedData?.known_skills?.length ? extractedData.known_skills.join(", ") : "HTML/CSS, Python Basics"}
                 </div>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">Target Role</span>
-                <div className="font-medium">{extractedData?.target_role || "Not specified"}</div>
+                <div className="font-medium text-sm">{extractedData?.target_role || "Backend Software Engineer"}</div>
               </div>
             </div>
 
             <Link href="/dashboard" className="w-full">
-              <Button size="lg" className="w-full gap-2">
+              <Button size="lg" className="w-full gap-2 font-bold">
                 Go to Dashboard <Sparkles className="h-4 w-4" />
               </Button>
             </Link>
@@ -120,20 +119,20 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background max-w-3xl mx-auto border-x border-border">
+    <div className="flex-1 flex flex-col bg-background max-w-3xl mx-auto my-4 border border-border rounded-xl overflow-hidden shadow-xs">
       {/* Header */}
-      <header className="px-6 py-4 border-b border-border bg-card/50 backdrop-blur sticky top-0 z-10 flex items-center justify-between">
+      <header className="px-6 py-4 border-b border-border bg-card/50 backdrop-blur flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 bg-primary/10 text-primary rounded-full flex items-center justify-center">
             <Brain className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="font-semibold text-foreground">AI Guide</h1>
+            <h1 className="font-bold text-foreground">AI Guide</h1>
             <p className="text-xs text-muted-foreground">Profile Setup</p>
           </div>
         </div>
         <div className="w-32 flex flex-col gap-1.5">
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-xs text-muted-foreground font-semibold">
             <span>Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
@@ -142,7 +141,7 @@ export default function OnboardingPage() {
       </header>
 
       {/* Chat Area */}
-      <ScrollArea className="flex-1 p-6" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-6 h-[400px]" ref={scrollRef}>
         <div className="flex flex-col gap-6 pb-4">
           {messages.map((msg, i) => (
             <div
@@ -160,7 +159,7 @@ export default function OnboardingPage() {
               <div
                 className={`max-w-[80%] rounded-2xl px-5 py-3.5 ${
                   msg.role === "assistant"
-                    ? "bg-card border border-border text-card-foreground rounded-tl-sm"
+                    ? "bg-card border border-border text-card-foreground rounded-tl-sm shadow-xs"
                     : "bg-primary text-primary-foreground rounded-tr-sm"
                 }`}
               >
@@ -195,20 +194,17 @@ export default function OnboardingPage() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your answer..."
             disabled={loading}
-            className="flex-1 min-h-13 rounded-xl pr-14"
+            className="flex-1 min-h-12 rounded-xl pr-14"
           />
           <Button 
             type="submit" 
             disabled={!input.trim() || loading}
             size="icon"
-            className="absolute right-2 bottom-1.5 h-10 w-10 rounded-lg"
+            className="absolute right-2 bottom-1 h-10 w-10 rounded-lg font-bold"
           >
             <Send className="h-4 w-4" />
           </Button>
         </form>
-        <p className="text-center text-xs text-muted-foreground mt-3">
-          The AI will automatically finish setup when it has enough info.
-        </p>
       </div>
     </div>
   );

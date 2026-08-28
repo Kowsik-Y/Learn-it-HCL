@@ -47,6 +47,7 @@ logs/
 # Database
 *.db
 *.sqlite3
+*.db-*
 
 # Docker
 docker-compose.override.yml

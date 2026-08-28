@@ -4,7 +4,6 @@ Identity Module — FastAPI Dependencies
 Authentication and authorization dependencies for route protection.
 """
 
-import uuid
 from typing import Annotated
 
 from fastapi import Depends, Request
@@ -46,7 +45,7 @@ async def get_current_user(
         raise AuthenticationError("Invalid token payload")
 
     service = IdentityService(db)
-    user = await service.get_user_by_id(uuid.UUID(user_id))
+    user = await service.get_user_by_id(user_id)
 
     if not user.is_active:
         raise AuthenticationError("Account is deactivated")
@@ -86,7 +85,7 @@ def require_permission(permission: Permission):
     return Depends(_check_permission)
 
 
-def require_tenant_access(resource_tenant_id: uuid.UUID):
+def require_tenant_access(resource_tenant_id: str):
     """Verify the current user has access to a specific tenant's resource."""
 
     async def _check_tenant(user: CurrentUser) -> User:

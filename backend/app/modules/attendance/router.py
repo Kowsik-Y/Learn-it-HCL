@@ -7,7 +7,6 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy import select, String, Integer, Float, Boolean, DateTime, Index
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -18,9 +17,9 @@ from app.modules.identity.dependencies import CurrentUser
 
 class AttendanceSession(Base, TimestampMixin, TenantMixin):
     __tablename__ = "attendance_sessions"
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    course_id: Mapped[uuid.UUID | None] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
-    teacher_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    course_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     session_date: Mapped[str] = mapped_column(String(20), nullable=False)
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -35,9 +34,9 @@ class AttendanceSession(Base, TimestampMixin, TenantMixin):
 
 class AttendanceRecord(Base, TimestampMixin, TenantMixin):
     __tablename__ = "attendance_records"
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False)
-    student_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    session_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    student_id: Mapped[str] = mapped_column(String(36), nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="absent", nullable=False)
     check_in_time: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     verification_method: Mapped[str] = mapped_column(String(50), nullable=False, default="otp")
@@ -67,7 +66,7 @@ async def check_in(
     db: AsyncSession = Depends(get_db),
 ):
     """Check in to an attendance session via OTP or QR."""
-    session_id = uuid.UUID(data.session_id)
+    session_id = data.session_id
 
     # Get session
     stmt = select(AttendanceSession).where(
@@ -123,7 +122,7 @@ async def check_in(
 
 @router.post("/sessions/{session_id}/generate-otp")
 async def generate_otp(
-    session_id: uuid.UUID,
+    session_id: str,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):

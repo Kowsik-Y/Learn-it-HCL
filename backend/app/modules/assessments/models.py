@@ -1,13 +1,13 @@
 """
-Assessments Module — Models and Router
+Assessments Module — Models
 
 Question bank, adaptive diagnostics, quizzes, and exams.
+Compatible with SQLite and PostgreSQL.
 """
 
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Float, ForeignKey, Text, Integer, Boolean, Index, DateTime
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+from sqlalchemy import String, Float, ForeignKey, Text, Integer, Boolean, Index, DateTime, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base, TimestampMixin, TenantMixin
@@ -18,11 +18,11 @@ class Assessment(Base, TimestampMixin, TenantMixin):
 
     __tablename__ = "assessments"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     assessment_type: Mapped[str] = mapped_column(String(50), nullable=False, default="quiz")
-    skill_ids: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    skill_ids: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     time_limit_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     passing_score: Mapped[float] = mapped_column(Float, default=0.7, nullable=False)
     max_attempts: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
@@ -38,18 +38,18 @@ class Question(Base, TimestampMixin, TenantMixin):
 
     __tablename__ = "questions"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    assessment_id: Mapped[uuid.UUID | None] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("assessments.id"), nullable=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    assessment_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("assessments.id"), nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     question_type: Mapped[str] = mapped_column(String(50), nullable=False, default="multiple_choice")
     difficulty_level: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    skill_ids: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    skill_ids: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     blooms_level: Mapped[str] = mapped_column(String(50), default="remember", nullable=False)
     estimated_time_seconds: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
     explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
-    hints: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    hints: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     correct_answer: Mapped[str | None] = mapped_column(Text, nullable=True)
-    options: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    options: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     order_index: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     assessment: Mapped["Assessment | None"] = relationship(back_populates="questions")
@@ -65,9 +65,9 @@ class AssessmentAttempt(Base, TimestampMixin, TenantMixin):
 
     __tablename__ = "assessment_attempts"
 
-    id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    assessment_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("assessments.id"), nullable=False)
-    learner_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    assessment_id: Mapped[str] = mapped_column(String(36), ForeignKey("assessments.id"), nullable=False)
+    learner_id: Mapped[str] = mapped_column(String(36), nullable=False)
     score: Mapped[float] = mapped_column(Float, default=0, nullable=False)
     max_score: Mapped[float] = mapped_column(Float, default=0, nullable=False)
     percentage: Mapped[float] = mapped_column(Float, default=0, nullable=False)
@@ -75,7 +75,7 @@ class AssessmentAttempt(Base, TimestampMixin, TenantMixin):
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     time_spent_seconds: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    responses: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    responses: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     __table_args__ = (
         Index("ix_attempts_learner", "learner_id"),

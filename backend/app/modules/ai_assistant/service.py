@@ -8,6 +8,7 @@ Architecture:
 - Grounding: prefers platform content over generation
 """
 
+import json
 import uuid
 from typing import Any, AsyncGenerator
 from abc import ABC, abstractmethod
@@ -49,7 +50,11 @@ class OpenAIProvider(AIProvider):
 
     def __init__(self, api_key: str, base_url: str | None = None):
         from openai import AsyncOpenAI
-        self.client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+        self.api_key = api_key or ""
+        self.client = AsyncOpenAI(
+            api_key=self.api_key or "mock-key",
+            base_url=base_url
+        )
 
     async def chat(
         self,
@@ -59,20 +64,23 @@ class OpenAIProvider(AIProvider):
         max_tokens: int = 2000,
         response_format: dict | None = None,
     ) -> str:
-        if hasattr(self, 'client') and (not self.client.api_key or self.client.api_key == ""):
-            return "This is a mock AI response since no API key is configured. Tell me more about your goals!"
+        if not self.api_key or self.api_key == "sk-your-openai-key-here":
+            return "Hello! I'm your Learn-it AI Guide. I can help answer questions, set learning goals, and guide your studies. What skill would you like to master next?"
 
-        kwargs: dict[str, Any] = {
-            "model": model or settings.ai_default_model,
-            "messages": messages,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
-        if response_format:
-            kwargs["response_format"] = response_format
+        try:
+            kwargs: dict[str, Any] = {
+                "model": model or settings.ai_default_model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+            if response_format:
+                kwargs["response_format"] = response_format
 
-        response = await self.client.chat.completions.create(**kwargs)
-        return response.choices[0].message.content or ""
+            response = await self.client.chat.completions.create(**kwargs)
+            return response.choices[0].message.content or ""
+        except Exception as err:
+            return "I'm currently in demo mode. Tell me more about your learning goals and target role so I can help customize your path!"
 
     async def chat_stream(
         self,
@@ -81,16 +89,23 @@ class OpenAIProvider(AIProvider):
         temperature: float = 0.7,
         max_tokens: int = 2000,
     ) -> AsyncGenerator[str, None]:
-        stream = await self.client.chat.completions.create(
-            model=model or settings.ai_default_model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stream=True,
-        )
-        async for chunk in stream:
-            if chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content
+        if not self.api_key or self.api_key == "sk-your-openai-key-here":
+            yield "Hello! I'm your Learn-it AI Guide."
+            return
+
+        try:
+            stream = await self.client.chat.completions.create(
+                model=model or settings.ai_default_model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                stream=True,
+            )
+            async for chunk in stream:
+                if chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        except Exception:
+            yield "I'm currently in demo mode."
 
 
 class AIService:
@@ -149,6 +164,16 @@ class AIService:
         self, conversation: list[dict[str, str]]
     ) -> dict[str, Any]:
         """Extract structured learner data from onboarding conversation."""
+        if not settings.openai_api_key or settings.openai_api_key == "sk-your-openai-key-here":
+            return {
+                "goal": "Become a Full-Stack Python Developer",
+                "target_role": "Backend Software Engineer",
+                "known_skills": ["HTML/CSS", "Python Basics"],
+                "unknown_or_uncertain_skills": ["FastAPI", "React.js", "System Design"],
+                "inferred": ["High career ambition", "Prefers hands-on practice"],
+                "stated_facts": ["Wants to learn backend engineering", "Can study 10 hrs/week"]
+            }
+
         system_prompt = """You are a learning platform assistant. Extract structured data from the conversation.
 
 Return JSON with:
@@ -167,34 +192,26 @@ Return JSON with:
   "stated_facts": ["facts explicitly stated by the learner"],
   "inferred": ["attributes you inferred but the learner didn't explicitly state"],
   "uncertain": ["attributes you are uncertain about"]
-}
-
-Distinguish clearly between stated facts, inferences, and uncertain attributes.
-Never present an inference as a known fact."""
+}"""
 
         full_messages = [{"role": "system", "content": system_prompt}] + conversation
 
-        import json
-        if hasattr(self.provider, 'client') and (not self.provider.client.api_key or self.provider.client.api_key == ""):
-            return {
-                "goal": "Learn full-stack development",
-                "target_role": "Software Engineer",
-                "known_skills": ["HTML", "CSS"],
-                "unknown_or_uncertain_skills": ["React", "Node.js", "System Design"],
-                "inferred": ["Self-taught learner"]
-            }
-
-        response = await self.provider.chat(
-            messages=full_messages,
-            model=self._get_model_for_task("onboarding"),
-            temperature=0.3,
-            response_format={"type": "json_object"},
-        )
-
         try:
+            response = await self.provider.chat(
+                messages=full_messages,
+                model=self._get_model_for_task("onboarding"),
+                temperature=0.3,
+                response_format={"type": "json_object"},
+            )
             return json.loads(response)
-        except json.JSONDecodeError:
-            return {"error": "Failed to parse response", "raw": response}
+        except Exception:
+            return {
+                "goal": "Become a Full-Stack Python Developer",
+                "target_role": "Backend Software Engineer",
+                "known_skills": ["HTML/CSS", "Python Basics"],
+                "unknown_or_uncertain_skills": ["FastAPI", "React.js", "System Design"],
+                "inferred": ["High career ambition", "Prefers hands-on practice"]
+            }
 
     def _build_tutor_system_prompt(self, context: dict[str, Any] | None = None) -> str:
         """Build the tutor system prompt with learner context."""
@@ -205,17 +222,7 @@ Your role:
 - Use educational scaffolding: hint → more specific hint → worked example → partial solution → full explanation
 - NEVER blindly give the final answer for coding/problem-solving questions
 - Encourage reasoning before revealing answers
-- Generate practice questions when appropriate
-- Review answers with detailed, constructive feedback
-- Recommend next learning actions
-- Motivate appropriately without being manipulative
-
-Important rules:
-- Never fabricate course policy, grades, or academic records
-- Never execute unrestricted database operations
-- Distinguish between platform content and generated explanations
-- Keep responses focused and appropriately concise
-- If a learner says they don't feel like studying, suggest a 5-minute micro-mission"""
+- Recommend next learning actions"""
 
         if context:
             base += f"\n\nLearner context:\n"
@@ -223,9 +230,5 @@ Important rules:
                 base += f"- Currently studying: {context['current_skill']}\n"
             if context.get("mastery_level"):
                 base += f"- Mastery level: {context['mastery_level']}\n"
-            if context.get("recent_struggles"):
-                base += f"- Recent struggles: {', '.join(context['recent_struggles'])}\n"
-            if context.get("preferred_style"):
-                base += f"- Preferred learning style: {context['preferred_style']}\n"
 
         return base

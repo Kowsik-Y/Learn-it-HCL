@@ -4,7 +4,6 @@ Identity Module — Pydantic Schemas
 Request/response schemas for authentication and user management.
 """
 
-import uuid
 from datetime import datetime
 from typing import Optional
 
@@ -49,11 +48,11 @@ class UpdateProfileRequest(BaseModel):
 # ── Response Schemas ─────────────────────────────────────────
 
 class UserResponse(BaseModel):
-    id: uuid.UUID
+    id: str
     email: str
     full_name: str
     role: str
-    tenant_id: uuid.UUID
+    tenant_id: str
     is_active: bool
     is_verified: bool
     avatar_url: Optional[str] = None
@@ -77,7 +76,7 @@ class UserProfileResponse(BaseModel):
 
 
 class OrganizationResponse(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
     slug: str
     tenant_type: str

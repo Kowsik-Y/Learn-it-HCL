@@ -2,16 +2,16 @@
 Identity Module — SQLAlchemy Models
 
 Users, organizations (tenants), roles, and audit logs.
+Compatible with both PostgreSQL and SQLite.
 """
 
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Boolean, ForeignKey, Text, DateTime, text, Index
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+from sqlalchemy import String, Boolean, ForeignKey, Text, DateTime, Index, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base, TimestampMixin, TenantMixin
+from app.database import Base, TimestampMixin
 
 
 class Organization(Base, TimestampMixin):
@@ -19,8 +19,8 @@ class Organization(Base, TimestampMixin):
 
     __tablename__ = "organizations"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
@@ -30,7 +30,7 @@ class Organization(Base, TimestampMixin):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    settings: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    settings: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     # Relationships
     users: Mapped[list["User"]] = relationship(back_populates="organization")
@@ -41,11 +41,11 @@ class User(Base, TimestampMixin):
 
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    tenant_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True),
+    tenant_id: Mapped[str] = mapped_column(
+        String(36),
         ForeignKey("organizations.id"),
         nullable=False,
         index=True,
@@ -60,7 +60,7 @@ class User(Base, TimestampMixin):
     last_login_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
-    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_: Mapped[dict | None] = mapped_column("metadata", JSON, nullable=True)
 
     # Relationships
     organization: Mapped["Organization"] = relationship(back_populates="users")
@@ -76,25 +76,24 @@ class AuditLog(Base):
 
     __tablename__ = "audit_logs"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
-    tenant_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), nullable=False, index=True
+    tenant_id: Mapped[str] = mapped_column(
+        String(36), nullable=False, index=True
     )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        PG_UUID(as_uuid=True), nullable=False, index=True
+    user_id: Mapped[str] = mapped_column(
+        String(36), nullable=False, index=True
     )
     action: Mapped[str] = mapped_column(String(100), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(100), nullable=False)
     resource_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    details: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        server_default=text("NOW()"),
         nullable=False,
     )
 

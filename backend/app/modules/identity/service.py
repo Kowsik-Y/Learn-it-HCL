@@ -53,7 +53,7 @@ class IdentityService:
 
         # Create user
         user = User(
-            id=uuid.uuid4(),
+            id=str(uuid.uuid4()),
             tenant_id=org.id,
             email=data.email,
             hashed_password=hash_password(data.password),
@@ -104,7 +104,7 @@ class IdentityService:
         if not user_id:
             raise AuthenticationError("Invalid token payload")
 
-        stmt = select(User).where(User.id == uuid.UUID(user_id))
+        stmt = select(User).where(User.id == user_id)
         result = await self.db.execute(stmt)
         user = result.scalar_one_or_none()
 
@@ -113,7 +113,7 @@ class IdentityService:
 
         return self._create_tokens(user)
 
-    async def get_profile(self, user_id: uuid.UUID) -> UserProfileResponse:
+    async def get_profile(self, user_id: str) -> UserProfileResponse:
         """Get full user profile with permissions and organization."""
         stmt = select(User).where(User.id == user_id)
         result = await self.db.execute(stmt)
@@ -136,7 +136,7 @@ class IdentityService:
         )
 
     async def get_user_by_id(
-        self, user_id: uuid.UUID, tenant_id: uuid.UUID | None = None
+        self, user_id: str, tenant_id: str | None = None
     ) -> User:
         """Get a user by ID with optional tenant validation."""
         stmt = select(User).where(User.id == user_id)
@@ -159,7 +159,7 @@ class IdentityService:
 
         if not org:
             org = Organization(
-                id=uuid.uuid4(),
+                id=str(uuid.uuid4()),
                 name=org_name,
                 slug=slug,
                 tenant_type="standalone",
