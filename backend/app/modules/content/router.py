@@ -60,7 +60,7 @@ async def list_courses(
 
 @router.get("/courses/{course_id}")
 async def get_course(
-    course_id: uuid.UUID,
+    course_id: str,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
@@ -99,7 +99,7 @@ async def get_course(
 
 @router.get("/lessons/{lesson_id}")
 async def get_lesson(
-    lesson_id: uuid.UUID,
+    lesson_id: str,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):

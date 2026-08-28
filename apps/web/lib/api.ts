@@ -87,10 +87,16 @@ class ApiClient {
     }
 
     if (!res.ok) {
-      const error: ApiError = await res.json().catch(() => ({
-        error: { code: 'UNKNOWN', message: 'An error occurred', request_id: 'unknown' },
-      }));
-      throw new Error(error.error.message);
+      const errorData = await res.json().catch(() => ({}));
+      let errorMessage = 'An error occurred';
+      if (errorData?.error?.message) {
+        errorMessage = errorData.error.message;
+      } else if (errorData?.detail) {
+        errorMessage = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+      throw new Error(errorMessage);
     }
 
     return res.json();

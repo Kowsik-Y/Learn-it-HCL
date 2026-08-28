@@ -65,7 +65,7 @@ async def list_skills(
 
 @router.get("/{skill_id}")
 async def get_skill(
-    skill_id: uuid.UUID,
+    skill_id: str,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
@@ -128,7 +128,7 @@ async def list_career_roles(
 
 @router.get("/career-roles/{role_id}/skills")
 async def get_role_skills(
-    role_id: uuid.UUID,
+    role_id: str,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):

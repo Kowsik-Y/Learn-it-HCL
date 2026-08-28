@@ -60,7 +60,7 @@ async def start_assessment(
     db: AsyncSession = Depends(get_db),
 ):
     """Start an assessment attempt and get the first question."""
-    assessment_id = uuid.UUID(data.assessment_id)
+    assessment_id = data.assessment_id
 
     # Create attempt
     attempt = AssessmentAttempt(
@@ -88,14 +88,14 @@ async def start_assessment(
 
 @router.post("/submit/{attempt_id}")
 async def submit_answer(
-    attempt_id: uuid.UUID,
+    attempt_id: str,
     data: SubmitAnswerRequest,
     current_user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
     """Submit an answer for a question in an assessment."""
     # Get the question
-    stmt = select(Question).where(Question.id == uuid.UUID(data.question_id))
+    stmt = select(Question).where(Question.id == data.question_id)
     result = await db.execute(stmt)
     question = result.scalar_one_or_none()
 
@@ -111,7 +111,7 @@ async def submit_answer(
         for skill_id in question.skill_ids:
             await mastery_service.record_evidence(
                 learner_id=current_user.id,
-                skill_id=uuid.UUID(skill_id),
+                skill_id=skill_id,
                 tenant_id=current_user.tenant_id,
                 evidence_type="assessment",
                 source_id=question.id,
