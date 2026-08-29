@@ -1,0 +1,7 @@
+[
+  { "id": "courses:read", "label": "View Courses" },
+  { "id": "courses:write", "label": "Manage Courses" },
+  { "id": "users:read", "label": "View Users" },
+  { "id": "users:write", "label": "Manage Users" },
+  { "id": "assessments:manage", "label": "Manage Assessments" }
+]

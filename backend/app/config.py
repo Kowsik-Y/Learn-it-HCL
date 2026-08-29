@@ -1,8 +1,8 @@
 """
-Learn-it HCL — Application Configuration
+Learn-it HCL — ML Service Configuration
 
-Centralized Pydantic settings for the entire backend.
-All configuration is loaded from environment variables.
+Centralized Pydantic settings for the ML microservice.
+Auth/CORS config removed (handled by Next.js gateway).
 """
 
 from functools import lru_cache
@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
+    """ML service settings loaded from environment variables."""
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -27,46 +27,26 @@ class Settings(BaseSettings):
     app_env: Literal["development", "staging", "production"] = "development"
     app_debug: bool = True
     app_host: str = "0.0.0.0"
-    app_port: int = 8000
+    app_port: int = 8001  # Different port from Next.js (3000)
 
-    # ── Database ─────────────────────────────────────────
-    database_url: str = "postgresql+asyncpg://learnit:learnit_dev@localhost:5432/learnit"
-    database_url_sync: str = "postgresql://learnit:learnit_dev@localhost:5432/learnit"
-    db_pool_size: int = 20
-    db_max_overflow: int = 10
+    # ── Database (read-only for recommendation engine) ───
+    database_url: str
+    database_url_sync: str
+    db_pool_size: int = 10
+    db_max_overflow: int = 5
     db_pool_recycle: int = 3600
 
-    # ── Redis ────────────────────────────────────────────
-    redis_url: str = "redis://localhost:6379/0"
-
-    # ── JWT ──────────────────────────────────────────────
-    jwt_secret_key: str = "change-this-to-a-random-secret-in-production"
-    jwt_algorithm: str = "HS256"
-    jwt_access_token_expire_minutes: int = 30
-    jwt_refresh_token_expire_days: int = 7
-
-    # ── CORS ─────────────────────────────────────────────
-    cors_origins: str = "http://localhost:3000,http://localhost:3001"
-
-    @property
-    def cors_origin_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",")]
-
     # ── AI Providers ─────────────────────────────────────
-    openai_api_key: str = ""
-    anthropic_api_key: str = ""
-    google_ai_api_key: str = ""
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
+    google_ai_api_key: str | None = None
     ai_default_provider: str = "openai"
     ai_default_model: str = "gpt-4o-mini"
-    local_model_base_url: str = "http://localhost:11434/v1"
+    local_model_base_url: str | None = None
 
     # ── Feature Flags ────────────────────────────────────
     ff_ai_tutor: bool = True
-    ff_gamification: bool = True
     ff_adaptive_diagnostics: bool = True
-    ff_career_path_mode: bool = True
-    ff_attendance: bool = True
-    ff_short_video_mode: bool = True
 
     @property
     def is_production(self) -> bool:

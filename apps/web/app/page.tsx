@@ -36,11 +36,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Navigation ──────────────────────────── */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 transition-all duration-300 ${
-          scrolled
+        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 transition-all duration-300 ${scrolled
             ? "bg-background/90 backdrop-blur-xl border-b border-border"
             : "bg-transparent"
-        }`}
+          }`}
       >
         <Link href="/" className="flex items-center gap-2.5">
           <Brain className="h-6 w-6 text-primary" />
@@ -53,7 +52,7 @@ export default function LandingPage() {
           <Link href="/login">
             <Button variant="ghost">Sign In</Button>
           </Link>
-          <Link href="/register">
+          <Link href="/request-access">
             <Button>Get Started</Button>
           </Link>
         </div>
@@ -70,7 +69,7 @@ export default function LandingPage() {
             AI-powered adaptive learning
           </Badge>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold   leading-[1.1] mb-6">
             Learn exactly what{" "}
             <span className="text-primary">
               you need
@@ -87,13 +86,10 @@ export default function LandingPage() {
           </p>
 
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/register">
+            <Link href="/request-access">
               <Button size="lg" className="gap-2">
-                Start Learning Free <ArrowRight className="h-4 w-4" />
+                Request Access <ArrowRight className="h-4 w-4" />
               </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button size="lg" variant="outline">View Demo</Button>
             </Link>
           </div>
         </div>
@@ -172,9 +168,9 @@ export default function LandingPage() {
             <p className="text-muted-foreground mb-8">
               Tell the AI your goal. It handles the rest.
             </p>
-            <Link href="/register">
+            <Link href="/request-access">
               <Button size="lg" className="gap-2">
-                Get Started Free <ArrowRight className="h-4 w-4" />
+                Request Access <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </CardContent>

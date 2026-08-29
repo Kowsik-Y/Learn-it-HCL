@@ -1,12 +1,11 @@
-"""AI Assistant Module — Router for tutor, onboarding, and recommendations."""
+"""AI Assistant Module — Router for tutor, onboarding (ML service)."""
 
 from typing import Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.modules.identity.dependencies import CurrentUser
 from app.modules.ai_assistant.service import AIService
 
 router = APIRouter()
@@ -29,7 +28,7 @@ class OnboardingChatRequest(BaseModel):
 @router.post("/tutor/chat")
 async def tutor_chat(
     data: TutorChatRequest,
-    current_user: CurrentUser,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     """Chat with the AI tutor. Uses educational scaffolding."""
@@ -52,7 +51,7 @@ async def tutor_chat(
 @router.post("/onboarding/chat")
 async def onboarding_chat(
     data: OnboardingChatRequest,
-    current_user: CurrentUser,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     """AI-guided onboarding conversation. Returns follow-up or extracted data."""
@@ -97,12 +96,8 @@ Do NOT force users through a giant form."""
 
 
 @router.post("/explain-recommendation")
-async def explain_recommendation(
-    current_user: CurrentUser,
-):
+async def explain_recommendation(request: Request):
     """Explain why a specific resource was recommended (or not)."""
-    # This is handled by the recommendation engine's explanation generator
-    # The AI assistant can provide a natural-language version
     return {
         "message": "Recommendation explanations come from the recommendation engine's evidence system, not from AI generation. See the 'reasons' field in any recommendation response."
     }

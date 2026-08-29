@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from typing import AsyncGenerator
 
 from sqlalchemy import MetaData, DateTime, String, Boolean, text, event
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -37,6 +38,18 @@ convention = {
 metadata = MetaData(naming_convention=convention)
 
 is_sqlite = settings.database_url.startswith("sqlite")
+
+
+def UUIDType() -> postgresql.UUID | String:
+    """Return the appropriate UUID column type for the current database.
+
+    - PostgreSQL: native UUID type, so asyncpg sends correct wire type.
+    - SQLite:     String(36) fallback (stores as text).
+    """
+    if is_sqlite:
+        return String(36)
+    return postgresql.UUID(as_uuid=False)
+
 
 engine_kwargs: dict = {}
 if is_sqlite:
@@ -96,7 +109,7 @@ class TenantMixin:
     """Mixin that adds tenant_id for row-level multi-tenancy."""
 
     tenant_id: Mapped[str] = mapped_column(
-        String(36),
+        UUIDType(),
         nullable=False,
         index=True,
     )

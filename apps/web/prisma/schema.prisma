@@ -1,0 +1,609 @@
+// Learn-it HCL — Prisma Schema
+// Matches the existing SQLAlchemy models from the Python backend.
+// Generated to work with the same PostgreSQL database.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Identity ─────────────────────────────────────────────
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(255)
+  slug        String   @unique @db.VarChar(100)
+  tenantType  String   @default("standalone") @map("tenant_type") @db.VarChar(50)
+  description String?  @db.Text
+  logoUrl     String?  @map("logo_url") @db.VarChar(500)
+  isActive    Boolean  @default(true) @map("is_active")
+  settings    Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  users User[]
+
+  @@index([slug])
+  @@map("organizations")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  tenantId       String    @map("tenant_id")
+  email          String    @db.VarChar(255)
+  hashedPassword String    @map("hashed_password") @db.VarChar(255)
+  fullName       String    @map("full_name") @db.VarChar(255)
+  role           String    @default("student") @db.VarChar(50)
+  isActive       Boolean   @default(true) @map("is_active")
+  isVerified     Boolean   @default(false) @map("is_verified")
+  avatarUrl      String?   @map("avatar_url") @db.VarChar(500)
+  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz
+  metadata       Json?
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  organization Organization @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, email], map: "ix_users_tenant_email")
+  @@index([tenantId])
+  @@index([tenantId, role], map: "ix_users_tenant_role")
+  @@map("users")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  userId       String   @map("user_id")
+  action       String   @db.VarChar(100)
+  resourceType String   @map("resource_type") @db.VarChar(100)
+  resourceId   String?  @map("resource_id") @db.VarChar(100)
+  details      Json?
+  ipAddress    String?  @map("ip_address") @db.VarChar(45)
+  userAgent    String?  @map("user_agent") @db.VarChar(500)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([tenantId, createdAt], map: "ix_audit_tenant_created")
+  @@map("audit_logs")
+}
+
+model CustomRole {
+  id          String   @id @default(uuid())
+  tenantId    String?  @map("tenant_id") // Null means global system role (created by super admin), otherwise scoped to org
+  name        String   @db.VarChar(100)
+  slug        String   @db.VarChar(100)
+  permissions Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([tenantId, slug], map: "ix_custom_roles_tenant_slug")
+  @@map("custom_roles")
+}
+
+model AccessRequest {
+  id        String   @id @default(uuid())
+  fullName  String   @map("full_name") @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  company   String?  @db.VarChar(255)
+  reason    String   @db.Text
+  status    String   @default("pending") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("access_requests")
+}
+
+// ── Learners ─────────────────────────────────────────────
+
+model LearnerProfile {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique @map("user_id")
+  tenantId               String   @map("tenant_id")
+  ageRange               String?  @map("age_range") @db.VarChar(20)
+  language               String   @default("en") @db.VarChar(10)
+  timezone               String   @default("UTC") @db.VarChar(50)
+  locale                 String   @default("en-US") @db.VarChar(10)
+  bio                    String?  @db.Text
+  education              Json?
+  professionalExperience Json?    @map("professional_experience")
+  onboardingCompleted    Boolean  @default(false) @map("onboarding_completed")
+  onboardingData         Json?    @map("onboarding_data")
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  preferences LearnerPreferences?
+  goals       LearnerGoal[]
+
+  @@index([userId], map: "ix_learner_profiles_user")
+  @@map("learner_profiles")
+}
+
+model LearnerPreferences {
+  id                            String   @id @default(uuid())
+  learnerId                     String   @unique @map("learner_id")
+  tenantId                      String   @map("tenant_id")
+  preferredContentType          String   @default("mixed") @map("preferred_content_type") @db.VarChar(50)
+  preferredStudyDurationMinutes Int      @default(30) @map("preferred_study_duration_minutes")
+  availableDays                 Json?    @map("available_days")
+  preferredDifficulty           String   @default("adaptive") @map("preferred_difficulty") @db.VarChar(50)
+  preferredLearningTime         String?  @map("preferred_learning_time") @db.VarChar(50)
+  preferredLanguage             String   @default("en") @map("preferred_language") @db.VarChar(10)
+  learningStyle                 String   @default("mixed") @map("learning_style") @db.VarChar(50)
+  projectOriented               Boolean  @default(true) @map("project_oriented")
+  mentorSupported               Boolean  @default(false) @map("mentor_supported")
+  createdAt                     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  learnerProfile LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  @@map("learner_preferences")
+}
+
+model LearnerGoal {
+  id                 String   @id @default(uuid())
+  learnerId          String   @map("learner_id")
+  tenantId           String   @map("tenant_id")
+  title              String   @db.VarChar(500)
+  description        String?  @db.Text
+  goalType           String   @default("career") @map("goal_type") @db.VarChar(50)
+  targetRole         String?  @map("target_role") @db.VarChar(255)
+  targetRoleId       String?  @map("target_role_id")
+  timeHorizonWeeks   Int?     @map("time_horizon_weeks")
+  hoursPerWeek       Int?     @map("hours_per_week")
+  knownSkills        Json?    @map("known_skills")
+  unknownSkills      Json?    @map("unknown_skills")
+  isActive           Boolean  @default(true) @map("is_active")
+  progressPercentage Float    @default(0) @map("progress_percentage")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  learnerProfile LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  @@index([learnerId], map: "ix_learner_goals_learner")
+  @@map("learner_goals")
+}
+
+// ── Skills ───────────────────────────────────────────────
+
+model Skill {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  name            String   @db.VarChar(255)
+  slug            String   @db.VarChar(255)
+  description     String?  @db.Text
+  category        String   @default("general") @db.VarChar(100)
+  parentSkillId   String?  @map("parent_skill_id")
+  difficultyLevel Int      @default(1) @map("difficulty_level")
+  isActive        Boolean  @default(true) @map("is_active")
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  parent   Skill?  @relation("SkillHierarchy", fields: [parentSkillId], references: [id])
+  children Skill[] @relation("SkillHierarchy")
+
+  sourceRelationships SkillRelationship[] @relation("SourceSkill")
+  targetRelationships SkillRelationship[] @relation("TargetSkill")
+  roleSkills          RoleSkill[]
+
+  @@unique([tenantId, slug], map: "ix_skills_tenant_slug")
+  @@index([tenantId, category], map: "ix_skills_tenant_category")
+  @@map("skills")
+}
+
+model SkillRelationship {
+  id               String @id @default(uuid())
+  tenantId         String @map("tenant_id")
+  sourceSkillId    String @map("source_skill_id")
+  targetSkillId    String @map("target_skill_id")
+  relationshipType String @map("relationship_type") @db.VarChar(50)
+  strength         Float  @default(1.0)
+
+  sourceSkill Skill @relation("SourceSkill", fields: [sourceSkillId], references: [id])
+  targetSkill Skill @relation("TargetSkill", fields: [targetSkillId], references: [id])
+
+  @@index([sourceSkillId], map: "ix_skillrel_source")
+  @@index([targetSkillId], map: "ix_skillrel_target")
+  @@index([tenantId, relationshipType], map: "ix_skillrel_tenant_type")
+  @@map("skill_relationships")
+}
+
+model CareerRole {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  name        String   @db.VarChar(255)
+  slug        String   @db.VarChar(255)
+  description String?  @db.Text
+  category    String   @default("engineering") @db.VarChar(100)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  roleSkills RoleSkill[]
+
+  @@unique([tenantId, slug], map: "ix_career_roles_tenant_slug")
+  @@map("career_roles")
+}
+
+model RoleSkill {
+  id             String @id @default(uuid())
+  tenantId       String @map("tenant_id")
+  careerRoleId   String @map("career_role_id")
+  skillId        String @map("skill_id")
+  importance     String @default("important") @db.VarChar(50)
+  minimumMastery Float  @default(0.7) @map("minimum_mastery")
+
+  careerRole CareerRole @relation(fields: [careerRoleId], references: [id])
+  skill      Skill      @relation(fields: [skillId], references: [id])
+
+  @@index([careerRoleId], map: "ix_roleskills_role")
+  @@index([skillId], map: "ix_roleskills_skill")
+  @@map("role_skills")
+}
+
+// ── Content ──────────────────────────────────────────────
+
+model Course {
+  id                     String   @id @default(uuid())
+  tenantId               String   @map("tenant_id")
+  title                  String   @db.VarChar(500)
+  slug                   String   @db.VarChar(255)
+  description            String?  @db.Text
+  shortDescription       String?  @map("short_description") @db.VarChar(500)
+  thumbnailUrl           String?  @map("thumbnail_url") @db.VarChar(500)
+  difficultyLevel        String   @default("beginner") @map("difficulty_level") @db.VarChar(50)
+  estimatedDurationHours Float    @default(0) @map("estimated_duration_hours")
+  language               String   @default("en") @db.VarChar(10)
+  tags                   Json?
+  isPublished            Boolean  @default(false) @map("is_published")
+  isFree                 Boolean  @default(true) @map("is_free")
+  enrollmentCount        Int      @default(0) @map("enrollment_count")
+  rating                 Float    @default(0)
+  version                Int      @default(1)
+  metadata               Json?
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  modules Module[]
+
+  @@unique([tenantId, slug], map: "ix_courses_tenant_slug")
+  @@index([tenantId, isPublished], map: "ix_courses_tenant_published")
+  @@map("courses")
+}
+
+model Module {
+  id                       String   @id @default(uuid())
+  tenantId                 String   @map("tenant_id")
+  courseId                 String   @map("course_id")
+  title                    String   @db.VarChar(500)
+  description              String?  @db.Text
+  orderIndex               Int      @default(0) @map("order_index")
+  estimatedDurationMinutes Int      @default(0) @map("estimated_duration_minutes")
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  course   Course    @relation(fields: [courseId], references: [id])
+  chapters Chapter[]
+
+  @@index([courseId], map: "ix_modules_course")
+  @@map("modules")
+}
+
+model Chapter {
+  id                       String   @id @default(uuid())
+  tenantId                 String   @map("tenant_id")
+  moduleId                 String   @map("module_id")
+  title                    String   @db.VarChar(500)
+  description              String?  @db.Text
+  orderIndex               Int      @default(0) @map("order_index")
+  estimatedDurationMinutes Int      @default(0) @map("estimated_duration_minutes")
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  module  Module   @relation(fields: [moduleId], references: [id])
+  lessons Lesson[]
+
+  @@index([moduleId], map: "ix_chapters_module")
+  @@map("chapters")
+}
+
+model Lesson {
+  id                       String   @id @default(uuid())
+  tenantId                 String   @map("tenant_id")
+  chapterId                String   @map("chapter_id")
+  title                    String   @db.VarChar(500)
+  description              String?  @db.Text
+  contentType              String   @default("article") @map("content_type") @db.VarChar(50)
+  contentUrl               String?  @map("content_url") @db.VarChar(1000)
+  contentBody              String?  @map("content_body") @db.Text
+  orderIndex               Int      @default(0) @map("order_index")
+  estimatedDurationMinutes Int      @default(10) @map("estimated_duration_minutes")
+  difficultyLevel          String   @default("beginner") @map("difficulty_level") @db.VarChar(50)
+  learningObjectives       Json?    @map("learning_objectives")
+  skillIds                 Json?    @map("skill_ids")
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  chapter Chapter @relation(fields: [chapterId], references: [id])
+
+  @@index([chapterId], map: "ix_lessons_chapter")
+  @@index([tenantId, contentType], map: "ix_lessons_content_type")
+  @@map("lessons")
+}
+
+model Resource {
+  id                       String   @id @default(uuid())
+  tenantId                 String   @map("tenant_id")
+  title                    String   @db.VarChar(500)
+  description              String?  @db.Text
+  resourceType             String   @map("resource_type") @db.VarChar(50)
+  url                      String?  @db.VarChar(1000)
+  content                  String?  @db.Text
+  skillIds                 Json?    @map("skill_ids")
+  difficultyLevel          String   @default("beginner") @map("difficulty_level") @db.VarChar(50)
+  estimatedDurationMinutes Int      @default(10) @map("estimated_duration_minutes")
+  qualityScore             Float    @default(0.5) @map("quality_score")
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("resources")
+}
+
+model Project {
+  id                     String   @id @default(uuid())
+  tenantId               String   @map("tenant_id")
+  title                  String   @db.VarChar(500)
+  description            String?  @db.Text
+  difficultyLevel        String   @default("beginner") @map("difficulty_level") @db.VarChar(50)
+  skillIds               Json?    @map("skill_ids")
+  estimatedDurationHours Float    @default(1.0) @map("estimated_duration_hours")
+  projectType            String   @default("mini") @map("project_type") @db.VarChar(50)
+  instructions           String?  @db.Text
+  starterCode            String?  @map("starter_code") @db.Text
+  evaluationCriteria     Json?    @map("evaluation_criteria")
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("projects")
+}
+
+// ── Assessments ──────────────────────────────────────────
+
+model Assessment {
+  id               String   @id @default(uuid())
+  tenantId         String   @map("tenant_id")
+  title            String   @db.VarChar(500)
+  description      String?  @db.Text
+  assessmentType   String   @default("quiz") @map("assessment_type") @db.VarChar(50)
+  skillIds         Json?    @map("skill_ids")
+  timeLimitMinutes Int?     @map("time_limit_minutes")
+  passingScore     Float    @default(0.7) @map("passing_score")
+  maxAttempts      Int      @default(3) @map("max_attempts")
+  isAdaptive       Boolean  @default(false) @map("is_adaptive")
+  questionCount    Int      @default(10) @map("question_count")
+  isPublished      Boolean  @default(true) @map("is_published")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  questions Question[]
+  attempts  AssessmentAttempt[]
+
+  @@map("assessments")
+}
+
+model Question {
+  id                   String   @id @default(uuid())
+  tenantId             String   @map("tenant_id")
+  assessmentId         String?  @map("assessment_id")
+  content              String   @db.Text
+  questionType         String   @default("multiple_choice") @map("question_type") @db.VarChar(50)
+  difficultyLevel      Int      @default(1) @map("difficulty_level")
+  skillIds             Json?    @map("skill_ids")
+  bloomsLevel          String   @default("remember") @map("blooms_level") @db.VarChar(50)
+  estimatedTimeSeconds Int      @default(60) @map("estimated_time_seconds")
+  explanation          String?  @db.Text
+  hints                Json?
+  correctAnswer        String?  @map("correct_answer") @db.Text
+  options              Json?
+  orderIndex           Int      @default(0) @map("order_index")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  assessment Assessment? @relation(fields: [assessmentId], references: [id])
+
+  @@index([assessmentId], map: "ix_questions_assessment")
+  @@index([tenantId, difficultyLevel], map: "ix_questions_difficulty")
+  @@map("questions")
+}
+
+model AssessmentAttempt {
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  assessmentId     String    @map("assessment_id")
+  learnerId        String    @map("learner_id")
+  score            Float     @default(0)
+  maxScore         Float     @default(0) @map("max_score")
+  percentage       Float     @default(0)
+  status           String    @default("in_progress") @db.VarChar(50)
+  startedAt        DateTime  @map("started_at") @db.Timestamptz
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz
+  timeSpentSeconds Int       @default(0) @map("time_spent_seconds")
+  responses        Json?
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id])
+
+  @@index([learnerId], map: "ix_attempts_learner")
+  @@index([assessmentId], map: "ix_attempts_assessment")
+  @@map("assessment_attempts")
+}
+
+// ── Mastery ──────────────────────────────────────────────
+
+model MasteryState {
+  id                 String    @id @default(uuid())
+  tenantId           String    @map("tenant_id")
+  learnerId          String    @map("learner_id")
+  skillId            String    @map("skill_id")
+  masteryScore       Float     @default(0.0) @map("mastery_score")
+  confidence         Float     @default(0.0)
+  evidenceCount      Int       @default(0) @map("evidence_count")
+  lastAssessedAt     DateTime? @map("last_assessed_at") @db.Timestamptz
+  lastPracticedAt    DateTime? @map("last_practiced_at") @db.Timestamptz
+  retentionEstimate  Float     @default(1.0) @map("retention_estimate")
+  difficultyEstimate Float     @default(0.5) @map("difficulty_estimate")
+  status             String    @default("not_started") @db.VarChar(50)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  evidence MasteryEvidence[]
+
+  @@unique([learnerId, skillId], map: "ix_mastery_learner_skill")
+  @@index([tenantId, learnerId], map: "ix_mastery_tenant_learner")
+  @@map("mastery_states")
+}
+
+model MasteryEvidence {
+  id             String   @id @default(uuid())
+  tenantId       String   @map("tenant_id")
+  masteryStateId String   @map("mastery_state_id")
+  evidenceType   String   @map("evidence_type") @db.VarChar(50)
+  sourceId       String   @map("source_id")
+  score          Float
+  maxScore       Float    @default(1.0) @map("max_score")
+  weight         Float    @default(1.0)
+  metadata       Json?
+  createdAt      DateTime @map("created_at") @db.Timestamptz
+
+  masteryState MasteryState @relation(fields: [masteryStateId], references: [id])
+
+  @@index([masteryStateId], map: "ix_evidence_mastery")
+  @@map("mastery_evidence")
+}
+
+// ── Gamification ─────────────────────────────────────────
+
+model XPEvent {
+  id             String   @id @default(uuid())
+  tenantId       String   @map("tenant_id")
+  learnerId      String   @map("learner_id")
+  amount         Int
+  reason         String   @db.VarChar(500)
+  sourceType     String   @map("source_type") @db.VarChar(100)
+  sourceId       String   @map("source_id")
+  idempotencyKey String?  @unique @map("idempotency_key") @db.VarChar(255)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([learnerId], map: "ix_xp_learner")
+  @@index([tenantId, learnerId], map: "ix_xp_tenant_learner")
+  @@map("xp_events")
+}
+
+model Streak {
+  id               String    @id @default(uuid())
+  tenantId         String    @map("tenant_id")
+  learnerId        String    @unique @map("learner_id")
+  currentCount     Int       @default(0) @map("current_count")
+  longestCount     Int       @default(0) @map("longest_count")
+  lastActivityDate DateTime? @map("last_activity_date") @db.Date
+  freezeCount      Int       @default(1) @map("freeze_count")
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("streaks")
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  iconUrl     String?  @map("icon_url") @db.VarChar(500)
+  category    String   @default("skill") @db.VarChar(100)
+  criteria    Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  learnerBadges LearnerBadge[]
+
+  @@map("badges")
+}
+
+model LearnerBadge {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  learnerId String   @map("learner_id")
+  badgeId   String   @map("badge_id")
+  earnedAt  DateTime @map("earned_at") @db.Timestamptz
+  reason    String?  @db.VarChar(500)
+
+  badge Badge @relation(fields: [badgeId], references: [id])
+
+  @@index([learnerId], map: "ix_learner_badges_learner")
+  @@map("learner_badges")
+}
+
+model Quest {
+  id                 String    @id @default(uuid())
+  tenantId           String    @map("tenant_id")
+  learnerId          String    @map("learner_id")
+  title              String    @db.VarChar(500)
+  description        String?   @db.Text
+  questType          String    @default("daily") @map("quest_type") @db.VarChar(50)
+  tasks              Json?
+  xpReward           Int       @default(50) @map("xp_reward")
+  badgeRewardId      String?   @map("badge_reward_id")
+  progressPercentage Float     @default(0) @map("progress_percentage")
+  isCompleted        Boolean   @default(false) @map("is_completed")
+  expiresAt          DateTime? @map("expires_at") @db.Timestamptz
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([learnerId], map: "ix_quests_learner")
+  @@map("quests")
+}
+
+// ── Attendance ───────────────────────────────────────────
+
+model AttendanceSession {
+  id                 String    @id @default(uuid())
+  tenantId           String    @map("tenant_id")
+  courseId           String?   @map("course_id")
+  teacherId          String    @map("teacher_id")
+  title              String    @db.VarChar(500)
+  sessionDate        String    @map("session_date") @db.VarChar(20)
+  startTime          DateTime  @map("start_time") @db.Timestamptz
+  endTime            DateTime  @map("end_time") @db.Timestamptz
+  status             String    @default("scheduled") @db.VarChar(50)
+  verificationMethod String    @default("otp") @map("verification_method") @db.VarChar(50)
+  otpCode            String?   @map("otp_code") @db.VarChar(10)
+  otpExpiresAt       DateTime? @map("otp_expires_at") @db.Timestamptz
+  qrToken            String?   @map("qr_token") @db.VarChar(255)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([tenantId, sessionDate], map: "ix_att_sess_tenant_date")
+  @@map("attendance_sessions")
+}
+
+model AttendanceRecord {
+  id                 String    @id @default(uuid())
+  tenantId           String    @map("tenant_id")
+  sessionId          String    @map("session_id")
+  studentId          String    @map("student_id")
+  status             String    @default("absent") @db.VarChar(50)
+  checkInTime        DateTime? @map("check_in_time") @db.Timestamptz
+  verificationMethod String    @default("otp") @map("verification_method") @db.VarChar(50)
+  deviceId           String?   @map("device_id") @db.VarChar(255)
+  isVerified         Boolean   @default(false) @map("is_verified")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([sessionId], map: "ix_att_rec_session")
+  @@index([studentId], map: "ix_att_rec_student")
+  @@map("attendance_records")
+}

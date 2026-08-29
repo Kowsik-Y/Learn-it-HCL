@@ -1,11 +1,10 @@
-"""Recommendations Module — Router."""
+"""Recommendations Module — Router (ML service)."""
 
 from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.modules.identity.dependencies import CurrentUser
 from app.modules.recommendations.engine import RecommendationEngine
 
 router = APIRouter()
@@ -13,16 +12,19 @@ router = APIRouter()
 
 @router.get("/")
 async def get_recommendations(
-    current_user: CurrentUser,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     max_results: int = Query(10, ge=1, le=50),
     available_minutes: Optional[int] = None,
 ):
     """Get personalized recommendations for the current learner."""
+    user_id = request.state.user_id
+    tenant_id = request.state.tenant_id
+
     engine = RecommendationEngine(db)
     results = await engine.generate_recommendations(
-        learner_id=current_user.id,
-        tenant_id=current_user.tenant_id,
+        learner_id=user_id,
+        tenant_id=tenant_id,
         max_results=max_results,
         available_minutes=available_minutes,
     )
@@ -48,15 +50,18 @@ async def get_recommendations(
 
 @router.get("/daily-mission")
 async def get_daily_mission(
-    current_user: CurrentUser,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     available_minutes: int = Query(30, ge=5, le=120),
 ):
     """Generate today's personalized learning mission."""
+    user_id = request.state.user_id
+    tenant_id = request.state.tenant_id
+
     engine = RecommendationEngine(db)
     results = await engine.generate_recommendations(
-        learner_id=current_user.id,
-        tenant_id=current_user.tenant_id,
+        learner_id=user_id,
+        tenant_id=tenant_id,
         max_results=4,
         available_minutes=available_minutes,
     )

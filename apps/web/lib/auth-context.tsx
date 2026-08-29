@@ -62,7 +62,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(accessToken);
     setUser(userData);
 
-    router.push("/dashboard");
+    if (userData.role === "super_admin") {
+      router.push("/admin/users");
+    } else if (userData.role === "org_admin") {
+      router.push("/org/users");
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   const register = async (data: { email: string; password: string; full_name: string }) => {

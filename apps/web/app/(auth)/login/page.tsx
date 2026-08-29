@@ -5,8 +5,14 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Brain, Mail, Lock, Loader2 } from "lucide-react";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { 
+  InputGroup, 
+  InputGroupAddon, 
+  InputGroupInput,
+  InputGroupText
+} from "@/components/ui/input-group";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -35,61 +41,63 @@ export default function LoginPage() {
           <CardDescription>Sign in to your Learn-it account</CardDescription>
         </CardHeader>
         <CardContent className="pt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit}>
             {error && (
-              <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive font-medium">
+              <div className="mb-4 rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive font-medium">
                 {error}
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-muted-foreground uppercase" htmlFor="email">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="pl-9"
-                  required
-                />
-              </div>
-            </div>
+            <FieldGroup>
+              <Field>
+                <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase" htmlFor="email">
+                  Email Address
+                </FieldLabel>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <InputGroupText>
+                      <Mail />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                  />
+                </InputGroup>
+              </Field>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-muted-foreground uppercase" htmlFor="password">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="pl-9"
-                  required
-                />
-              </div>
-            </div>
+              <Field>
+                <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase" htmlFor="password">
+                  Password
+                </FieldLabel>
+                <InputGroup>
+                  <InputGroupAddon>
+                    <InputGroupText>
+                      <Lock />
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                  />
+                </InputGroup>
+              </Field>
+            </FieldGroup>
 
-            <Button type="submit" className="w-full font-bold" disabled={loading}>
+            <Button type="submit" className="w-full font-bold mt-6" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-primary font-semibold hover:underline">
-              Create one
-            </Link>
-          </p>
         </CardContent>
       </Card>
     </div>

@@ -8,13 +8,7 @@ from app.config import get_settings
 from app.database import Base
 
 # Import all models so Alembic can detect them
-from app.modules.identity.models import *  # noqa
-from app.modules.skills.models import *  # noqa
-from app.modules.content.models import *  # noqa
-from app.modules.learners.models import *  # noqa
-from app.modules.mastery.models import *  # noqa
-from app.modules.assessments.models import *  # noqa
-from app.modules.gamification.models import *  # noqa
+from app.generated_models import *  # noqa
 
 config = context.config
 settings = get_settings()

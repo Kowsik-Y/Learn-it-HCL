@@ -11,13 +11,13 @@ export default function AuthLayout({
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between relative overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[140px] pointer-events-none" />
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-150 h-150 rounded-full bg-primary/10 blur-[140px] pointer-events-none" />
 
       {/* Top Header */}
-      <header className="p-6 flex items-center justify-between relative z-10">
-        <Link href="/" className="flex items-center gap-2">
+      <header className="px-6 py-4 flex items-center justify-between relative z-10">
+        <Link href="/" className="flex items-center gap-2.5">
           <Brain className="h-6 w-6 text-primary" />
-          <span className="font-extrabold text-lg tracking-tight">Learn-it HCL</span>
+          <span className="font-extrabold text-lg">Learn-it HCL</span>
         </Link>
         <ThemeToggle />
       </header>

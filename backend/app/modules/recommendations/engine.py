@@ -26,9 +26,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.mastery.models import MasteryState
-from app.modules.skills.models import Skill, SkillRelationship, RoleSkill
-from app.modules.content.models import Lesson, Course
-from app.modules.learners.models import LearnerGoal, LearnerPreferences
+from app.modules.mastery.models import MasteryState
+from app.generated_models import (
+    Skills as Skill,
+    SkillRelationships as SkillRelationship,
+    RoleSkills as RoleSkill,
+    Lessons as Lesson,
+    Courses as Course,
+    LearnerGoals as LearnerGoal,
+    LearnerPreferences as LearnerPreferences
+)
 
 
 @dataclass
@@ -164,7 +171,7 @@ class RecommendationEngine:
         }
 
         # Get preferences
-        from app.modules.learners.models import LearnerProfile
+        from app.generated_models import LearnerProfiles as LearnerProfile
         pref_stmt = select(LearnerPreferences).join(
             LearnerProfile, LearnerPreferences.learner_id == LearnerProfile.id
         ).where(LearnerProfile.user_id == learner_id)

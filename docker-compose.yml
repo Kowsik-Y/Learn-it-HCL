@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # ── PostgreSQL Database ──────────────────────────────
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: learnit
+      POSTGRES_PASSWORD: learnit_dev
+      POSTGRES_DB: learnit
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U learnit -d learnit"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Next.js Web App (API Gateway + Auth + UI) ────────
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://learnit:learnit_dev@db:5432/learnit
+      - JWT_SECRET_KEY=change-this-to-a-secure-secret-in-production
+      - ML_SERVICE_URL=http://ml-service:8001
+    depends_on:
+      db:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+    # Command overridden for dev so migrations can be run easily
+    command: >
+      sh -c "npx prisma db push && pnpm start"
+
+  # ── Python ML Microservice (AI + Recommendations) ────
+  ml-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=postgresql+asyncpg://learnit:learnit_dev@db:5432/learnit
+      - DATABASE_URL_SYNC=postgresql://learnit:learnit_dev@db:5432/learnit
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

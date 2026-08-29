@@ -1,11 +1,11 @@
 /**
  * Learn-it HCL — API Client
  *
- * Type-safe API client for the backend.
- * Handles auth token management, refresh, and error formatting.
+ * Type-safe API client that calls Next.js API routes (same-origin).
+ * All requests go through Next.js which handles auth + DB + ML proxying.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE = '/api';
 
 interface ApiError {
   error: {
@@ -117,7 +117,7 @@ class ApiClient {
     });
   }
 
-  getProfile() {
+  getAuthProfile() {
     return this.request<unknown>('/auth/me');
   }
 
@@ -148,6 +148,12 @@ class ApiClient {
 
   getLesson(lessonId: string) {
     return this.request<unknown>(`/content/lessons/${lessonId}`);
+  }
+
+  completeLesson(lessonId: string) {
+    return this.request<unknown>(`/content/lessons/${lessonId}/complete`, {
+      method: 'POST',
+    });
   }
 
   // ── Mastery ──────────────────────────────────
@@ -221,19 +227,17 @@ class ApiClient {
       body: JSON.stringify({ messages }),
     });
   }
+  // ── Profile ──────────────────────────────────
+  getProfile() {
+    return this.request<unknown>('/profile');
+  }
 
-  // ── Attendance ───────────────────────────────
-  checkIn(sessionId: string, otpCode?: string) {
-    return this.request<unknown>('/attendance/check-in', {
-      method: 'POST',
-      body: JSON.stringify({ session_id: sessionId, otp_code: otpCode }),
+  updateProfile(data: any) {
+    return this.request<unknown>('/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
     });
   }
-
-  getAttendanceHistory() {
-    return this.request<unknown>('/attendance/history');
-  }
-
   // ── Analytics ────────────────────────────────
   getDashboardData() {
     return this.request<unknown>('/analytics/dashboard');
