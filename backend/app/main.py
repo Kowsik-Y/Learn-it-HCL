@@ -24,6 +24,8 @@ from app.modules.recommendations.router import router as recommendations_router
 from app.modules.recommendations.playlist_router import router as playlist_router
 from app.modules.mastery.router import router as mastery_router
 from app.modules.ai_course_agent.router import router as ai_course_agent_router
+from app.modules.assessments.router import router as assessments_router
+from app.modules.analytics.router import router as analytics_router
 
 
 settings = get_settings()
@@ -80,6 +82,16 @@ def create_app() -> FastAPI:
     )
     app.include_router(
         playlist_router, prefix=f"{ml_prefix}", tags=["Adaptive Playlist"]
+    )
+    app.include_router(
+        assessments_router,
+        prefix=f"{ml_prefix}/assessments",
+        tags=["Adaptive Assessments"],
+    )
+    app.include_router(
+        analytics_router,
+        prefix=f"{ml_prefix}/analytics",
+        tags=["Analytics & Risk"],
     )
 
     # ── Health Check ──

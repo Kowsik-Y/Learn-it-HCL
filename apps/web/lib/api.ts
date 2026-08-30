@@ -246,6 +246,39 @@ class ApiClient {
   getLearnerSummary() {
     return this.request<unknown>('/analytics/learner-summary');
   }
+
+  // ── Dropout Risk (ML) ───────────────────────
+  getDropoutRisk(signals: { days_inactive: number; current_streak: number; pass_rate: number; retention_score: number; consecutive_failures: number }) {
+    return this.request<unknown>('/analytics/dropout-risk', {
+      method: 'POST',
+      body: JSON.stringify({ learner_id: 'current', signals }),
+    });
+  }
+
+  // ── Adaptive Assessments (ML) ───────────────
+  getAdaptiveNextQuestion(responses: Array<{ item_id: string; difficulty: number; discrimination: number; is_correct: boolean }>, itemPool: any[] = [], currentTheta: number = 0) {
+    return this.request<unknown>('/assessments/adaptive/next-question', {
+      method: 'POST',
+      body: JSON.stringify({ responses, item_pool: itemPool, current_theta: currentTheta }),
+    });
+  }
+
+  estimateAbility(responses: Array<{ item_id: string; difficulty: number; discrimination: number; is_correct: boolean }>) {
+    return this.request<unknown>('/assessments/adaptive/estimate-ability', {
+      method: 'POST',
+      body: JSON.stringify({ responses }),
+    });
+  }
+
+  // ── Review Queue ────────────────────────────
+  getReviewQueue() {
+    return this.request<unknown>('/mastery/');
+  }
+
+  // ── Learning Paths ──────────────────────────
+  getLearningPaths() {
+    return this.request<unknown>('/recommendations/?max_results=15');
+  }
 }
 
 export const api = new ApiClient();

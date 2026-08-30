@@ -17,12 +17,20 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 const COMMON_LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: "Target", group: "Learning Platform" },
   { href: "/courses", label: "Courses", icon: "BookOpen", group: "Learning Platform" },
+  { href: "/learning-paths", label: "Learning Paths", icon: "Map", group: "Learning Platform" },
+  { href: "/skills", label: "Skills Map", icon: "Brain", group: "Mastery & Review" },
+  { href: "/review", label: "Review Queue", icon: "RotateCcw", group: "Mastery & Review" },
+  { href: "/achievements", label: "Achievements", icon: "Award", group: "Progress" },
   { href: "/profile", label: "Profile", icon: "User", group: "Account" },
 ];
 
 const ROLE_NAVIGATION: Record<string, any[]> = {
   student: COMMON_LINKS,
-  teacher: COMMON_LINKS,
+  teacher: [
+    { href: "/teacher/analytics", label: "Class Analytics", icon: "BarChart3", group: "Teacher Tools" },
+    { href: "/teacher/courses", label: "Manage Courses", icon: "BookOpen", group: "Teacher Tools" },
+    ...COMMON_LINKS,
+  ],
   org_admin: [
     { href: "/org/users", label: "Organization Users", icon: "Users", group: "Organization" },
     { href: "/org/settings", label: "Settings", icon: "Settings", group: "Organization" },

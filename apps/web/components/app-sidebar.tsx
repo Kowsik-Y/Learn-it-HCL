@@ -33,6 +33,9 @@ import {
   User as UserIcon,
   ChevronUp,
   Building,
+  RotateCcw,
+  BarChart3,
+  Map,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -53,6 +56,10 @@ const IconMap: Record<string, any> = {
   User: UserIcon,
   Shield,
   Settings,
+  Brain,
+  RotateCcw,
+  BarChart3,
+  Map,
 };
 
 export function AppSidebar() {
