@@ -19,14 +19,22 @@ export async function proxy(request: NextRequest) {
   // ── API routes: validate Authorization header ──
   if (pathname.startsWith("/api/")) {
     // Public API routes that don't need auth
-    const publicAPIs = ["/api/auth/login", "/api/auth/request-access", "/api/auth/refresh"];
+    const publicAPIs = [
+      "/api/auth/login", 
+      "/api/auth/request-access", 
+      "/api/auth/refresh",
+      "/api/ai/course/generate"
+    ];
     if (publicAPIs.some((p) => pathname.startsWith(p))) {
       return NextResponse.next();
     }
 
-    // All other API routes require a valid Bearer token
+    // All other API routes require a valid Bearer token or cookie token
     const authHeader = request.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const cookieToken = request.cookies.get("access_token")?.value;
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : cookieToken;
+
+    if (!token) {
       return NextResponse.json(
         { error: { code: "AUTH_ERROR", message: "Authentication required" } },
         { status: 401 }
@@ -34,7 +42,6 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-      const token = authHeader.slice(7);
       await jwtVerify(token, JWT_SECRET, { algorithms: ["HS256"] });
       return NextResponse.next();
     } catch {

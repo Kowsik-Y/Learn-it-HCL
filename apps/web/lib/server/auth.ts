@@ -8,6 +8,7 @@
 
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/server/db";
 
@@ -126,11 +127,18 @@ export async function getCurrentUser(
   request: Request
 ): Promise<AuthUser> {
   const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
+  const cookieHeader = request.headers.get("cookie");
+
+  let token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token && cookieHeader) {
+    const match = cookieHeader.match(/access_token=([^;]+)/);
+    if (match) token = match[1];
+  }
+
+  if (!token) {
     throw new AuthError("Authentication required", 401);
   }
 
-  const token = authHeader.slice(7);
   let payload: TokenPayload;
   try {
     payload = await verifyToken(token);

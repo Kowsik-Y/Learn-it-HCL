@@ -58,10 +58,10 @@ export async function POST(request: Request) {
       },
       tokens,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
+      { error: { code: "INTERNAL_ERROR", message: error?.message || "An error occurred" } },
       { status: 500 }
     );
   }
