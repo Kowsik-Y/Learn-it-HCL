@@ -37,11 +37,13 @@ class Settings(BaseSettings):
     db_pool_recycle: int = 3600
 
     # ── AI Providers ─────────────────────────────────────
+    groq_api_key: str | None = None
+    groq_base_url: str = "https://api.groq.com/openai/v1"
     openai_api_key: str | None = None
     anthropic_api_key: str | None = None
     google_ai_api_key: str | None = None
-    ai_default_provider: str = "openai"
-    ai_default_model: str = "gpt-4o-mini"
+    ai_default_provider: str = "groq"
+    ai_default_model: str = "meta/gpt-oss-120b"
     local_model_base_url: str | None = None
 
     # ── Feature Flags ────────────────────────────────────
