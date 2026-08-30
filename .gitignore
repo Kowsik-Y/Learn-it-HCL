@@ -52,6 +52,9 @@ logs/
 # Docker
 docker-compose.override.yml
 
+# ML model artifacts (binary — too large for git)
+backend/saved_models/
+
 # Generated files
 *.gen.ts
 *.generated.ts

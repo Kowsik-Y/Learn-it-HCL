@@ -21,8 +21,10 @@ from app.middleware.gateway_auth import GatewayAuthMiddleware
 # Import ML routers only
 from app.modules.ai_assistant.router import router as ai_assistant_router
 from app.modules.recommendations.router import router as recommendations_router
+from app.modules.recommendations.playlist_router import router as playlist_router
 from app.modules.mastery.router import router as mastery_router
 from app.modules.ai_course_agent.router import router as ai_course_agent_router
+
 
 settings = get_settings()
 
@@ -75,6 +77,9 @@ def create_app() -> FastAPI:
     )
     app.include_router(
         ai_course_agent_router, prefix=f"{ml_prefix}/course_agent", tags=["Course Agent"]
+    )
+    app.include_router(
+        playlist_router, prefix=f"{ml_prefix}", tags=["Adaptive Playlist"]
     )
 
     # ── Health Check ──
