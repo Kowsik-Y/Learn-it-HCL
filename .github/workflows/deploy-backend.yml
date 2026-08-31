@@ -1,0 +1,67 @@
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:  # Allow manual triggers
+
+env:
+  RESOURCE_GROUP: rg-learnit-prod-india
+  ACR_NAME: ${{ secrets.ACR_NAME }}
+  ACA_APP: ca-learnit-backend
+  IMAGE_NAME: backend
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build & Push image to ACR
+        run: |
+          az acr build \
+            --registry $ACR_NAME \
+            --image $IMAGE_NAME:latest \
+            --image $IMAGE_NAME:${{ github.sha }} \
+            ./backend
+
+      - name: Deploy to Azure Container Apps
+        run: |
+          az containerapp update \
+            --name $ACA_APP \
+            --resource-group $RESOURCE_GROUP \
+            --image ${ACR_NAME}.azurecr.io/$IMAGE_NAME:${{ github.sha }} \
+            -o none
+
+      - name: Wait for deployment and check health
+        run: |
+          echo "Waiting 60s for container to start..."
+          sleep 60
+          FQDN=$(az containerapp show \
+            --name $ACA_APP \
+            --resource-group $RESOURCE_GROUP \
+            --query properties.configuration.ingress.fqdn \
+            --output tsv)
+          echo "Backend URL: https://$FQDN"
+          curl -f "https://$FQDN/health" || echo "Health check failed - check logs"
+
+      - name: Print Backend URL
+        run: |
+          FQDN=$(az containerapp show \
+            --name $ACA_APP \
+            --resource-group $RESOURCE_GROUP \
+            --query properties.configuration.ingress.fqdn \
+            --output tsv)
+          echo "🚀 Backend deployed: https://$FQDN"
+          echo "📖 Swagger docs: https://$FQDN/docs"

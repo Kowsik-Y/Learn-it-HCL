@@ -15,7 +15,11 @@ RUN pip install --no-cache-dir -e .
 # Copy application source code
 COPY . .
 
+# Copy startup script
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
+
 EXPOSE 8001
 
-# Run the FastAPI application using uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+# Run migrations then start the FastAPI application
+CMD ["/bin/bash", "./start.sh"]
