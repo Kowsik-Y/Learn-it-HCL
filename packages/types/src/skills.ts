@@ -1,4 +1,4 @@
-import type { UUID, ISODateTime } from './common';
+import type { ISODateTime, UUID } from './common';
 
 export interface Skill {
   id: UUID;

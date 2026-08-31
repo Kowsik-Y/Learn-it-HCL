@@ -1,7 +1,13 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import React from "react";
+import { Loader2 } from 'lucide-react';
+import type React from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface FormDialogProps {
   open: boolean;
@@ -23,10 +29,10 @@ export function FormDialog({
   description,
   onSubmit,
   isProcessing = false,
-  submitLabel = "Save Changes",
-  cancelLabel = "Cancel",
+  submitLabel = 'Save Changes',
+  cancelLabel = 'Cancel',
   children,
-  className = "sm:max-w-md"
+  className = 'sm:max-w-md',
 }: FormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,9 +42,7 @@ export function FormDialog({
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-6 mt-4">
-          <div className="space-y-4">
-            {children}
-          </div>
+          <div className="space-y-4">{children}</div>
           <div className="flex justify-end space-x-3 pt-6">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {cancelLabel}

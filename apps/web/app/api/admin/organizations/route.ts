@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { requireSuperAdmin, AuthError, ROLES, hashPassword } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, hashPassword, ROLES, requireSuperAdmin } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
 export async function GET(request: Request) {
   try {
     await requireSuperAdmin(request);
 
     const organizations = await prisma.organization.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       include: {
         _count: {
           select: { users: true },
@@ -29,14 +29,14 @@ export async function GET(request: Request) {
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("List orgs error:", error);
+    console.error('List orgs error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to list organizations" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to list organizations' } },
+      { status: 500 },
     );
   }
 }
@@ -44,14 +44,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await requireSuperAdmin(request);
-    
+
     const body = await request.json();
     const { name, slug, admin_email, admin_password, admin_name } = body;
 
     if (!name || !slug || !admin_email || !admin_password || !admin_name) {
       return NextResponse.json(
-        { error: { code: "VALIDATION_ERROR", message: "Missing required fields" } },
-        { status: 400 }
+        { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields' } },
+        { status: 400 },
       );
     }
 
@@ -62,8 +62,8 @@ export async function POST(request: Request) {
 
     if (existingOrg) {
       return NextResponse.json(
-        { error: { code: "CONFLICT", message: "Organization slug already exists" } },
-        { status: 409 }
+        { error: { code: 'CONFLICT', message: 'Organization slug already exists' } },
+        { status: 409 },
       );
     }
 
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         data: {
           name,
           slug,
-          tenantType: "standalone",
+          tenantType: 'standalone',
         },
       });
 
@@ -94,26 +94,28 @@ export async function POST(request: Request) {
       return org;
     });
 
-    return NextResponse.json({
-      message: "Organization and initial admin created successfully",
-      organization: {
-        id: organization.id,
-        name: organization.name,
-        slug: organization.slug,
+    return NextResponse.json(
+      {
+        message: 'Organization and initial admin created successfully',
+        organization: {
+          id: organization.id,
+          name: organization.name,
+          slug: organization.slug,
+        },
       },
-    }, { status: 201 });
-
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Create org error:", error);
+    console.error('Create org error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to create organization" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to create organization' } },
+      { status: 500 },
     );
   }
 }

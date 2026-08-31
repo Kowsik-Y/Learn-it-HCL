@@ -1,4 +1,4 @@
-import type { UUID, ISODateTime, UserRole } from './common';
+import type { ISODateTime, UserRole, UUID } from './common';
 
 export interface LoginRequest {
   email: string;

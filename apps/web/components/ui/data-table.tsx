@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from 'react';
 import {
   Table,
   TableBody,
@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 export interface Column<T> {
   header: React.ReactNode;
@@ -23,11 +23,11 @@ export interface DataTableProps<T> {
   emptyMessage?: React.ReactNode;
 }
 
-export function DataTable<T>({ 
-  columns, 
-  data, 
-  keyExtractor, 
-  emptyMessage = "No data found." 
+export function DataTable<T>({
+  columns,
+  data,
+  keyExtractor,
+  emptyMessage = 'No data found.',
 }: DataTableProps<T>) {
   return (
     <div className="overflow-x-auto">
@@ -44,8 +44,8 @@ export function DataTable<T>({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell 
-                colSpan={columns.length} 
+              <TableCell
+                colSpan={columns.length}
                 className="h-24 text-center text-muted-foreground"
               >
                 {emptyMessage}
@@ -55,8 +55,19 @@ export function DataTable<T>({
             data.map((item) => (
               <TableRow key={keyExtractor(item)} className="group">
                 {columns.map((col, index) => (
-                  <TableCell key={index} className={typeof col.cellClassName === 'function' ? col.cellClassName(item) : col.cellClassName}>
-                    {col.render ? col.render(item) : (col.accessor ? String(item[col.accessor]) : null)}
+                  <TableCell
+                    key={index}
+                    className={
+                      typeof col.cellClassName === 'function'
+                        ? col.cellClassName(item)
+                        : col.cellClassName
+                    }
+                  >
+                    {col.render
+                      ? col.render(item)
+                      : col.accessor
+                        ? String(item[col.accessor])
+                        : null}
                   </TableCell>
                 ))}
               </TableRow>

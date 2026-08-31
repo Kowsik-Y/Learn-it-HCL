@@ -6,32 +6,27 @@
  * Runs only on the server (Next.js API routes / middleware).
  */
 
-import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import bcrypt from "bcryptjs";
-import crypto from "crypto";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/server/db";
+import crypto from 'node:crypto';
+import bcrypt from 'bcryptjs';
+import { type JWTPayload, jwtVerify, SignJWT } from 'jose';
+import { prisma } from '@/lib/server/db';
 
 // ── Configuration ───────────────────────────────────────
 
 export const ROLES = {
-  SUPER_ADMIN: "super_admin",
-  ORG_ADMIN: "org_admin",
+  SUPER_ADMIN: 'super_admin',
+  ORG_ADMIN: 'org_admin',
 } as const;
 
-
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET_KEY || "change-this-to-a-random-secret-in-production"
+  process.env.JWT_SECRET_KEY || 'change-this-to-a-random-secret-in-production',
 );
-const JWT_ALGORITHM = "HS256";
+const JWT_ALGORITHM = 'HS256';
 const ACCESS_TOKEN_EXPIRE_MINUTES = parseInt(
-  process.env.JWT_ACCESS_TOKEN_EXPIRE_MINUTES || "30",
-  10
+  process.env.JWT_ACCESS_TOKEN_EXPIRE_MINUTES || '30',
+  10,
 );
-const REFRESH_TOKEN_EXPIRE_DAYS = parseInt(
-  process.env.JWT_REFRESH_TOKEN_EXPIRE_DAYS || "7",
-  10
-);
+const REFRESH_TOKEN_EXPIRE_DAYS = parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRE_DAYS || '7', 10);
 
 // ── Password Hashing ────────────────────────────────────
 
@@ -42,7 +37,7 @@ export async function hashPassword(password: string): Promise<string> {
 
 export async function verifyPassword(
   plainPassword: string,
-  hashedPassword: string
+  hashedPassword: string,
 ): Promise<boolean> {
   return bcrypt.compare(plainPassword, hashedPassword);
 }
@@ -54,7 +49,7 @@ export interface TokenPayload extends JWTPayload {
   email: string;
   role: string;
   tenant_id: string;
-  type: "access" | "refresh";
+  type: 'access' | 'refresh';
 }
 
 export async function createAccessToken(data: {
@@ -66,7 +61,7 @@ export async function createAccessToken(data: {
   const now = Math.floor(Date.now() / 1000);
   return new SignJWT({
     ...data,
-    type: "access",
+    type: 'access',
     jti: crypto.randomUUID(),
     iat: now,
   })
@@ -84,7 +79,7 @@ export async function createRefreshToken(data: {
   const now = Math.floor(Date.now() / 1000);
   return new SignJWT({
     ...data,
-    type: "refresh",
+    type: 'refresh',
     jti: crypto.randomUUID(),
     iat: now,
   })
@@ -102,7 +97,7 @@ export async function verifyToken(token: string): Promise<TokenPayload> {
     });
     return payload as TokenPayload;
   } catch {
-    throw new Error("Invalid or expired token");
+    throw new Error('Invalid or expired token');
   }
 }
 
@@ -123,31 +118,29 @@ export interface AuthUser {
  * Extract and validate the current user from the Authorization header.
  * Use this in API Route Handlers.
  */
-export async function getCurrentUser(
-  request: Request
-): Promise<AuthUser> {
-  const authHeader = request.headers.get("Authorization");
-  const cookieHeader = request.headers.get("cookie");
+export async function getCurrentUser(request: Request): Promise<AuthUser> {
+  const authHeader = request.headers.get('Authorization');
+  const cookieHeader = request.headers.get('cookie');
 
-  let token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  let token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token && cookieHeader) {
     const match = cookieHeader.match(/access_token=([^;]+)/);
     if (match) token = match[1];
   }
 
   if (!token) {
-    throw new AuthError("Authentication required", 401);
+    throw new AuthError('Authentication required', 401);
   }
 
   let payload: TokenPayload;
   try {
     payload = await verifyToken(token);
   } catch {
-    throw new AuthError("Invalid or expired token", 401);
+    throw new AuthError('Invalid or expired token', 401);
   }
 
-  if (payload.type !== "access") {
-    throw new AuthError("Invalid token type", 401);
+  if (payload.type !== 'access') {
+    throw new AuthError('Invalid token type', 401);
   }
 
   const user = await prisma.user.findUnique({
@@ -155,11 +148,11 @@ export async function getCurrentUser(
   });
 
   if (!user) {
-    throw new AuthError("User not found", 401);
+    throw new AuthError('User not found', 401);
   }
 
   if (!user.isActive) {
-    throw new AuthError("Account is deactivated", 403);
+    throw new AuthError('Account is deactivated', 403);
   }
 
   return {
@@ -180,7 +173,7 @@ export async function getCurrentUser(
 export async function requireSuperAdmin(request: Request): Promise<AuthUser> {
   const user = await getCurrentUser(request);
   if (user.role !== ROLES.SUPER_ADMIN) {
-    throw new AuthError("Forbidden: Requires Super Admin privileges", 403);
+    throw new AuthError('Forbidden: Requires Super Admin privileges', 403);
   }
   return user;
 }
@@ -191,7 +184,7 @@ export async function requireSuperAdmin(request: Request): Promise<AuthUser> {
 export async function requireOrgAdmin(request: Request): Promise<AuthUser> {
   const user = await getCurrentUser(request);
   if (user.role !== ROLES.SUPER_ADMIN && user.role !== ROLES.ORG_ADMIN) {
-    throw new AuthError("Forbidden: Requires Organization Admin privileges", 403);
+    throw new AuthError('Forbidden: Requires Organization Admin privileges', 403);
   }
   return user;
 }
@@ -199,10 +192,13 @@ export async function requireOrgAdmin(request: Request): Promise<AuthUser> {
 /**
  * Ensure the current user has a specific permission explicitly granted in their custom role.
  */
-export async function requirePermission(request: Request, requiredPermission: string): Promise<AuthUser> {
+export async function requirePermission(
+  request: Request,
+  requiredPermission: string,
+): Promise<AuthUser> {
   const user = await getCurrentUser(request);
-  
-  // Super Admins and Org Admins inherently bypass granular permission checks 
+
+  // Super Admins and Org Admins inherently bypass granular permission checks
   // as they are platform/tenant owners.
   if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ORG_ADMIN) {
     return user;
@@ -210,21 +206,20 @@ export async function requirePermission(request: Request, requiredPermission: st
 
   // Fetch the user's custom role definition to check permissions
   const roleRecord = await prisma.customRole.findFirst({
-    where: { 
+    where: {
       slug: user.role,
-      OR: [
-        { tenantId: null },
-        { tenantId: user.tenantId }
-      ]
-    }
+      OR: [{ tenantId: null }, { tenantId: user.tenantId }],
+    },
   });
 
   if (!roleRecord) {
-    throw new AuthError("Forbidden: Role definition not found", 403);
+    throw new AuthError('Forbidden: Role definition not found', 403);
   }
 
-  const permissions = Array.isArray(roleRecord.permissions) ? roleRecord.permissions as string[] : [];
-  
+  const permissions = Array.isArray(roleRecord.permissions)
+    ? (roleRecord.permissions as string[])
+    : [];
+
   if (!permissions.includes(requiredPermission)) {
     throw new AuthError(`Forbidden: Missing required permission '${requiredPermission}'`, 403);
   }
@@ -255,7 +250,7 @@ export async function createTokenPair(user: {
   return {
     access_token: accessToken,
     refresh_token: refreshToken,
-    token_type: "bearer",
+    token_type: 'bearer',
     expires_in: ACCESS_TOKEN_EXPIRE_MINUTES * 60,
   };
 }
@@ -266,7 +261,7 @@ export class AuthError extends Error {
   status: number;
   constructor(message: string, status: number = 401) {
     super(message);
-    this.name = "AuthError";
+    this.name = 'AuthError';
     this.status = status;
   }
 }

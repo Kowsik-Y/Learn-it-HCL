@@ -1,12 +1,35 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
-import { api } from "@/lib/api";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Award,
+  BarChart3,
+  BookOpen,
+  Brain,
+  Building,
+  ChevronUp,
+  Layers,
+  LogOut,
+  Map as MapIcon,
+  RotateCcw,
+  Settings,
+  Shield,
+  Sparkles,
+  Target,
+  User as UserIcon,
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Sidebar,
   SidebarContent,
@@ -18,32 +41,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import {
-  Brain,
-  Target,
-  BookOpen,
-  Layers,
-  Sparkles,
-  Award,
-  Users,
-  Settings,
-  Shield,
-  LogOut,
-  User as UserIcon,
-  ChevronUp,
-  Building,
-  RotateCcw,
-  BarChart3,
-  Map,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/sidebar';
+import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 const IconMap: Record<string, any> = {
   Target,
@@ -59,7 +59,7 @@ const IconMap: Record<string, any> = {
   Brain,
   RotateCcw,
   BarChart3,
-  Map,
+  Map: MapIcon,
 };
 
 export function AppSidebar() {
@@ -70,39 +70,40 @@ export function AppSidebar() {
   useEffect(() => {
     async function fetchNav() {
       try {
-        const res = await api.request<{ navigation_links: any[] }>("/auth/me");
+        const res = await api.request<{ navigation_links: any[] }>('/auth/me');
         if (res.navigation_links) {
           setNavLinks(res.navigation_links);
         }
       } catch (err) {
-        console.error("Failed to load nav links", err);
+        console.error('Failed to load nav links', err);
       }
     }
     fetchNav();
   }, []);
 
-  const isAdmin = user?.role === "super_admin";
-  const isOrgAdmin = user?.role === "org_admin";
+  const isAdmin = user?.role === 'super_admin';
+  const isOrgAdmin = user?.role === 'org_admin';
 
-  const groupedLinks = navLinks.reduce((acc, link) => {
-    const group = link.group || "Navigation";
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(link);
-    return acc;
-  }, {} as Record<string, any[]>);
+  const groupedLinks = navLinks.reduce(
+    (acc, link) => {
+      const group = link.group || 'Navigation';
+      if (!acc[group]) acc[group] = [];
+      acc[group].push(link);
+      return acc;
+    },
+    {} as Record<string, any[]>,
+  );
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="h-16 border-b border-border flex flex-col justify-center px-4">
         <div className="flex items-center justify-between">
           <Link
-            href={isAdmin ? "/admin/users" : isOrgAdmin ? "/org/users" : "/dashboard"}
+            href={isAdmin ? '/admin/users' : isOrgAdmin ? '/org/users' : '/dashboard'}
             className="flex items-center gap-2 overflow-hidden group-data-[collapsible=icon]:hidden"
           >
             <Brain className="h-6 w-6 text-primary shrink-0" />
-            <span className="font-bold text-lg whitespace-nowrap">
-              Learn-it HCL
-            </span>
+            <span className="font-bold text-lg whitespace-nowrap">Learn-it HCL</span>
           </Link>
           <SidebarTrigger />
         </div>
@@ -117,7 +118,11 @@ export function AppSidebar() {
                 const Icon = IconMap[link.icon] || Target;
                 return (
                   <SidebarMenuItem key={link.href}>
-                    <SidebarMenuButton tooltip={link.label} render={<Link href={link.href} />} isActive={pathname.startsWith(link.href)}>
+                    <SidebarMenuButton
+                      tooltip={link.label}
+                      render={<Link href={link.href} />}
+                      isActive={pathname.startsWith(link.href)}
+                    >
                       <Icon />
                       <span>{link.label}</span>
                     </SidebarMenuButton>
@@ -141,17 +146,17 @@ export function AppSidebar() {
                   />
                 }
               >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user?.avatar_url || ""} />
-                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold">
-                      {user?.full_name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user?.full_name || "User"}</span>
-                    <span className="truncate text-xs">{user?.email || "user@example.com"}</span>
-                  </div>
-                  <ChevronUp className="ml-auto size-4" />
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage src={user?.avatar_url || ''} />
+                  <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-bold">
+                    {user?.full_name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{user?.full_name || 'User'}</span>
+                  <span className="truncate text-xs">{user?.email || 'user@example.com'}</span>
+                </div>
+                <ChevronUp className="ml-auto size-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"

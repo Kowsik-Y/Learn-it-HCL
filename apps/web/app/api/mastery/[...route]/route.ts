@@ -3,14 +3,11 @@
  * Read-only mastery states (calculation happens in Python ML service).
  */
 
-import { NextResponse } from "next/server";
-import { getCurrentUser, AuthError } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, getCurrentUser } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ route?: string[] }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ route?: string[] }> }) {
   try {
     const user = await getCurrentUser(request);
     const { route } = await params;
@@ -25,14 +22,14 @@ export async function GET(
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Mastery error:", error);
+    console.error('Mastery error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
@@ -52,9 +49,9 @@ async function handleGetAllMastery(user: { id: string; tenantId: string }) {
     },
   });
 
-  const mastered = states.filter((s: { status: string; }) => s.status === "mastered").length;
-  const learning = states.filter((s: { status: string; }) => s.status === "learning").length;
-  const practiced = states.filter((s: { status: string; }) => s.status === "practiced").length;
+  const mastered = states.filter((s: { status: string }) => s.status === 'mastered').length;
+  const learning = states.filter((s: { status: string }) => s.status === 'learning').length;
+  const practiced = states.filter((s: { status: string }) => s.status === 'practiced').length;
 
   return NextResponse.json({
     summary: {
@@ -91,7 +88,7 @@ async function handleGetSkillMastery(user: { id: string; tenantId: string }, ski
       skill_id: skillId,
       mastery_score: 0.0,
       confidence: 0.0,
-      status: "not_started",
+      status: 'not_started',
       evidence_count: 0,
     });
   }

@@ -3,14 +3,14 @@
  * List, start attempts, submit answers.
  */
 
-import { NextResponse } from "next/server";
-import { getCurrentUser, AuthError } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
-import { mlClient, MLServiceError } from "@/lib/server/ml-client";
+import { NextResponse } from 'next/server';
+import { AuthError, getCurrentUser } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
+import { mlClient } from '@/lib/server/ml-client';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ route?: string[] }> }
+  { params: _params }: { params: Promise<{ route?: string[] }> },
 ) {
   try {
     const user = await getCurrentUser(request);
@@ -23,87 +23,94 @@ export async function GET(
     });
 
     return NextResponse.json({
-      items: assessments.map((a: { id: any; title: any; assessmentType: any; questionCount: any; timeLimitMinutes: any; passingScore: any; isAdaptive: any; }) => ({
-        id: a.id,
-        title: a.title,
-        assessment_type: a.assessmentType,
-        question_count: a.questionCount,
-        time_limit_minutes: a.timeLimitMinutes,
-        passing_score: a.passingScore,
-        is_adaptive: a.isAdaptive,
-      })),
+      items: assessments.map(
+        (a: {
+          id: any;
+          title: any;
+          assessmentType: any;
+          questionCount: any;
+          timeLimitMinutes: any;
+          passingScore: any;
+          isAdaptive: any;
+        }) => ({
+          id: a.id,
+          title: a.title,
+          assessment_type: a.assessmentType,
+          question_count: a.questionCount,
+          time_limit_minutes: a.timeLimitMinutes,
+          passing_score: a.passingScore,
+          is_adaptive: a.isAdaptive,
+        }),
+      ),
     });
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Assessments error:", error);
+    console.error('Assessments error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ route: string[] }> }
-) {
+export async function POST(request: Request, { params }: { params: Promise<{ route: string[] }> }) {
   try {
     const user = await getCurrentUser(request);
     const { route } = await params;
-    const path = route?.join("/") || "";
+    const path = route?.join('/') || '';
     const body = await request.json();
 
     // POST /api/assessments/start
-    if (path === "start") {
+    if (path === 'start') {
       return handleStartAssessment(user, body);
     }
 
     // POST /api/assessments/submit/:attemptId
-    if (route && route[0] === "submit" && route.length === 2) {
+    if (route && route[0] === 'submit' && route.length === 2) {
       return handleSubmitAnswer(user, route[1], body);
     }
 
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Unknown assessments path" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Unknown assessments path' } },
+      { status: 404 },
     );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Assessments error:", error);
+    console.error('Assessments error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
 
 async function handleStartAssessment(
   user: { id: string; tenantId: string },
-  body: { assessment_id: string }
+  body: { assessment_id: string },
 ) {
   const attempt = await prisma.assessmentAttempt.create({
     data: {
       assessmentId: body.assessment_id,
       learnerId: user.id,
       tenantId: user.tenantId,
-      status: "in_progress",
+      status: 'in_progress',
       startedAt: new Date(),
     },
   });
 
   const question = await prisma.question.findFirst({
     where: { assessmentId: body.assessment_id },
-    orderBy: { orderIndex: "asc" },
+    orderBy: { orderIndex: 'asc' },
   });
 
   return NextResponse.json({
@@ -124,8 +131,8 @@ async function handleStartAssessment(
 
 async function handleSubmitAnswer(
   user: { id: string; tenantId: string },
-  attemptId: string,
-  body: { question_id: string; answer: string }
+  _attemptId: string,
+  body: { question_id: string; answer: string },
 ) {
   const question = await prisma.question.findUnique({
     where: { id: body.question_id },
@@ -133,8 +140,8 @@ async function handleSubmitAnswer(
 
   if (!question) {
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Question not found" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Question not found' } },
+      { status: 404 },
     );
   }
 
@@ -148,10 +155,10 @@ async function handleSubmitAnswer(
           { id: user.id, tenantId: user.tenantId },
           {
             skill_id: skillId,
-            evidence_type: "assessment",
+            evidence_type: 'assessment',
             source_id: question.id,
             score: isCorrect ? 1.0 : 0.0,
-          }
+          },
         );
       } catch {
         // Non-critical: mastery update failure shouldn't block answer submission

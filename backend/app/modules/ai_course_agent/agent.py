@@ -59,7 +59,9 @@ class AgentState(TypedDict):
 def generate_roadmap(state: AgentState) -> dict:
     topic_title = state['topic'].strip()
     audience = state['target_audience'].strip()
-    
+    def make_lesson(clean_name, summary, duration="45 mins"):
+        query_topic = clean_name.replace(" ", "+")
+        
         # Direct GeeksforGeeks tutorial routing
         gfg_slug_map = {
             "architecture": "https://www.geeksforgeeks.org/reactjs-virtual-dom/",

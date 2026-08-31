@@ -1,3 +1,5 @@
+import { Loader2 } from 'lucide-react';
+import type React from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,9 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Loader2 } from "lucide-react";
-import React from "react";
+} from '@/components/ui/alert-dialog';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -20,19 +20,19 @@ interface ConfirmDialogProps {
   isProcessing?: boolean;
   confirmLabel?: string;
   cancelLabel?: string;
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
 }
 
 export function ConfirmDialog({
   open,
   onOpenChange,
-  title = "Are you absolutely sure?",
+  title = 'Are you absolutely sure?',
   description,
   onConfirm,
   isProcessing = false,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
-  variant = "destructive"
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  variant = 'destructive',
 }: ConfirmDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -43,11 +43,7 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={onConfirm} 
-            variant={variant}
-            disabled={isProcessing}
-          >
+          <AlertDialogAction onClick={onConfirm} variant={variant} disabled={isProcessing}>
             {isProcessing && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             {confirmLabel}
           </AlertDialogAction>

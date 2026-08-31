@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -23,6 +23,12 @@ import {
   Sparkles,
   Crown,
   Shield,
+  BookOpen,
+  RotateCw,
+  Sprout,
+  Compass,
+  Hammer,
+  Rocket,
 } from "lucide-react";
 
 type Level = {
@@ -75,6 +81,15 @@ type XPEvent = {
   created_at: string;
 };
 
+const LEVEL_ICONS: Record<string, React.ComponentType<any>> = {
+  Novice: Sprout,
+  Explorer: Compass,
+  Builder: Hammer,
+  Practitioner: Zap,
+  Advanced: Rocket,
+  Expert: Crown,
+};
+
 export default function AchievementsPage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<GamificationProfile | null>(null);
@@ -83,11 +98,7 @@ export default function AchievementsPage() {
   const [xpHistory, setXpHistory] = useState<XPEvent[]>([]);
   const [badgeFilter, setBadgeFilter] = useState("all");
 
-  useEffect(() => {
-    loadAll();
-  }, []);
-
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     try {
       const [profileRes, badgesRes, questsRes, xpRes] = await Promise.allSettled([
         api.getGamificationProfile(),
@@ -134,7 +145,11 @@ export default function AchievementsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   const getBadgeIcon = (category: string, isEarned: boolean) => {
     const icons: Record<string, any> = {
@@ -159,14 +174,20 @@ export default function AchievementsPage() {
   };
 
   const getSourceIcon = (sourceType: string) => {
-    switch (sourceType) {
-      case "lesson": return "📚";
-      case "quiz": return "✅";
-      case "streak": return "🔥";
-      case "quest": return "🎯";
-      case "review": return "🔄";
-      default: return "⭐";
-    }
+    const icons: Record<string, React.ComponentType<any>> = {
+      lesson_complete: BookOpen,
+      assessment_pass: CheckCircle2,
+      streak_bonus: Flame,
+      practice: Zap,
+      badge_earned: Trophy,
+      attendance: Clock,
+      lesson: BookOpen,
+      quiz: CheckCircle2,
+      streak: Flame,
+      quest: Target,
+      review: RotateCw,
+    };
+    return icons[sourceType] || Star;
   };
 
   const badgeCategories = ["all", ...Array.from(new Set(badges.map((b) => b.category)))];
@@ -199,8 +220,11 @@ export default function AchievementsPage() {
             <div className="flex flex-col md:flex-row items-center gap-6">
               {/* Level icon */}
               <div className="relative">
-                <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-4xl">
-                  {profile.level.icon}
+                <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  {(() => {
+                    const Icon = LEVEL_ICONS[profile.level.name] || Sprout;
+                    return <Icon className="h-12 w-12" />;
+                  })()}
                 </div>
                 <Badge className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3">
                   Lvl {profile.level.number}
@@ -388,7 +412,12 @@ export default function AchievementsPage() {
             xpHistory.map((event) => (
               <Card key={event.id} className="hover:bg-muted/30 transition-colors">
                 <CardContent className="py-3 flex items-center gap-3">
-                  <span className="text-xl">{getSourceIcon(event.source_type)}</span>
+                  <div className="h-10 w-10 rounded-full bg-primary/5 flex items-center justify-center text-primary shrink-0">
+                    {(() => {
+                      const Icon = getSourceIcon(event.source_type);
+                      return <Icon className="h-5 w-5" />;
+                    })()}
+                  </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{event.reason}</p>
                     <p className="text-xs text-muted-foreground">

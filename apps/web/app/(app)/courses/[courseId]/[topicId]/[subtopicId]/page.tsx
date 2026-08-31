@@ -1,43 +1,78 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Award } from "lucide-react";
-import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
-import { useParams } from "next/navigation";
-import { useCourse } from "@/components/course/course-context";
-import { mockCourseData } from "@/lib/mock-course-data";
-import { api } from "@/lib/api";
+import { Award, FileText } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import { toast } from 'sonner';
+import { useCourse } from '@/components/course/course-context';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { api } from '@/lib/api';
+
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CourseLearningInterface() {
   const params = useParams();
   const activeLesson = params.subtopicId as string;
   const { completedLessons, setCompletedLessons, setTotalXp } = useCourse();
-  const [activeLanguage, setActiveLanguage] = useState("en");
+  const [activeLanguage, setActiveLanguage] = useState('en');
 
-  const lessonContent = mockCourseData.content[activeLesson as keyof typeof mockCourseData.content] || null;
+  const [lesson, setLesson] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLesson() {
+      try {
+        setLoading(true);
+        const res = await api.getLesson(activeLesson) as any;
+        setLesson(res);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (activeLesson) {
+      fetchLesson();
+    }
+  }, [activeLesson]);
 
   const handleComplete = async () => {
     if (!completedLessons.includes(activeLesson)) {
       try {
         await api.completeLesson(activeLesson);
         setCompletedLessons((prev) => [...prev, activeLesson]);
-        const xpGained = lessonContent?.xp || 10;
+        const xpGained = 50; // standard dynamic lesson XP
         setTotalXp((prev) => prev + xpGained);
         toast.success(`Lesson Completed! +${xpGained} XP`, {
           icon: <Award className="text-yellow-500" />,
         });
       } catch (err) {
-        toast.error("Failed to save progress");
+        toast.error('Failed to save progress');
         console.error(err);
       }
     }
   };
 
-  if (!lessonContent) {
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto w-full p-4 md:p-8 lg:p-10 space-y-8 pb-32">
+        <Skeleton className="h-10 w-2/3" />
+        <Skeleton className="aspect-video w-full rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-xl" />
+      </div>
+    );
+  }
+
+  if (!lesson) {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground p-8 text-center">
         Select a lesson from the sidebar to begin.
@@ -45,13 +80,16 @@ export default function CourseLearningInterface() {
     );
   }
 
+  const hasVideo = lesson.content_type === 'video' && lesson.content_url;
+  const videoUrl = hasVideo ? lesson.content_url : null;
+
   return (
     <div className="max-w-4xl mx-auto w-full p-4 md:p-8 lg:p-10 space-y-8 pb-32">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">
-          {mockCourseData.modules.flatMap(m => m.lessons).find(l => l.id === activeLesson)?.title}
+          {lesson.title}
         </h1>
-        {lessonContent.videos && (
+        {videoUrl && (
           <div className="w-full sm:w-45 shrink-0">
             <Select value={activeLanguage} onValueChange={(val) => val && setActiveLanguage(val)}>
               <SelectTrigger>
@@ -67,11 +105,11 @@ export default function CourseLearningInterface() {
       </div>
 
       {/* Video Player */}
-      {lessonContent.videos && (
+      {videoUrl && (
         <div className="aspect-video w-full rounded-xl overflow-hidden border shadow-sm bg-black relative">
           <iframe
             className="absolute inset-0 w-full h-full"
-            src={lessonContent.videos[activeLanguage as keyof typeof lessonContent.videos]}
+            src={videoUrl}
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -81,22 +119,36 @@ export default function CourseLearningInterface() {
       )}
 
       {/* Markdown Content */}
-      {lessonContent.markdown && (
+      {lesson.content_body ? (
         <Card className="shadow-sm">
           <CardContent className="p-6 sm:p-8 prose dark:prose-invert max-w-none">
-            <ReactMarkdown>{lessonContent.markdown}</ReactMarkdown>
+            <ReactMarkdown>{lesson.content_body}</ReactMarkdown>
           </CardContent>
         </Card>
-      )}
+      ) : !videoUrl ? (
+        <Card className="shadow-sm border-dashed">
+          <CardContent className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
+            <FileText className="h-8 w-8 text-muted-foreground/50 animate-pulse" />
+            <div>
+              <p className="font-semibold">No content available</p>
+              <p className="text-xs">This lesson does not contain any video or reading material yet.</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="flex justify-end pt-6 border-t mt-8">
-        <Button 
-          size="lg" 
+        <Button
+          size="lg"
           onClick={handleComplete}
           disabled={completedLessons.includes(activeLesson)}
-          className={completedLessons.includes(activeLesson) ? "bg-green-600 text-white hover:bg-green-700 w-full sm:w-auto" : "w-full sm:w-auto"}
+          className={
+            completedLessons.includes(activeLesson)
+              ? 'bg-green-600 text-white hover:bg-green-700 w-full sm:w-auto font-bold'
+              : 'w-full sm:w-auto font-bold'
+          }
         >
-          {completedLessons.includes(activeLesson) ? "Completed" : "Mark as Complete & Earn XP"}
+          {completedLessons.includes(activeLesson) ? 'Completed' : 'Mark as Complete & Earn XP'}
         </Button>
       </div>
     </div>

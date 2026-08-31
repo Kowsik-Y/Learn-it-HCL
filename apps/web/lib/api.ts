@@ -7,15 +7,6 @@
 
 const API_BASE = '/api';
 
-interface ApiError {
-  error: {
-    code: string;
-    message: string;
-    request_id: string;
-    details?: Record<string, unknown>;
-  };
-}
-
 class ApiClient {
   private baseUrl: string;
 
@@ -50,10 +41,7 @@ class ApiClient {
     }
   }
 
-  async request<T>(
-    path: string,
-    options: RequestInit = {},
-  ): Promise<T> {
+  async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const token = this.getToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -61,7 +49,7 @@ class ApiClient {
     };
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers.Authorization = `Bearer ${token}`;
     }
 
     let res = await fetch(`${this.baseUrl}${path}`, {
@@ -73,7 +61,7 @@ class ApiClient {
     if (res.status === 401 && token) {
       const refreshed = await this.refreshToken();
       if (refreshed) {
-        headers['Authorization'] = `Bearer ${this.getToken()}`;
+        headers.Authorization = `Bearer ${this.getToken()}`;
         res = await fetch(`${this.baseUrl}${path}`, { ...options, headers });
       } else {
         // Redirect to login
@@ -92,7 +80,10 @@ class ApiClient {
       if (errorData?.error?.message) {
         errorMessage = errorData.error.message;
       } else if (errorData?.detail) {
-        errorMessage = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+        errorMessage =
+          typeof errorData.detail === 'string'
+            ? errorData.detail
+            : JSON.stringify(errorData.detail);
       } else if (errorData?.message) {
         errorMessage = errorData.message;
       }
@@ -174,7 +165,9 @@ class ApiClient {
   }
 
   getDailyMission(availableMinutes: number = 30) {
-    return this.request<unknown>(`/recommendations/daily-mission?available_minutes=${availableMinutes}`);
+    return this.request<unknown>(
+      `/recommendations/daily-mission?available_minutes=${availableMinutes}`,
+    );
   }
 
   // ── Assessments ──────────────────────────────
@@ -248,7 +241,13 @@ class ApiClient {
   }
 
   // ── Dropout Risk (ML) ───────────────────────
-  getDropoutRisk(signals: { days_inactive: number; current_streak: number; pass_rate: number; retention_score: number; consecutive_failures: number }) {
+  getDropoutRisk(signals: {
+    days_inactive: number;
+    current_streak: number;
+    pass_rate: number;
+    retention_score: number;
+    consecutive_failures: number;
+  }) {
     return this.request<unknown>('/analytics/dropout-risk', {
       method: 'POST',
       body: JSON.stringify({ learner_id: 'current', signals }),
@@ -256,14 +255,30 @@ class ApiClient {
   }
 
   // ── Adaptive Assessments (ML) ───────────────
-  getAdaptiveNextQuestion(responses: Array<{ item_id: string; difficulty: number; discrimination: number; is_correct: boolean }>, itemPool: any[] = [], currentTheta: number = 0) {
+  getAdaptiveNextQuestion(
+    responses: Array<{
+      item_id: string;
+      difficulty: number;
+      discrimination: number;
+      is_correct: boolean;
+    }>,
+    itemPool: any[] = [],
+    currentTheta: number = 0,
+  ) {
     return this.request<unknown>('/assessments/adaptive/next-question', {
       method: 'POST',
       body: JSON.stringify({ responses, item_pool: itemPool, current_theta: currentTheta }),
     });
   }
 
-  estimateAbility(responses: Array<{ item_id: string; difficulty: number; discrimination: number; is_correct: boolean }>) {
+  estimateAbility(
+    responses: Array<{
+      item_id: string;
+      difficulty: number;
+      discrimination: number;
+      is_correct: boolean;
+    }>,
+  ) {
     return this.request<unknown>('/assessments/adaptive/estimate-ability', {
       method: 'POST',
       body: JSON.stringify({ responses }),

@@ -1,53 +1,53 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { User, Mail, Building, FileText, Loader2, CheckCircle2 } from "lucide-react";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { 
-  InputGroup, 
-  InputGroupAddon, 
-  InputGroupInput, 
+import { Building, CheckCircle2, FileText, Loader2, Mail, User } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   InputGroupTextarea,
-  InputGroupText
-} from "@/components/ui/input-group";
+} from '@/components/ui/input-group';
 
 export default function RequestAccessPage() {
-  const router = useRouter();
+  const _router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    company: "",
-    reason: "",
+    fullName: '',
+    email: '',
+    company: '',
+    reason: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
-      const res = await fetch("/api/auth/request-access", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/auth/request-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error?.message || "Failed to submit request");
+        throw new Error(data.error?.message || 'Failed to submit request');
       }
 
       setSuccess(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -64,11 +64,14 @@ export default function RequestAccessPage() {
             <div className="space-y-2">
               <h2 className="text-2xl font-bold">Request Submitted!</h2>
               <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-                Thank you for applying. Our team will review your application and provision an account for you shortly.
+                Thank you for applying. Our team will review your application and provision an
+                account for you shortly.
               </p>
             </div>
             <Link href="/" className="inline-block mt-4">
-              <Button variant="outline" className="font-bold">Return Home</Button>
+              <Button variant="outline" className="font-bold">
+                Return Home
+              </Button>
             </Link>
           </CardContent>
         </Card>
@@ -172,12 +175,12 @@ export default function RequestAccessPage() {
 
             <Button type="submit" className="w-full font-bold mt-6" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? "Submitting..." : "Submit Application"}
+              {loading ? 'Submitting...' : 'Submit Application'}
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link href="/login" className="text-primary font-semibold hover:underline">
               Sign in
             </Link>

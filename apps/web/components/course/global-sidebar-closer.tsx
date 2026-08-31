@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useEffect } from 'react';
+import { useSidebar } from '@/components/ui/sidebar';
 
 export function GlobalSidebarCloser() {
   const { setOpen } = useSidebar();

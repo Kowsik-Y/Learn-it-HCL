@@ -3,51 +3,55 @@
  * Dashboard data aggregation.
  */
 
-import { NextResponse } from "next/server";
-import { getCurrentUser, AuthError } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, getCurrentUser } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
 const LEVELS = [
-  { name: "Novice", number: 1, min_xp: 0, max_xp: 500 },
-  { name: "Explorer", number: 2, min_xp: 500, max_xp: 1500 },
-  { name: "Builder", number: 3, min_xp: 1500, max_xp: 3500 },
-  { name: "Practitioner", number: 4, min_xp: 3500, max_xp: 7000 },
-  { name: "Advanced", number: 5, min_xp: 7000, max_xp: 12000 },
-  { name: "Expert", number: 6, min_xp: 12000, max_xp: 999999 },
+  { name: 'Novice', number: 1, min_xp: 0, max_xp: 500 },
+  { name: 'Explorer', number: 2, min_xp: 500, max_xp: 1500 },
+  { name: 'Builder', number: 3, min_xp: 1500, max_xp: 3500 },
+  { name: 'Practitioner', number: 4, min_xp: 3500, max_xp: 7000 },
+  { name: 'Advanced', number: 5, min_xp: 7000, max_xp: 12000 },
+  { name: 'Expert', number: 6, min_xp: 12000, max_xp: 999999 },
 ];
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ route: string[] }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ route: string[] }> }) {
   try {
     const user = await getCurrentUser(request);
     const { route } = await params;
-    const path = route?.join("/") || "";
+    const path = route?.join('/') || '';
 
-    if (path === "dashboard") return handleDashboard(user);
-    if (path === "learner-summary") return handleLearnerSummary(user);
+    if (path === 'dashboard') return handleDashboard(user);
+    if (path === 'learner-summary') return handleLearnerSummary(user);
 
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Unknown analytics path" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Unknown analytics path' } },
+      { status: 404 },
     );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Analytics error:", error);
+    console.error('Analytics error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
 
-async function handleDashboard(user: { id: string; tenantId: string; email: string; fullName: string; role: string; avatarUrl: string | null }) {
+async function handleDashboard(user: {
+  id: string;
+  tenantId: string;
+  email: string;
+  fullName: string;
+  role: string;
+  avatarUrl: string | null;
+}) {
   // Parallel queries for performance
   const [xpAgg, streak, profile, masteryStates, quests, recentXp] = await Promise.all([
     prisma.xPEvent.aggregate({
@@ -66,11 +70,11 @@ async function handleDashboard(user: { id: string; tenantId: string; email: stri
     }),
     prisma.quest.findMany({
       where: { learnerId: user.id, isCompleted: false },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     }),
     prisma.xPEvent.findMany({
       where: { learnerId: user.id },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: 20,
     }),
   ]);
@@ -86,9 +90,8 @@ async function handleDashboard(user: { id: string; tenantId: string; email: stri
 
   // Get skill names for mastery
   const skillIds = masteryStates.map((m) => m.skillId);
-  const skills = skillIds.length > 0
-    ? await prisma.skill.findMany({ where: { id: { in: skillIds } } })
-    : [];
+  const skills =
+    skillIds.length > 0 ? await prisma.skill.findMany({ where: { id: { in: skillIds } } }) : [];
   const skillNameMap = new Map(skills.map((s) => [s.id, s.name]));
 
   return NextResponse.json({
@@ -102,7 +105,7 @@ async function handleDashboard(user: { id: string; tenantId: string; email: stri
     learner: {
       full_name: user.fullName,
       email: user.email,
-      avatar_url: user.avatarUrl || "",
+      avatar_url: user.avatarUrl || '',
       role: user.role,
     },
     goals: (profile?.goals || []).map((g) => ({
@@ -115,7 +118,7 @@ async function handleDashboard(user: { id: string; tenantId: string; email: stri
     mastery_summary: masteryStates
       .map((m) => ({
         skill_id: m.skillId,
-        skill_name: skillNameMap.get(m.skillId) || "Unknown",
+        skill_name: skillNameMap.get(m.skillId) || 'Unknown',
         score: m.masteryScore,
         confidence: m.confidence,
         status: m.status,
@@ -124,19 +127,21 @@ async function handleDashboard(user: { id: string; tenantId: string; email: stri
     daily_mission: {
       activities: [
         {
-          title: "Practice: Data Structures",
-          type: "lesson",
-          explanation: "Your mastery is at 55% — 3 more practice sessions to reach 70%.",
+          title: 'Practice: Data Structures',
+          type: 'lesson',
+          explanation: 'Your mastery is at 55% — 3 more practice sessions to reach 70%.',
         },
         {
-          title: "Review: REST API Basics",
-          type: "review",
-          explanation: "It's been 3 days since you last studied REST APIs. A quick review will reinforce retention.",
+          title: 'Review: REST API Basics',
+          type: 'review',
+          explanation:
+            "It's been 3 days since you last studied REST APIs. A quick review will reinforce retention.",
         },
         {
-          title: "Quiz: SQL Fundamentals",
-          type: "challenge",
-          explanation: "Test your SQL knowledge — scoring above 60% will unlock the FastAPI module.",
+          title: 'Quiz: SQL Fundamentals',
+          type: 'challenge',
+          explanation:
+            'Test your SQL knowledge — scoring above 60% will unlock the FastAPI module.',
         },
       ],
     },

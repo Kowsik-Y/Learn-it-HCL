@@ -2,46 +2,43 @@
  * Learners API — /api/learners/profile and /api/learners/goals
  */
 
-import { NextResponse } from "next/server";
-import { getCurrentUser, AuthError } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, getCurrentUser } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ route: string[] }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ route: string[] }> }) {
   try {
     const user = await getCurrentUser(request);
     const { route } = await params;
-    const path = route?.join("/") || "";
+    const path = route?.join('/') || '';
 
-    if (path === "profile") {
+    if (path === 'profile') {
       return handleProfile(user);
     }
 
-    if (path === "goals") {
+    if (path === 'goals') {
       return handleGoals(user);
     }
 
-    if (path === "daily-check-in") {
+    if (path === 'daily-check-in') {
       return handleDailyCheckIn();
     }
 
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: `Unknown path: /api/learners/${path}` } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: `Unknown path: /api/learners/${path}` } },
+      { status: 404 },
     );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Learners error:", error);
+    console.error('Learners error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
@@ -102,19 +99,19 @@ async function handleGoals(user: { id: string }) {
 
 function handleDailyCheckIn() {
   return NextResponse.json({
-    prompt: "How are you feeling today?",
+    prompt: 'How are you feeling today?',
     energy_options: [
-      { value: "ready", label: "Ready 🔥", emoji: "🔥" },
-      { value: "good", label: "Good 🙂", emoji: "🙂" },
-      { value: "okay", label: "Okay 😐", emoji: "😐" },
-      { value: "tired", label: "Tired 😴", emoji: "😴" },
-      { value: "overwhelmed", label: "Overwhelmed 😵", emoji: "😵" },
+      { value: 'ready', label: 'Ready 🔥', emoji: '🔥' },
+      { value: 'good', label: 'Good 🙂', emoji: '🙂' },
+      { value: 'okay', label: 'Okay 😐', emoji: '😐' },
+      { value: 'tired', label: 'Tired 😴', emoji: '😴' },
+      { value: 'overwhelmed', label: 'Overwhelmed 😵', emoji: '😵' },
     ],
     time_options: [
-      { value: 5, label: "5 min" },
-      { value: 15, label: "15 min" },
-      { value: 30, label: "30 min" },
-      { value: 60, label: "60+ min" },
+      { value: 5, label: '5 min' },
+      { value: 15, label: '15 min' },
+      { value: 30, label: '30 min' },
+      { value: 60, label: '60+ min' },
     ],
   });
 }
