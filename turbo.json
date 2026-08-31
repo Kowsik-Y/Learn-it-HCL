@@ -1,5 +1,13 @@
 {
   "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": [
+    "NEXT_PUBLIC_API_URL",
+    "ML_SERVICE_URL",
+    "JWT_SECRET_KEY",
+    "JWT_ACCESS_TOKEN_EXPIRE_MINUTES",
+    "JWT_REFRESH_TOKEN_EXPIRE_DAYS",
+    "DATABASE_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

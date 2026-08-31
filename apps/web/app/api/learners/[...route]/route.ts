@@ -84,7 +84,7 @@ async function handleGoals(user: { id: string }) {
   });
 
   return NextResponse.json({
-    items: goals.map((g) => ({
+    items: goals.map((g: any) => ({
       id: g.id,
       title: g.title,
       goal_type: g.goalType,

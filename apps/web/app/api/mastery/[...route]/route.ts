@@ -62,7 +62,7 @@ async function handleGetAllMastery(user: { id: string; tenantId: string }) {
       not_started: states.length - mastered - learning - practiced,
       overall_progress: (mastered / Math.max(states.length, 1)) * 100,
     },
-    skills: states.map((s) => ({
+    skills: states.map((s: any) => ({
       skill_id: s.skillId,
       mastery_score: parseFloat(s.masteryScore.toFixed(3)),
       confidence: parseFloat(s.confidence.toFixed(3)),

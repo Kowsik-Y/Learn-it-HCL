@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({
-      items: users.map((u) => ({
+      items: users.map((u: any) => ({
         id: u.id,
         email: u.email,
         full_name: u.fullName,

@@ -89,10 +89,10 @@ async function handleDashboard(user: {
   }
 
   // Get skill names for mastery
-  const skillIds = masteryStates.map((m) => m.skillId);
+  const skillIds = masteryStates.map((m: any) => m.skillId);
   const skills =
     skillIds.length > 0 ? await prisma.skill.findMany({ where: { id: { in: skillIds } } }) : [];
-  const skillNameMap = new Map(skills.map((s) => [s.id, s.name]));
+  const skillNameMap = new Map(skills.map((s: any) => [s.id, s.name]));
 
   return NextResponse.json({
     gamification: {
@@ -108,7 +108,7 @@ async function handleDashboard(user: {
       avatar_url: user.avatarUrl || '',
       role: user.role,
     },
-    goals: (profile?.goals || []).map((g) => ({
+    goals: (profile?.goals || []).map((g: any) => ({
       id: g.id,
       title: g.title,
       goal_type: g.goalType,
@@ -116,14 +116,14 @@ async function handleDashboard(user: {
       progress_percentage: g.progressPercentage,
     })),
     mastery_summary: masteryStates
-      .map((m) => ({
+      .map((m: any) => ({
         skill_id: m.skillId,
         skill_name: skillNameMap.get(m.skillId) || 'Unknown',
         score: m.masteryScore,
         confidence: m.confidence,
         status: m.status,
       }))
-      .sort((a, b) => b.score - a.score),
+      .sort((a: any, b: any) => b.score - a.score),
     daily_mission: {
       activities: [
         {
@@ -145,7 +145,7 @@ async function handleDashboard(user: {
         },
       ],
     },
-    active_quests: quests.map((q) => ({
+    active_quests: quests.map((q: any) => ({
       id: q.id,
       title: q.title,
       description: q.description,
@@ -153,7 +153,7 @@ async function handleDashboard(user: {
       progress: q.progressPercentage,
       target: 100,
     })),
-    recent_xp: recentXp.map((e) => ({
+    recent_xp: recentXp.map((e: any) => ({
       id: e.id,
       amount: e.amount,
       reason: e.reason,

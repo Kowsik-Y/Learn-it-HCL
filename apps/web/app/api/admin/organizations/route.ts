@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({
-      items: organizations.map((org) => ({
+      items: organizations.map((org: any) => ({
         id: org.id,
         name: org.name,
         slug: org.slug,
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     const hashedPassword = await hashPassword(admin_password);
 
     // Create Org and the Org Admin in a transaction
-    const organization = await prisma.$transaction(async (tx) => {
+    const organization = await prisma.$transaction(async (tx: any) => {
       const org = await tx.organization.create({
         data: {
           name,
