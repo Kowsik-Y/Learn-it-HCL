@@ -117,7 +117,7 @@ export default function CoursesPage() {
           </div>
         </div>
       ) : (
-        <div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Course List Column */}
           <div className="lg:col-span-5 space-y-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
