@@ -49,15 +49,24 @@ jobs:
 
       - name: Wait for deployment and check health
         run: |
-          echo "Waiting 60s for container to start..."
-          sleep 60
+          echo "Waiting 30s for container and SSL to initialize..."
+          sleep 30
           FQDN=$(az containerapp show \
-            --name $ACA_APP \
-            --resource-group $RESOURCE_GROUP \
+            --name "$ACA_APP" \
+            --resource-group "$RESOURCE_GROUP" \
             --query properties.configuration.ingress.fqdn \
             --output tsv)
           echo "Backend URL: https://$FQDN"
-          curl -f "https://$FQDN/health" || echo "Health check failed - check logs"
+          
+          for i in {1..6}; do
+            if curl -s -f --max-time 10 "https://$FQDN/health"; then
+              echo ""
+              echo "✅ Backend health check passed!"
+              break
+            fi
+            echo "Waiting for container endpoint (attempt $i/6)..."
+            sleep 15
+          done
 
       - name: Print Backend URL
         run: |
