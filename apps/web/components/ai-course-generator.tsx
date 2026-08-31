@@ -212,9 +212,10 @@ export function AiCourseGenerator() {
   const [completedLessons, setCompletedLessons] = useState<Record<string, boolean>>({});
 
   const getDynamicLessonContent = (topicName: string, lessonTitle: string) => {
-    const cleanTopic = topicName || topic || 'React';
+    const cleanTopic = topicName || topic || 'Data Structures';
     const cleanTitle = lessonTitle || 'Lesson';
-    const lower = cleanTitle.toLowerCase();
+    const topicLower = cleanTopic.toLowerCase();
+    const titleLower = cleanTitle.toLowerCase();
 
     let lectureMaterial = '';
     let gfgUrl = '';
@@ -222,332 +223,274 @@ export function AiCourseGenerator() {
     let videos: { id: string; title: string; channel: string }[] = [];
 
     if (
-      lower.includes('architecture') ||
-      lower.includes('virtual dom') ||
-      lower.includes('foundations')
+      topicLower.includes('structure') ||
+      topicLower.includes('algorithm') ||
+      topicLower.includes('dsa') ||
+      topicLower.includes('array') ||
+      topicLower.includes('tree') ||
+      topicLower.includes('graph')
     ) {
-      lectureMaterial = `### Deep Dive: ${cleanTitle}
-
-Understanding **${cleanTitle}** is essential for mastering high-performance **${cleanTopic}** applications.
-
-#### Core Principles & Mechanics:
-1. **Virtual DOM & Reconciliation**: React maintains an in-memory representation of UI elements. When state changes occur, React computes minimal diffs (Fiber algorithm) before applying changes to the actual DOM.
-2. **Component Lifecycle**: Understanding mounting, updating, and unmounting phases prevents memory leaks and unnecessary re-renders.
-3. **Declarative Rendering**: Write UI as a pure function of state, allowing automatic UI updates whenever state transitions happen.
-
-#### Code & Implementation Pattern:
-\`\`\`javascript
-// Virtual DOM Reconciliation Demonstration
-import React, { useState } from 'react';
-
-export function ArchitectureDemo() {
-  const [count, setCount] = useState(0);
-  return (
-    <div className="card shadow-lg p-4">
-      <h2 className="text-xl font-bold">Virtual DOM Counter: {count}</h2>
-      <button onClick={() => setCount(c => c + 1)} className="btn btn-primary">
-        Increment State
-      </button>
-    </div>
-  );
-}
-\`\`\`
-
-#### Key Takeaways:
-- Treat React state as immutable.
-- Keep components small, focused, and pure whenever possible.`;
-
-      gfgUrl = 'https://www.geeksforgeeks.org/reactjs-virtual-dom/';
-      docsUrl = 'https://react.dev/learn/render-and-commit';
+      gfgUrl = `https://www.geeksforgeeks.org/data-structures/`;
+      docsUrl = `https://en.wikipedia.org/wiki/Data_structure`;
       videos = [
         {
-          id: 'SqcY0GlETPk',
-          title: 'React Architecture & Virtual DOM in 100 Seconds',
-          channel: 'Fireship',
-        },
-        {
-          id: '8JafUJg5jFk',
-          title: 'How React Virtual DOM Works Under the Hood',
-          channel: 'Web Dev Simplified',
-        },
-        {
-          id: 'bMknfKXIFA8',
-          title: 'React Architecture - Full Masterclass',
+          id: 'RBSGKlAvoiM',
+          title: 'Data Structures Easy to Advanced — Full Course',
           channel: 'freeCodeCamp',
         },
         {
-          id: 'Tn6-PIqc4UM',
-          title: 'React Component Tree & Reconciliation',
-          channel: 'Programming with Mosh',
-        },
-      ];
-    } else if (
-      lower.includes('setup') ||
-      lower.includes('environment') ||
-      lower.includes('tooling')
-    ) {
-      lectureMaterial = `### Tooling & Environment Setup: ${cleanTitle}
-
-Setting up a modern developer environment for **${cleanTopic}** guarantees fast hot-module reloading and strict type safety.
-
-#### Environment Essentials:
-1. **Vite / Next.js Bundlers**: Replaces legacy Create-React-App with lightning-fast ES module bundling.
-2. **Node.js & Package Managers**: Managing dependencies using npm, yarn, or pnpm.
-3. **Developer Tools**: Integrating React Developer Tools browser extension for profiling state & props.
-
-#### Terminal & Config Snippet:
-\`\`\`bash
-# Create modern Vite + React app
-npx create-vite@latest my-app --template react-ts
-cd my-app
-npm install
-npm run dev
-\`\`\`
-
-#### Key Takeaways:
-- Always enforce ESLint & Prettier formatting.
-- Inspect component re-renders using React DevTools Profiler.`;
-
-      gfgUrl = 'https://www.geeksforgeeks.org/reactjs-introduction/';
-      docsUrl = 'https://vitejs.dev/guide/';
-      videos = [
-        { id: 'w7ejDZ8SWv8', title: 'Vite + React Setup Crash Course', channel: 'Traversy Media' },
-        {
-          id: 'Tn6-PIqc4UM',
-          title: 'Setting up Node.js & React Environment',
-          channel: 'Programming with Mosh',
+          id: 'zg9ih6SVACc',
+          title: 'Data Structures & Algorithms Beginner Course',
+          channel: 'Caleb Curry',
         },
         {
-          id: 'erEgovGjbEs',
-          title: 'React Developer Tools Deep Dive',
-          channel: 'Web Dev Simplified',
+          id: '09_LlHjoEiY',
+          title: 'Data Structures 101: Arrays & Linked Lists',
+          channel: 'CS Dojo',
         },
         {
-          id: 'hdI2bqOjy3c',
-          title: 'npm & Node environment configuration',
-          channel: 'Traversy Media',
-        },
-      ];
-    } else if (
-      lower.includes('syntax') ||
-      lower.includes('component') ||
-      lower.includes('data') ||
-      lower.includes('props')
-    ) {
-      lectureMaterial = `### Components, Props & Data Structures: ${cleanTitle}
-
-Components are the building blocks of **${cleanTopic}**. Mastering props passing and immutability is vital.
-
-#### Core Concepts:
-1. **Functional Components**: Lightweight JavaScript functions returning JSX.
-2. **Props Passing**: Read-only data passed from parent to child components.
-3. **JSX Syntax Rules**: Enclosing elements in a single fragment and using camelCase for HTML attributes.
-
-#### Code & Implementation Pattern:
-\`\`\`javascript
-// Reusable Component with Typed Props
-export function UserProfile({ name, role, isActive }) {
-  return (
-    <div className="user-card border p-3 rounded-lg">
-      <h3 className="font-bold text-lg">{name}</h3>
-      <p className="text-sm text-gray-500">{role}</p>
-      {isActive && <span className="badge bg-green-500">Active User</span>}
-    </div>
-  );
-}
-\`\`\`
-
-#### Key Takeaways:
-- Never mutate props directly inside child components.
-- Use destructuring for cleaner prop signatures.`;
-
-      gfgUrl = 'https://www.geeksforgeeks.org/reactjs-components/';
-      docsUrl = 'https://react.dev/learn/passing-props-to-a-component';
-      videos = [
-        {
-          id: 'w7ejDZ8SWv8',
-          title: 'React Components & Props Walkthrough',
-          channel: 'Traversy Media',
-        },
-        {
-          id: 'bMknfKXIFA8',
-          title: 'JSX Syntax & Component Architecture',
+          id: 't0Cq6tVNRBA',
+          title: 'Graph Algorithms & Graph Theory',
           channel: 'freeCodeCamp',
         },
-        {
-          id: 'Tn6-PIqc4UM',
-          title: 'Functional Components vs Class Components',
-          channel: 'Programming with Mosh',
-        },
-        { id: 'SqcY0GlETPk', title: 'JSX Expressions in 100 Seconds', channel: 'Fireship' },
       ];
-    } else if (
-      lower.includes('state') ||
-      lower.includes('hook') ||
-      lower.includes('application') ||
-      lower.includes('working')
-    ) {
-      lectureMaterial = `### State Management & React Hooks: ${cleanTitle}
+      lectureMaterial = `### Data Structures & Algorithms: ${cleanTitle}
 
-State represents dynamic data that changes over time. Hooks allow functional components to manage state and side effects.
-
-#### Core Hooks:
-1. **useState**: Manages local component state and triggers re-renders on update.
-2. **useEffect**: Handles side-effects like data fetching, subscriptions, and DOM manipulations.
-3. **Custom Hooks**: Encapsulating reusable state logic across multiple components.
-
-#### Code & Implementation Pattern:
-\`\`\`javascript
-import React, { useState, useEffect } from 'react';
-
-export function DataFetcher() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('https://api.example.com/items')
-      .then(res => res.json())
-      .then(result => {
-        setData(result);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <p>Loading data...</p>;
-  return <div>Data Loaded: {JSON.stringify(data)}</div>;
-}
-\`\`\`
-
-#### Key Takeaways:
-- Include all reactive variables in the useEffect dependency array.
-- Clean up subscriptions or timers in the useEffect return function.`;
-
-      gfgUrl = 'https://www.geeksforgeeks.org/reactjs-hooks/';
-      docsUrl = 'https://react.dev/reference/react/useState';
-      videos = [
-        {
-          id: 'TNhaISOUy6Q',
-          title: 'React Hooks Course - useState & useEffect',
-          channel: 'Web Dev Simplified',
-        },
-        {
-          id: 'bMknfKXIFA8',
-          title: 'Building Your First State-Driven App',
-          channel: 'freeCodeCamp',
-        },
-        { id: 'SqcY0GlETPk', title: 'React Hooks Overview in 100 Seconds', channel: 'Fireship' },
-        {
-          id: 'w7ejDZ8SWv8',
-          title: 'React State Management & Practical App',
-          channel: 'Traversy Media',
-        },
-      ];
-    } else if (
-      lower.includes('routing') ||
-      lower.includes('navigation') ||
-      lower.includes('api') ||
-      lower.includes('server')
-    ) {
-      lectureMaterial = `### Routing & API Integration: ${cleanTitle}
-
-Connecting your frontend to backend endpoints and building multi-page navigation using React Router.
-
-#### Key Concepts:
-1. **Client-Side Routing**: Navigating between views without full browser page reloads.
-2. **Axios / Fetch API**: Async/await network requests for REST & GraphQL endpoints.
-3. **State Sync & Cache**: Managing server state using TanStack Query or SWR.
-
-#### Code & Implementation Pattern:
-\`\`\`javascript
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-
-export function AppRouter() {
-  return (
-    <BrowserRouter>
-      <nav className="flex gap-4 p-4 border-b">
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-      </nav>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-\`\`\`
-
-#### Key Takeaways:
-- Always handle 404/Error boundaries for invalid route paths.
-- Centralize API base URLs in environment configuration.`;
-
-      gfgUrl = 'https://www.geeksforgeeks.org/reactjs-router/';
-      docsUrl = 'https://reactrouter.com/en/main';
-      videos = [
-        {
-          id: '59IXY5IDubY',
-          title: 'React Router v6 Complete Tutorial',
-          channel: 'Web Dev Simplified',
-        },
-        {
-          id: 'bMknfKXIFA8',
-          title: 'Connecting React Frontend to REST API',
-          channel: 'freeCodeCamp',
-        },
-        {
-          id: 'w7ejDZ8SWv8',
-          title: 'Axios API Requests & React Integration',
-          channel: 'Traversy Media',
-        },
-        { id: 'SqcY0GlETPk', title: 'Client Side Routing Explained', channel: 'Fireship' },
-      ];
-    } else {
-      lectureMaterial = `### Deep Dive: ${cleanTitle}
-
-Mastering **${cleanTitle}** in **${cleanTopic}** empowers software engineers to design scalable, production-grade applications.
+Mastering **${cleanTitle}** in **${cleanTopic}** is foundational for algorithmic problem-solving, Big-O complexity analysis, and technical engineering interviews.
 
 #### Core Principles:
-1. **Domain Isolation**: Structuring code by feature modules to maximize maintainability.
-2. **Predictable Data Flow**: Managing inputs, transformation logic, and output state deterministically.
-3. **Automated Testing**: Writing unit and integration tests to verify component behavior.
+1. **Time & Space Complexity**: Evaluating Big-O asymptotic bounds (\`O(1)\`, \`O(n)\`, \`O(n log n)\`) for memory footprint and execution latency.
+2. **Optimal Data Layout**: Choosing appropriate memory models (consecutive array memory vs. pointer-linked nodes).
+3. **Algorithmic Invariants**: Maintaining structural balance, recursion termination criteria, and pointer references.
 
 #### Implementation Pattern:
 \`\`\`javascript
-// Production pattern for ${cleanTitle}
-export function ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '')}Module() {
-  console.log("Executing ${cleanTitle} module");
-  return {
-    module: "${cleanTitle}",
-    topic: "${cleanTopic}",
-    status: "Active"
-  };
+// Efficient implementation pattern for ${cleanTitle}
+export class Node {
+  constructor(value) {
+    this.value = value;
+    this.next = null;
+  }
+}
+
+export function ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '')}Runner(items) {
+  console.log("Processing ${cleanTitle} for ${cleanTopic}");
+  return items.map(item => ({ item, processed: true }));
 }
 \`\`\`
 
 #### Key Takeaways:
-- Follow standard code formatting and domain boundary guidelines.
-- Continuously refactor complex logic into reusable helper functions.`;
-
-      gfgUrl = `https://www.google.com/search?q=geeksforgeeks+${encodeURIComponent(`${cleanTopic} ${cleanTitle}`)}`;
-      docsUrl = `https://developer.mozilla.org/en-US/search?q=${encodeURIComponent(`${cleanTopic} ${cleanTitle}`)}`;
+- Always check edge cases (empty collection, single element, boundary bounds).
+- Prefer iterative techniques or tail-recursion to preserve stack frames.`;
+    } else if (
+      topicLower.includes('python') ||
+      topicLower.includes('django') ||
+      topicLower.includes('fastapi')
+    ) {
+      gfgUrl = `https://www.geeksforgeeks.org/python-programming-language/`;
+      docsUrl = `https://docs.python.org/3/`;
       videos = [
         {
-          id: 'bMknfKXIFA8',
-          title: `${cleanTitle} — Full Engineering Guide`,
+          id: 'rfscVS0vtbw',
+          title: 'Learn Python — Full Course for Beginners',
           channel: 'freeCodeCamp',
         },
         {
-          id: 'SqcY0GlETPk',
-          title: `${cleanTopic} Core Principles in 100 Seconds`,
-          channel: 'Fireship',
-        },
-        { id: 'w7ejDZ8SWv8', title: `${cleanTitle} Hands-on Tutorial`, channel: 'Traversy Media' },
-        {
-          id: 'Tn6-PIqc4UM',
-          title: `${cleanTopic} Best Practices Masterclass`,
+          id: '_uQrJ0TkZlc',
+          title: 'Python Tutorial for Beginners',
           channel: 'Programming with Mosh',
         },
+        {
+          id: 'HGOBQPFzWKo',
+          title: 'Python Intermediate Tutorial & OOP',
+          channel: 'Tech With Tim',
+        },
+        {
+          id: '8ext9G7xspg',
+          title: 'Python Advanced Architecture & Design Patterns',
+          channel: 'ArjanCodes',
+        },
       ];
+      lectureMaterial = `### Python Engineering: ${cleanTitle}
+
+Python is a versatile, high-level, interpreted programming language emphasizing code readability and strong module ecosystems.
+
+#### Core Principles:
+1. **Readable & Idiomatic (PEP 8)**: Explicit imports, clear variable naming, and list comprehensions.
+2. **Dynamic Typing & Type Hints**: Combining runtime flexibility with static type checking (\`mypy\`, Pydantic).
+3. **Async I/O Concurrency**: Utilizing \`asyncio\` event loops for non-blocking network throughput.
+
+#### Implementation Pattern:
+\`\`\`python
+# Idiomatic Python pattern for ${cleanTitle}
+from typing import List, Dict, Any
+
+def process_${cleanTitle.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Process ${cleanTitle} entries deterministically."""
+    results = [item for item in data if item.get("active")]
+    return {"topic": "${cleanTopic}", "count": len(results)}
+\`\`\`
+
+#### Key Takeaways:
+- Leverage context managers (\`with\` statements) for safe resource handling.
+- Use virtual environments to isolate package dependencies.`;
+    } else if (
+      topicLower.includes('sql') ||
+      topicLower.includes('database') ||
+      topicLower.includes('postgre') ||
+      topicLower.includes('mysql')
+    ) {
+      gfgUrl = `https://www.geeksforgeeks.org/sql-tutorial/`;
+      docsUrl = `https://www.postgresql.org/docs/`;
+      videos = [
+        {
+          id: 'HXV3zeQKqGY',
+          title: 'SQL Tutorial — Full Database Course for Beginners',
+          channel: 'freeCodeCamp',
+        },
+        {
+          id: '27axs9dO7AE',
+          title: 'MySQL & Relational Databases Crash Course',
+          channel: 'Traversy Media',
+        },
+        {
+          id: 'M-55o_0yize',
+          title: 'SQL Window Functions & Complex Queries',
+          channel: 'Mode Analytics',
+        },
+        {
+          id: 'IXycPq7MnwE',
+          title: 'Database Indexing & Query Optimization',
+          channel: 'CMU Database Group',
+        },
+      ];
+      lectureMaterial = `### Database & SQL Engineering: ${cleanTitle}
+
+Relational databases organize structured data into schema-enforced tables connected via primary and foreign key constraints.
+
+#### Core Principles:
+1. **ACID Guarantees**: Atomicity, Consistency, Isolation, and Durability across transactions.
+2. **Indexing Strategies**: B-Tree and Hash indexes to convert sequential scans into fast lookup trees.
+3. **Relational Normalization**: Minimizing redundant data across tables (1NF, 2NF, 3NF).
+
+#### Implementation Pattern:
+\`\`\`sql
+-- Structured Query for ${cleanTitle}
+SELECT 
+    id, title, created_at,
+    COUNT(*) OVER() AS total_count
+FROM ${cleanTopic.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}_records
+WHERE is_active = TRUE
+ORDER BY created_at DESC
+LIMIT 10;
+\`\`\`
+
+#### Key Takeaways:
+- Always inspect query execution plans (\`EXPLAIN ANALYZE\`) before deploying to production.
+- Use parameterized queries to prevent SQL injection vulnerabilities.`;
+    } else if (
+      topicLower.includes('machine') ||
+      topicLower.includes('ai') ||
+      topicLower.includes('deep') ||
+      topicLower.includes('learning')
+    ) {
+      gfgUrl = `https://www.geeksforgeeks.org/machine-learning/`;
+      docsUrl = `https://scikit-learn.org/stable/`;
+      videos = [
+        {
+          id: 'GwIo3gDZCVQ',
+          title: 'Machine Learning Full Course for Beginners',
+          channel: 'Simplilearn',
+        },
+        {
+          id: 'Gv9_4yMHFhI',
+          title: 'Supervised vs Unsupervised Learning',
+          channel: 'StatQuest',
+        },
+        {
+          id: 'aircAruvnKk',
+          title: 'Neural Networks & Deep Learning Explained',
+          channel: '3Blue1Brown',
+        },
+        {
+          id: 'qFJeN9V1ZsI',
+          title: 'Attention Mechanism & Transformers',
+          channel: 'Andrej Karpathy',
+        },
+      ];
+      lectureMaterial = `### Artificial Intelligence & ML: ${cleanTitle}
+
+Machine Learning algorithms automatically extract representations, parameters, and decision boundaries from datasets.
+
+#### Core Principles:
+1. **Supervised & Unsupervised Learning**: Optimization functions targeting labeled regression/classification vs. clustering.
+2. **Bias-Variance Tradeoff**: Balancing model underfitting against overfitting generalization error.
+3. **Gradient Descent**: Iteratively updating weights along loss function gradients.
+
+#### Implementation Pattern:
+\`\`\`python
+# Machine Learning model evaluation for ${cleanTitle}
+import numpy as np
+
+def evaluate_${cleanTitle.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}(y_true, y_pred):
+    mse = np.mean((y_true - y_pred) ** 2)
+    return {"mse": float(mse), "accuracy": float(np.mean(y_true == y_pred))}
+\`\`\`
+
+#### Key Takeaways:
+- Always separate data into train, validation, and test splits to prevent data leakage.
+- Normalize continuous numerical features prior to neural network training.`;
+    } else {
+      // Default Web / React / JavaScript
+      gfgUrl = `https://www.geeksforgeeks.org/reactjs-introduction/`;
+      docsUrl = `https://react.dev/learn`;
+      videos = [
+        {
+          id: 'DLX62G4lc44',
+          title: 'React Full Course for Beginners 2024',
+          channel: 'freeCodeCamp',
+        },
+        {
+          id: 'bMknfKXIFA8',
+          title: 'React JS Tutorial for Beginners',
+          channel: 'Programming with Mosh',
+        },
+        {
+          id: 'hQAHSlTtVmA',
+          title: 'React Hooks Explained (useState & useEffect)',
+          channel: 'Web Dev Simplified',
+        },
+        {
+          id: 'XaBZMYxnl94',
+          title: 'React Performance Optimization & Design Patterns',
+          channel: 'Jack Herrington',
+        },
+      ];
+      lectureMaterial = `### Web & Frontend Engineering: ${cleanTitle}
+
+Building modern web applications requires declarative component structures, state management, and optimized rendering.
+
+#### Core Principles:
+1. **Component-Driven UI**: Reusable UI blocks responding deterministically to state changes.
+2. **Unidirectional Data Flow**: Passing props down component trees while bubbling event handlers up.
+3. **Asynchronous State Updates**: Managing API data, loading indicators, and error boundaries.
+
+#### Implementation Pattern:
+\`\`\`javascript
+// Frontend component pattern for ${cleanTitle}
+export function ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '')}View({ data }) {
+  return (
+    <div className="p-4 border rounded-xl bg-card">
+      <h3 className="font-bold text-lg">${cleanTitle}</h3>
+      <p className="text-sm text-muted-foreground">{data || 'Active Workspace'}</p>
+    </div>
+  );
+}
+\`\`\`
+
+#### Key Takeaways:
+- Keep state local to where it is needed and extract shared logic into hooks.
+- Optimize images and bundle sizes for fast core web vitals.`;
     }
 
     return { lectureMaterial, gfgUrl, docsUrl, videos };
@@ -1077,7 +1020,7 @@ export function ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '')}Module() {
 
                 <div className="pt-4 border-t flex justify-center">
                   <a
-                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${topic || 'React'} ${selectedLesson.title}`.trim())}`}
+                    href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${topic || selectedLesson.moduleTitle || ''} ${selectedLesson.title}`.trim())}`}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center justify-center rounded-xl bg-muted hover:bg-muted/80 text-foreground font-bold px-5 py-2.5 text-xs transition-all gap-2"
