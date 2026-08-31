@@ -174,7 +174,7 @@ class RecommendationEngine:
         from app.generated_models import LearnerProfiles as LearnerProfile
         pref_stmt = select(LearnerPreferences).join(
             LearnerProfile, LearnerPreferences.learner_id == LearnerProfile.id
-        ).where(cast(LearnerProfile.user_id, String) == str(learner_id))
+        ).where(LearnerProfile.user_id == learner_id)
         pref_result = await self.db.execute(pref_stmt)
         preferences = pref_result.scalar_one_or_none()
 
@@ -182,7 +182,7 @@ class RecommendationEngine:
         goal_stmt = select(LearnerGoal).join(
             LearnerProfile, LearnerGoal.learner_id == LearnerProfile.id
         ).where(
-            cast(LearnerProfile.user_id, String) == str(learner_id),
+            LearnerProfile.user_id == learner_id,
             LearnerGoal.is_active == True,
         )
         goal_result = await self.db.execute(goal_stmt)

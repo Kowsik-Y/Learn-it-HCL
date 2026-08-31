@@ -48,7 +48,7 @@ def UUIDType() -> postgresql.UUID | String:
     """
     if is_sqlite:
         return String(36)
-    return postgresql.UUID(as_uuid=False)
+    return postgresql.UUID()
 
 
 engine_kwargs: dict = {}

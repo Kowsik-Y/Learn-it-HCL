@@ -1,3 +1,4 @@
+from app.database import UUIDType
 from typing import Optional
 import datetime
 
@@ -15,7 +16,7 @@ class AccessRequests(Base):
         PrimaryKeyConstraint('id', name='access_requests_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     reason: Mapped[str] = mapped_column(Text, nullable=False)
@@ -31,8 +32,8 @@ class Assessments(Base):
         PrimaryKeyConstraint('id', name='assessments_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     assessment_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'quiz'::character varying"))
     passing_score: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0.7'))
@@ -58,10 +59,10 @@ class AttendanceRecords(Base):
         Index('ix_att_rec_student', 'student_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    session_id: Mapped[str] = mapped_column(Text, nullable=False)
-    student_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    session_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    student_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'absent'::character varying"))
     verification_method: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'otp'::character varying"))
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('false'))
@@ -78,9 +79,9 @@ class AttendanceSessions(Base):
         Index('ix_att_sess_tenant_date', 'tenant_id', 'session_date')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    teacher_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    teacher_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     session_date: Mapped[str] = mapped_column(String(20), nullable=False)
     start_time: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False)
@@ -89,7 +90,7 @@ class AttendanceSessions(Base):
     verification_method: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'otp'::character varying"))
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    course_id: Mapped[Optional[str]] = mapped_column(Text)
+    course_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     otp_code: Mapped[Optional[str]] = mapped_column(String(10))
     otp_expires_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True))
     qr_token: Mapped[Optional[str]] = mapped_column(String(255))
@@ -102,9 +103,9 @@ class AuditLogs(Base):
         Index('ix_audit_tenant_created', 'tenant_id', 'created_at')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    user_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    user_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     action: Mapped[str] = mapped_column(String(100), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
@@ -120,8 +121,8 @@ class Badges(Base):
         PrimaryKeyConstraint('id', name='badges_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     category: Mapped[str] = mapped_column(String(100), nullable=False, server_default=text("'skill'::character varying"))
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
@@ -140,8 +141,8 @@ class CareerRoles(Base):
         Index('ix_career_roles_tenant_slug', 'tenant_id', 'slug', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     category: Mapped[str] = mapped_column(String(100), nullable=False, server_default=text("'engineering'::character varying"))
@@ -161,9 +162,9 @@ class Courses(Base):
         Index('ix_courses_tenant_slug', 'tenant_id', 'slug', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    teacher_id: Mapped[Optional[str]] = mapped_column(Text)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    teacher_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     difficulty_level: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'beginner'::character varying"))
@@ -192,11 +193,11 @@ class CustomRoles(Base):
         Index('ix_custom_roles_tenant_slug', 'tenant_id', 'slug', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    tenant_id: Mapped[Optional[str]] = mapped_column(Text)
+    tenant_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     permissions: Mapped[Optional[dict]] = mapped_column(JSONB)
 
 
@@ -208,9 +209,9 @@ class LearnerProfiles(Base):
         Index('learner_profiles_user_id_key', 'user_id', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    user_id: Mapped[str] = mapped_column(Text, nullable=False)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    user_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     language: Mapped[str] = mapped_column(String(10), nullable=False, server_default=text("'en'::character varying"))
     timezone: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'UTC'::character varying"))
     locale: Mapped[str] = mapped_column(String(10), nullable=False, server_default=text("'en-US'::character varying"))
@@ -235,10 +236,10 @@ class MasteryStates(Base):
         Index('ix_mastery_tenant_learner', 'tenant_id', 'learner_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
-    skill_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    skill_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     mastery_score: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0.0'))
     confidence: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0.0'))
     evidence_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
@@ -261,7 +262,7 @@ class Organizations(Base):
         Index('organizations_slug_key', 'slug', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), nullable=False)
     tenant_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'standalone'::character varying"))
@@ -281,8 +282,8 @@ class Projects(Base):
         PrimaryKeyConstraint('id', name='projects_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     difficulty_level: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'beginner'::character varying"))
     estimated_duration_hours: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('1.0'))
@@ -303,9 +304,9 @@ class Quests(Base):
         Index('ix_quests_learner', 'learner_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     quest_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'daily'::character varying"))
     xp_reward: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('50'))
@@ -315,7 +316,7 @@ class Quests(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     description: Mapped[Optional[str]] = mapped_column(Text)
     tasks: Mapped[Optional[dict]] = mapped_column(JSONB)
-    badge_reward_id: Mapped[Optional[str]] = mapped_column(Text)
+    badge_reward_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     expires_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(True))
 
 
@@ -325,8 +326,8 @@ class Resources(Base):
         PrimaryKeyConstraint('id', name='resources_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(50), nullable=False)
     difficulty_level: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'beginner'::character varying"))
@@ -349,8 +350,8 @@ class Skills(Base):
         Index('ix_skills_tenant_slug', 'tenant_id', 'slug', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), nullable=False)
     category: Mapped[str] = mapped_column(String(100), nullable=False, server_default=text("'general'::character varying"))
@@ -359,7 +360,7 @@ class Skills(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     description: Mapped[Optional[str]] = mapped_column(Text)
-    parent_skill_id: Mapped[Optional[str]] = mapped_column(Text)
+    parent_skill_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     metadata_: Mapped[Optional[dict]] = mapped_column('metadata', JSONB)
 
     parent_skill: Mapped[Optional['Skills']] = relationship('Skills', remote_side=[id], back_populates='parent_skill_reverse')
@@ -376,9 +377,9 @@ class Streaks(Base):
         Index('streaks_learner_id_key', 'learner_id', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     current_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     longest_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     freeze_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('1'))
@@ -397,13 +398,13 @@ class XpEvents(Base):
         Index('xp_events_idempotency_key_key', 'idempotency_key', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     reason: Mapped[str] = mapped_column(String(500), nullable=False)
     source_type: Mapped[str] = mapped_column(String(100), nullable=False)
-    source_id: Mapped[str] = mapped_column(Text, nullable=False)
+    source_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     idempotency_key: Mapped[Optional[str]] = mapped_column(String(255))
 
@@ -417,10 +418,10 @@ class AssessmentAttempts(Base):
         Index('ix_attempts_learner', 'learner_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    assessment_id: Mapped[str] = mapped_column(Text, nullable=False)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    assessment_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     score: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0'))
     max_score: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0'))
     percentage: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0'))
@@ -443,10 +444,10 @@ class LearnerBadges(Base):
         Index('ix_learner_badges_learner', 'learner_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
-    badge_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    badge_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     earned_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False)
     reason: Mapped[Optional[str]] = mapped_column(String(500))
 
@@ -461,9 +462,9 @@ class LearnerGoals(Base):
         Index('ix_learner_goals_learner', 'learner_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     goal_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'career'::character varying"))
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('true'))
@@ -472,7 +473,7 @@ class LearnerGoals(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     description: Mapped[Optional[str]] = mapped_column(Text)
     target_role: Mapped[Optional[str]] = mapped_column(String(255))
-    target_role_id: Mapped[Optional[str]] = mapped_column(Text)
+    target_role_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     time_horizon_weeks: Mapped[Optional[int]] = mapped_column(Integer)
     hours_per_week: Mapped[Optional[int]] = mapped_column(Integer)
     known_skills: Mapped[Optional[dict]] = mapped_column(JSONB)
@@ -489,9 +490,9 @@ class LearnerPreferences(Base):
         Index('learner_preferences_learner_id_key', 'learner_id', unique=True)
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    learner_id: Mapped[str] = mapped_column(Text, nullable=False)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    learner_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     preferred_content_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'mixed'::character varying"))
     preferred_study_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('30'))
     preferred_difficulty: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'adaptive'::character varying"))
@@ -515,11 +516,11 @@ class MasteryEvidence(Base):
         Index('ix_evidence_mastery', 'mastery_state_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    mastery_state_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    mastery_state_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     evidence_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    source_id: Mapped[str] = mapped_column(Text, nullable=False)
+    source_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     score: Mapped[float] = mapped_column(Double(53), nullable=False)
     max_score: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('1.0'))
     weight: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('1.0'))
@@ -537,9 +538,9 @@ class Modules(Base):
         Index('ix_modules_course', 'course_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    course_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    course_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     order_index: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     estimated_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
@@ -560,8 +561,8 @@ class Questions(Base):
         Index('ix_questions_difficulty', 'tenant_id', 'difficulty_level')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     question_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'multiple_choice'::character varying"))
     difficulty_level: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('1'))
@@ -570,7 +571,7 @@ class Questions(Base):
     order_index: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
-    assessment_id: Mapped[Optional[str]] = mapped_column(Text)
+    assessment_id: Mapped[Optional[str]] = mapped_column(UUIDType())
     skill_ids: Mapped[Optional[dict]] = mapped_column(JSONB)
     explanation: Mapped[Optional[str]] = mapped_column(Text)
     hints: Mapped[Optional[dict]] = mapped_column(JSONB)
@@ -590,10 +591,10 @@ class RoleSkills(Base):
         Index('ix_roleskills_skill', 'skill_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    career_role_id: Mapped[str] = mapped_column(Text, nullable=False)
-    skill_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    career_role_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    skill_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     importance: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'important'::character varying"))
     minimum_mastery: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('0.7'))
 
@@ -612,10 +613,10 @@ class SkillRelationships(Base):
         Index('ix_skillrel_tenant_type', 'tenant_id', 'relationship_type')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    source_skill_id: Mapped[str] = mapped_column(Text, nullable=False)
-    target_skill_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    source_skill_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    target_skill_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     relationship_type: Mapped[str] = mapped_column(String(50), nullable=False)
     strength: Mapped[float] = mapped_column(Double(53), nullable=False, server_default=text('1.0'))
 
@@ -633,8 +634,8 @@ class Users(Base):
         Index('users_tenant_id_idx', 'tenant_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -658,9 +659,9 @@ class Chapters(Base):
         Index('ix_chapters_module', 'module_id')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    module_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    module_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     order_index: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
     estimated_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
@@ -681,9 +682,9 @@ class Lessons(Base):
         Index('ix_lessons_content_type', 'tenant_id', 'content_type')
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
-    chapter_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    chapter_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     content_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default=text("'article'::character varying"))
     order_index: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'))
@@ -705,8 +706,8 @@ class Batches(Base):
         PrimaryKeyConstraint('id', name='batches_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    tenant_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     start_date: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False)
     end_date: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False)
@@ -720,9 +721,9 @@ class BatchEnrollments(Base):
         PrimaryKeyConstraint('id', name='batch_enrollments_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    batch_id: Mapped[str] = mapped_column(Text, nullable=False)
-    student_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    batch_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    student_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
 
 
@@ -732,8 +733,8 @@ class CourseBatches(Base):
         PrimaryKeyConstraint('id', name='course_batches_pkey'),
     )
 
-    id: Mapped[str] = mapped_column(Text, primary_key=True)
-    course_id: Mapped[str] = mapped_column(Text, nullable=False)
-    batch_id: Mapped[str] = mapped_column(Text, nullable=False)
+    id: Mapped[str] = mapped_column(UUIDType(), primary_key=True)
+    course_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
+    batch_id: Mapped[str] = mapped_column(UUIDType(), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
 
