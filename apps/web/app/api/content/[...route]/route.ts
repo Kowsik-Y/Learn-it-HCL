@@ -76,16 +76,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ rou
   }
 }
 
-async function handleListCourses(user: { tenantId: string }, url: URL) {
+async function handleListCourses(user: { tenantId: string; role: string }, url: URL) {
   const search = url.searchParams.get('search') || undefined;
   const difficulty = url.searchParams.get('difficulty') || undefined;
   const page = parseInt(url.searchParams.get('page') || '1', 10);
   const pageSize = parseInt(url.searchParams.get('page_size') || '20', 10);
 
   const where: Record<string, unknown> = {
-    tenantId: user.tenantId,
     isPublished: true,
   };
+  if (user.role !== 'super_admin') {
+    where.tenantId = user.tenantId;
+  }
   if (search) where.title = { contains: search, mode: 'insensitive' };
   if (difficulty) where.difficultyLevel = difficulty;
 
@@ -126,9 +128,14 @@ async function handleListCourses(user: { tenantId: string }, url: URL) {
   });
 }
 
-async function handleGetCourse(user: { tenantId: string }, courseId: string) {
+async function handleGetCourse(user: { tenantId: string; role: string }, courseId: string) {
+  const where: Record<string, unknown> = { id: courseId };
+  if (user.role !== 'super_admin') {
+    where.tenantId = user.tenantId;
+  }
+
   const course = await prisma.course.findFirst({
-    where: { id: courseId, tenantId: user.tenantId },
+    where,
     include: {
       modules: {
         orderBy: { orderIndex: 'asc' },
@@ -178,9 +185,14 @@ async function handleGetCourse(user: { tenantId: string }, courseId: string) {
   });
 }
 
-async function handleGetLesson(user: { tenantId: string }, lessonId: string) {
+async function handleGetLesson(user: { tenantId: string; role: string }, lessonId: string) {
+  const where: Record<string, unknown> = { id: lessonId };
+  if (user.role !== 'super_admin') {
+    where.tenantId = user.tenantId;
+  }
+
   const lesson = await prisma.lesson.findFirst({
-    where: { id: lessonId, tenantId: user.tenantId },
+    where,
   });
 
   if (!lesson) {
