@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import select, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.mastery.models import MasteryState
@@ -174,7 +174,7 @@ class RecommendationEngine:
         from app.generated_models import LearnerProfiles as LearnerProfile
         pref_stmt = select(LearnerPreferences).join(
             LearnerProfile, LearnerPreferences.learner_id == LearnerProfile.id
-        ).where(LearnerProfile.user_id == learner_id)
+        ).where(cast(LearnerProfile.user_id, String) == str(learner_id))
         pref_result = await self.db.execute(pref_stmt)
         preferences = pref_result.scalar_one_or_none()
 
@@ -182,7 +182,7 @@ class RecommendationEngine:
         goal_stmt = select(LearnerGoal).join(
             LearnerProfile, LearnerGoal.learner_id == LearnerProfile.id
         ).where(
-            LearnerProfile.user_id == learner_id,
+            cast(LearnerProfile.user_id, String) == str(learner_id),
             LearnerGoal.is_active == True,
         )
         goal_result = await self.db.execute(goal_stmt)
