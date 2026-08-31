@@ -145,10 +145,8 @@ export default function CourseLearningInterface() {
               This topic contains a curated external video search or link.
             </p>
           </div>
-          <Button asChild variant="outline">
-            <a href={rawVideoUrl} target="_blank" rel="noopener noreferrer">
-              View on YouTube
-            </a>
+          <Button variant="outline" onClick={() => window.open(rawVideoUrl || '', '_blank')}>
+            View on YouTube
           </Button>
         </div>
       ) : null}
@@ -160,7 +158,7 @@ export default function CourseLearningInterface() {
             <ReactMarkdown>{lesson.content_body}</ReactMarkdown>
           </CardContent>
         </Card>
-      ) : !videoUrl ? (
+      ) : !rawVideoUrl ? (
         <Card className="shadow-sm border-dashed">
           <CardContent className="p-8 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
             <FileText className="h-8 w-8 text-muted-foreground/50 animate-pulse" />
