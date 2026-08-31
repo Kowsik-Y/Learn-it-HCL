@@ -66,8 +66,19 @@ class MLClient {
     const res = await fetch(url, fetchOptions);
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      const message = errorData?.detail || errorData?.error?.message || 'ML service error';
+      const errorText = await res.text().catch(() => '');
+      // biome-ignore lint/suspicious/noExplicitAny: error data can be any
+      let errorData: any = {};
+      try {
+        if (errorText) errorData = JSON.parse(errorText);
+      } catch (_e) {
+        // Not JSON
+      }
+
+      const message =
+        errorData?.detail ||
+        errorData?.error?.message ||
+        `ML service error: HTTP ${res.status} ${res.statusText} - ${errorText.slice(0, 200)}`;
       throw new MLServiceError(message, res.status);
     }
 
