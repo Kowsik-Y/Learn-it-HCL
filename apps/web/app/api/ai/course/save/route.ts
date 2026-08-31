@@ -117,13 +117,17 @@ export async function POST(request: Request) {
             contentBody = `## ${lessonTitle}\n\n${material}`;
           }
         }
+        // Extract video URL if present
+        // @ts-expect-error
+        const videoUrl = isObject ? lessonItem.video_url : null;
 
         await prisma.lesson.create({
           data: {
             tenantId,
             chapterId: chapter.id,
             title: lessonTitle,
-            contentType: 'article',
+            contentType: videoUrl ? 'video' : 'article',
+            contentUrl: videoUrl || null,
             contentBody:
               contentBody ||
               `## ${lessonTitle}\n\nThis lesson covers key concepts in **${topic}**.`,
