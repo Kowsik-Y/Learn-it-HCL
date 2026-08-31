@@ -2,6 +2,7 @@
 
 import { Award, FileText } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { useCourse } from '@/components/course/course-context';
@@ -14,10 +15,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { api } from '@/lib/api';
 
-import { useEffect, useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+function getEmbedUrl(url: string | null) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes('youtube.com') || parsed.hostname.includes('youtu.be')) {
+      if (parsed.pathname.includes('/results')) return null; // Cannot embed search results
+      if (parsed.pathname === '/watch') {
+        const v = parsed.searchParams.get('v');
+        if (v) return `https://www.youtube.com/embed/${v}`;
+      }
+      if (parsed.hostname === 'youtu.be') {
+        const v = parsed.pathname.slice(1);
+        return `https://www.youtube.com/embed/${v}`;
+      }
+      return url;
+    }
+    return url;
+  } catch (e) {
+    return null;
+  }
+}
 
 export default function CourseLearningInterface() {
   const params = useParams();
@@ -32,7 +53,8 @@ export default function CourseLearningInterface() {
     async function fetchLesson() {
       try {
         setLoading(true);
-        const res = await api.getLesson(activeLesson) as any;
+        // biome-ignore lint/suspicious/noExplicitAny: mvp
+        const res = (await api.getLesson(activeLesson)) as any;
         setLesson(res);
       } catch (err) {
         console.error(err);
@@ -50,7 +72,7 @@ export default function CourseLearningInterface() {
       try {
         await api.completeLesson(activeLesson);
         setCompletedLessons((prev) => [...prev, activeLesson]);
-        const xpGained = 50; // standard dynamic lesson XP
+        const xpGained = 50;
         setTotalXp((prev) => prev + xpGained);
         toast.success(`Lesson Completed! +${xpGained} XP`, {
           icon: <Award className="text-yellow-500" />,
@@ -81,15 +103,14 @@ export default function CourseLearningInterface() {
   }
 
   const hasVideo = lesson.content_type === 'video' && lesson.content_url;
-  const videoUrl = hasVideo ? lesson.content_url : null;
+  const rawVideoUrl = hasVideo ? lesson.content_url : null;
+  const embedUrl = getEmbedUrl(rawVideoUrl);
 
   return (
     <div className="max-w-4xl mx-auto w-full p-4 md:p-8 lg:p-10 space-y-8 pb-32">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {lesson.title}
-        </h1>
-        {videoUrl && (
+        <h1 className="text-3xl font-bold tracking-tight">{lesson.title}</h1>
+        {rawVideoUrl && (
           <div className="w-full sm:w-45 shrink-0">
             <Select value={activeLanguage} onValueChange={(val) => val && setActiveLanguage(val)}>
               <SelectTrigger>
@@ -104,19 +125,33 @@ export default function CourseLearningInterface() {
         )}
       </div>
 
-      {/* Video Player */}
-      {videoUrl && (
+      {/* Video Player or External Link */}
+      {embedUrl ? (
         <div className="aspect-video w-full rounded-xl overflow-hidden border shadow-sm bg-black relative">
           <iframe
             className="absolute inset-0 w-full h-full"
-            src={videoUrl}
-            title="YouTube video player"
+            src={embedUrl}
+            title="Video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </div>
-      )}
+      ) : rawVideoUrl ? (
+        <div className="p-4 bg-muted/50 rounded-xl border flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h3 className="font-medium flex items-center gap-2">External Video Resource</h3>
+            <p className="text-sm text-muted-foreground">
+              This topic contains a curated external video search or link.
+            </p>
+          </div>
+          <Button asChild variant="outline">
+            <a href={rawVideoUrl} target="_blank" rel="noopener noreferrer">
+              View on YouTube
+            </a>
+          </Button>
+        </div>
+      ) : null}
 
       {/* Markdown Content */}
       {lesson.content_body ? (
@@ -131,7 +166,9 @@ export default function CourseLearningInterface() {
             <FileText className="h-8 w-8 text-muted-foreground/50 animate-pulse" />
             <div>
               <p className="font-semibold">No content available</p>
-              <p className="text-xs">This lesson does not contain any video or reading material yet.</p>
+              <p className="text-xs">
+                This lesson does not contain any video or reading material yet.
+              </p>
             </div>
           </CardContent>
         </Card>
