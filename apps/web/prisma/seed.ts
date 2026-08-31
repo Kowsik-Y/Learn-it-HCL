@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import fs from 'fs';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -76,6 +78,23 @@ async function main() {
   if (!process.env.SUPER_ADMIN_PASSWORD) {
     console.log(`🔑 Default Password: Admin123!`);
     console.log(`⚠️  Please change this password immediately in a production environment.`);
+  }
+
+  console.log('📖 Executing seed_generated.sql to populate demo data...');
+  try {
+    const sqlPath = path.join(__dirname, 'seed_generated.sql');
+    if (fs.existsSync(sqlPath)) {
+      const sqlStr = fs.readFileSync(sqlPath, 'utf8');
+      const statements = sqlStr.split(';').filter((s) => s.trim().length > 0);
+      for (const statement of statements) {
+        await prisma.$executeRawUnsafe(statement);
+      }
+      console.log(`✅ Executed ${statements.length} SQL statements from seed_generated.sql`);
+    } else {
+      console.log('⚠️ seed_generated.sql not found, skipping demo data seed.');
+    }
+  } catch (err) {
+    console.error('⚠️ Failed to execute seed_generated.sql:', err);
   }
 
   console.log('✨ Seeding completed successfully!');
