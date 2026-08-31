@@ -30,18 +30,21 @@ jobs:
 
       - name: Build & Push image to ACR
         run: |
+          TARGET_ACR=$(az acr list --resource-group $RESOURCE_GROUP --query "[0].name" -o tsv)
+          echo "Using ACR: $TARGET_ACR"
           az acr build \
-            --registry $ACR_NAME \
-            --image $IMAGE_NAME:latest \
-            --image $IMAGE_NAME:${{ github.sha }} \
+            --registry "$TARGET_ACR" \
+            --image "$IMAGE_NAME:latest" \
+            --image "$IMAGE_NAME:${{ github.sha }}" \
             ./backend
 
       - name: Deploy to Azure Container Apps
         run: |
+          ACR_SERVER=$(az acr list --resource-group $RESOURCE_GROUP --query "[0].loginServer" -o tsv)
           az containerapp update \
-            --name $ACA_APP \
-            --resource-group $RESOURCE_GROUP \
-            --image ${ACR_NAME}.azurecr.io/$IMAGE_NAME:${{ github.sha }} \
+            --name "$ACA_APP" \
+            --resource-group "$RESOURCE_GROUP" \
+            --image "${ACR_SERVER}/$IMAGE_NAME:${{ github.sha }}" \
             -o none
 
       - name: Wait for deployment and check health
