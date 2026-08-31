@@ -6,11 +6,9 @@
  * Passes user_id and tenant_id via headers (already authenticated by Next.js).
  */
 
-const ML_SERVICE_URL =
-  process.env.ML_SERVICE_URL ||
-  (process.env.NEXT_PUBLIC_API_URL
-    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/ml\/?$/, '')
-    : 'http://localhost:8001');
+const baseEnv =
+  process.env.ML_SERVICE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+const ML_SERVICE_URL = baseEnv.replace(/\/ml\/?$/, '').replace(/\/$/, '');
 
 interface MLRequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
