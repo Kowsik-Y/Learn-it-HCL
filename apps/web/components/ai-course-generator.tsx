@@ -212,10 +212,13 @@ export function AiCourseGenerator() {
   const [completedLessons, setCompletedLessons] = useState<Record<string, boolean>>({});
 
   const getDynamicLessonContent = (topicName: string, lessonTitle: string) => {
-    const cleanTopic = topicName || topic || 'Data Structures';
+    const cleanTopic = topicName || topic || '';
     const cleanTitle = lessonTitle || 'Lesson';
+    // Check both topic name AND lesson title for keyword matching
     const topicLower = cleanTopic.toLowerCase();
     const titleLower = cleanTitle.toLowerCase();
+    // Combined signal: topic or title may contain domain keywords
+    const combined = `${topicLower} ${titleLower}`;
 
     let lectureMaterial = '';
     let gfgUrl = '';
@@ -223,12 +226,15 @@ export function AiCourseGenerator() {
     let videos: { id: string; title: string; channel: string }[] = [];
 
     if (
-      topicLower.includes('structure') ||
-      topicLower.includes('algorithm') ||
-      topicLower.includes('dsa') ||
-      topicLower.includes('array') ||
-      topicLower.includes('tree') ||
-      topicLower.includes('graph')
+      combined.includes('data structure') ||
+      combined.includes('algorithm') ||
+      combined.includes(' dsa') ||
+      combined.includes('linked list') ||
+      combined.includes('binary tree') ||
+      combined.includes('sorting') ||
+      combined.includes('searching') ||
+      (combined.includes('array') && !combined.includes('react')) ||
+      (combined.includes('graph') && !combined.includes('react'))
     ) {
       gfgUrl = `https://www.geeksforgeeks.org/data-structures/`;
       docsUrl = `https://en.wikipedia.org/wiki/Data_structure`;
@@ -283,9 +289,10 @@ export function ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '')}Runner(items) {
 - Always check edge cases (empty collection, single element, boundary bounds).
 - Prefer iterative techniques or tail-recursion to preserve stack frames.`;
     } else if (
-      topicLower.includes('python') ||
-      topicLower.includes('django') ||
-      topicLower.includes('fastapi')
+      combined.includes('python') ||
+      combined.includes('django') ||
+      combined.includes('fastapi') ||
+      combined.includes('flask')
     ) {
       gfgUrl = `https://www.geeksforgeeks.org/python-programming-language/`;
       docsUrl = `https://docs.python.org/3/`;
@@ -335,10 +342,11 @@ def process_${cleanTitle.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}(data: List
 - Leverage context managers (\`with\` statements) for safe resource handling.
 - Use virtual environments to isolate package dependencies.`;
     } else if (
-      topicLower.includes('sql') ||
-      topicLower.includes('database') ||
-      topicLower.includes('postgre') ||
-      topicLower.includes('mysql')
+      combined.includes('sql') ||
+      combined.includes('database') ||
+      combined.includes('postgre') ||
+      combined.includes('mysql') ||
+      combined.includes('relational')
     ) {
       gfgUrl = `https://www.geeksforgeeks.org/sql-tutorial/`;
       docsUrl = `https://www.postgresql.org/docs/`;
@@ -389,10 +397,11 @@ LIMIT 10;
 - Always inspect query execution plans (\`EXPLAIN ANALYZE\`) before deploying to production.
 - Use parameterized queries to prevent SQL injection vulnerabilities.`;
     } else if (
-      topicLower.includes('machine') ||
-      topicLower.includes('ai') ||
-      topicLower.includes('deep') ||
-      topicLower.includes('learning')
+      combined.includes('machine learning') ||
+      combined.includes('deep learning') ||
+      (combined.includes('ai') && !combined.includes('trail')) ||
+      combined.includes('neural network') ||
+      combined.includes('artificial intelligence')
     ) {
       gfgUrl = `https://www.geeksforgeeks.org/machine-learning/`;
       docsUrl = `https://scikit-learn.org/stable/`;
@@ -590,7 +599,9 @@ export function ${cleanTitle.replace(/[^a-zA-Z0-9]/g, '')}View({ data }) {
 
   const openLessonModal = (moduleTitle: string, lessonInput: any) => {
     const titleStr = typeof lessonInput === 'string' ? lessonInput : lessonInput.title;
-    const dynamicData = getDynamicLessonContent(topic, titleStr);
+    // Use topic state first, then fall back to moduleTitle for topic-aware video selection
+    const effectiveTopic = topic || moduleTitle || '';
+    const dynamicData = getDynamicLessonContent(effectiveTopic, titleStr);
 
     const lessonObj = {
       title: titleStr,
