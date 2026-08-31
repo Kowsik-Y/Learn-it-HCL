@@ -5,8 +5,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/server/db';
 import { getCurrentUser } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
 function slugify(text: string) {
   return text
@@ -30,7 +30,11 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { roadmap, materials, topic, target_audience, language } = body as {
-      roadmap: { title?: string; overview?: string; modules?: { title: string; lessons: string[] }[] };
+      roadmap: {
+        title?: string;
+        overview?: string;
+        modules?: { title: string; lessons: string[] }[];
+      };
       materials: { title: string; content: string }[];
       topic: string;
       target_audience: string;
@@ -97,8 +101,22 @@ export async function POST(request: Request) {
       });
 
       for (let li = 0; li < (mod.lessons || []).length; li++) {
-        const lessonTitle = mod.lessons[li];
-        const contentBody = materialMap[lessonTitle] || '';
+        const lessonItem = mod.lessons[li];
+        const isObject = typeof lessonItem === 'object' && lessonItem !== null;
+
+        // Extract title
+        // @ts-expect-error
+        const lessonTitle = isObject ? lessonItem.title || 'Untitled Lesson' : String(lessonItem);
+
+        // Extract or construct content
+        let contentBody = materialMap[lessonTitle] || '';
+        if (!contentBody && isObject) {
+          // @ts-expect-error
+          const material = lessonItem.lecture_material || lessonItem.summary;
+          if (material) {
+            contentBody = `## ${lessonTitle}\n\n${material}`;
+          }
+        }
 
         await prisma.lesson.create({
           data: {
@@ -106,7 +124,9 @@ export async function POST(request: Request) {
             chapterId: chapter.id,
             title: lessonTitle,
             contentType: 'article',
-            contentBody: contentBody || `## ${lessonTitle}\n\nThis lesson covers key concepts in **${topic}**.`,
+            contentBody:
+              contentBody ||
+              `## ${lessonTitle}\n\nThis lesson covers key concepts in **${topic}**.`,
             orderIndex: li,
             estimatedDurationMinutes: 30,
             difficultyLevel: 'intermediate',
