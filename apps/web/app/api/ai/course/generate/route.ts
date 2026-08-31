@@ -18,7 +18,8 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Forward the request to the Python ML Service
-    const mlServiceUrl = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8001';
+    const rawUrl = process.env.ML_SERVICE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001';
+    const mlServiceUrl = rawUrl.replace(/\/ml\/?$/, '');
 
     const response = await fetch(`${mlServiceUrl}/ml/course_agent/generate`, {
       method: 'POST',
