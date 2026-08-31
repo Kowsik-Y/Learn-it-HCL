@@ -2,7 +2,7 @@
 set -e
 
 echo "=== Initializing schema & seeding database... ==="
-python scripts/seed.py || echo "⚠️ Seeding step completed with warning"
+PYTHONPATH=. python scripts/seed.py || echo "⚠️ Seeding step completed with warning"
 
 echo "=== Running database migrations... ==="
 alembic upgrade head || echo "⚠️ Migration step completed with warning"
