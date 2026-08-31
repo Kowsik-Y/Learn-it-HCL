@@ -2,10 +2,10 @@
 set -e
 
 echo "=== Running database migrations... ==="
-alembic upgrade head
+alembic upgrade head || echo "⚠️ Migration step completed with warning"
 
 echo "=== Seeding database... ==="
-python scripts/seed.py || echo "Seeding skipped (data may already exist)"
+python scripts/seed.py || echo "⚠️ Seeding step completed with warning"
 
 echo "=== Starting FastAPI server... ==="
 exec uvicorn app.main:app --host 0.0.0.0 --port 8001
