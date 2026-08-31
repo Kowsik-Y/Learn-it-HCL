@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push --accept-data-loss && prisma db seed && next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "create-super-admin": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} scripts/create-super-admin.ts"
