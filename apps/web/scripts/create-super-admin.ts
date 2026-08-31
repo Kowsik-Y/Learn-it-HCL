@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import * as bcrypt from "bcryptjs";
-import * as readline from "readline";
+import * as readline from 'node:readline';
+import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -10,21 +10,21 @@ const rl = readline.createInterface({
 });
 
 async function main() {
-  console.log("🚀 Super Admin Creation Script");
+  console.log('🚀 Super Admin Creation Script');
 
-  rl.question("Email: ", async (email) => {
+  rl.question('Email: ', async (email) => {
     if (!email) {
-      console.log("Email is required.");
+      console.log('Email is required.');
       process.exit(1);
     }
 
-    rl.question("Password: ", async (password) => {
+    rl.question('Password: ', async (password) => {
       if (!password) {
-        console.log("Password is required.");
+        console.log('Password is required.');
         process.exit(1);
       }
 
-      rl.question("Full Name: ", async (fullName) => {
+      rl.question('Full Name: ', async (fullName) => {
         try {
           // Check if a user with this email already exists
           const existingUser = await prisma.user.findFirst({
@@ -37,20 +37,20 @@ async function main() {
           }
 
           let systemOrg = await prisma.organization.findUnique({
-            where: { slug: "system-admin" }
+            where: { slug: 'system-admin' },
           });
-          
+
           if (!systemOrg) {
-             systemOrg = await prisma.organization.create({
-               data: {
-                 name: "System Administration",
-                 slug: "system-admin",
-                 tenantType: "system"
-               }
-             });
+            systemOrg = await prisma.organization.create({
+              data: {
+                name: 'System Administration',
+                slug: 'system-admin',
+                tenantType: 'system',
+              },
+            });
           }
 
-          console.log("Creating Super Admin...");
+          console.log('Creating Super Admin...');
           const hashedPassword = await bcrypt.hash(password, 10);
 
           const user = await prisma.user.create({
@@ -58,15 +58,15 @@ async function main() {
               tenantId: systemOrg.id,
               email,
               hashedPassword,
-              fullName: fullName || "Super Admin",
-              role: "super_admin",
+              fullName: fullName || 'Super Admin',
+              role: 'super_admin',
               isActive: true,
             },
           });
 
           console.log(`✅ Super Admin created successfully: ${user.email}`);
         } catch (error) {
-          console.error("❌ Failed to create super admin:", error);
+          console.error('❌ Failed to create super admin:', error);
         } finally {
           await prisma.$disconnect();
           rl.close();

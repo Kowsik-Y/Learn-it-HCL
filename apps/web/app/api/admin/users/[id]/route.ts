@@ -1,11 +1,8 @@
-import { NextResponse } from "next/server";
-import { requireSuperAdmin } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { requireSuperAdmin } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireSuperAdmin(request);
     const { id } = await params;
@@ -24,32 +21,29 @@ export async function PUT(
   } catch (error: any) {
     return NextResponse.json(
       { error: { message: error.message } },
-      { status: error.status || 500 }
+      { status: error.status || 500 },
     );
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const adminUser = await requireSuperAdmin(request);
     const { id } = await params;
-    
+
     if (id === adminUser.id) {
-       return NextResponse.json({ error: { message: "Cannot delete yourself" } }, { status: 403 });
+      return NextResponse.json({ error: { message: 'Cannot delete yourself' } }, { status: 403 });
     }
 
     await prisma.user.delete({
       where: { id },
     });
-    
-    return NextResponse.json({ success: true, message: "User deleted" });
+
+    return NextResponse.json({ success: true, message: 'User deleted' });
   } catch (error: any) {
     return NextResponse.json(
       { error: { message: error.message } },
-      { status: error.status || 500 }
+      { status: error.status || 500 },
     );
   }
 }

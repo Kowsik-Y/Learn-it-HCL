@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { requireOrgAdmin, AuthError, ROLES, hashPassword } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, hashPassword, ROLES, requireOrgAdmin } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
 export async function GET(request: Request) {
   try {
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
     const users = await prisma.user.findMany({
       where: { tenantId: adminUser.tenantId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       select: {
         id: true,
         email: true,
@@ -34,14 +34,14 @@ export async function GET(request: Request) {
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("List users error:", error);
+    console.error('List users error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to list users" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to list users' } },
+      { status: 500 },
     );
   }
 }
@@ -49,22 +49,25 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const adminUser = await requireOrgAdmin(request);
-    
+
     const body = await request.json();
     const { email, password, full_name, role } = body;
 
     if (!email || !password || !full_name || !role) {
       return NextResponse.json(
-        { error: { code: "VALIDATION_ERROR", message: "Missing required fields" } },
-        { status: 400 }
+        { error: { code: 'VALIDATION_ERROR', message: 'Missing required fields' } },
+        { status: 400 },
       );
     }
 
     // Ensure the org admin can only create TEACHER or STUDENT roles, unless they are SUPER_ADMIN
-    if (role === ROLES.SUPER_ADMIN || (role === ROLES.ORG_ADMIN && adminUser.role !== ROLES.SUPER_ADMIN)) {
+    if (
+      role === ROLES.SUPER_ADMIN ||
+      (role === ROLES.ORG_ADMIN && adminUser.role !== ROLES.SUPER_ADMIN)
+    ) {
       return NextResponse.json(
-        { error: { code: "FORBIDDEN", message: "Cannot assign this role" } },
-        { status: 403 }
+        { error: { code: 'FORBIDDEN', message: 'Cannot assign this role' } },
+        { status: 403 },
       );
     }
 
@@ -80,8 +83,8 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: { code: "CONFLICT", message: "User already exists in this organization" } },
-        { status: 409 }
+        { error: { code: 'CONFLICT', message: 'User already exists in this organization' } },
+        { status: 409 },
       );
     }
 
@@ -98,27 +101,29 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({
-      message: "User created successfully",
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        full_name: newUser.fullName,
-        role: newUser.role,
+    return NextResponse.json(
+      {
+        message: 'User created successfully',
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          full_name: newUser.fullName,
+          role: newUser.role,
+        },
       },
-    }, { status: 201 });
-
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Create user error:", error);
+    console.error('Create user error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to create user" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to create user' } },
+      { status: 500 },
     );
   }
 }

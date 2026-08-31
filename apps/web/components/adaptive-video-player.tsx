@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -14,7 +15,7 @@ interface PlaylistSelection {
     duration_mins: number;
     embed_url: string;
     watch_url: string;
-    tier: "beginner" | "intermediate" | "advanced";
+    tier: 'beginner' | 'intermediate' | 'advanced';
   };
   fallback_video?: {
     video_id: string;
@@ -52,12 +53,9 @@ interface AdaptiveVideoPlayerProps {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TIER_STYLES: Record<string, string> = {
-  beginner:
-    "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30",
-  intermediate:
-    "bg-blue-500/20 text-blue-300 border border-blue-500/30",
-  advanced:
-    "bg-purple-500/20 text-purple-300 border border-purple-500/30",
+  beginner: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+  intermediate: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+  advanced: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -91,9 +89,9 @@ export function AdaptiveVideoPlayer({
     setEventSent(false);
     setUpdatedMastery(null);
 
-    fetch("/api/ml/playlist/select", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    fetch('/api/ml/playlist/select', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic, ...mlContext }),
     })
       .then((r) => r.json())
@@ -102,10 +100,10 @@ export function AdaptiveVideoPlayer({
         setLoading(false);
       })
       .catch(() => {
-        setError("Could not load adaptive video recommendation.");
+        setError('Could not load adaptive video recommendation.');
         setLoading(false);
       });
-  }, [topic, skillId]);
+  }, [topic, mlContext]);
 
   // ── Simulate watch progress (replace with YouTube IFrame API in production) ─
 
@@ -125,21 +123,18 @@ export function AdaptiveVideoPlayer({
     return () => {
       if (watchInterval.current) clearInterval(watchInterval.current);
     };
-  }, [selection, eventSent]);
+  }, [selection, eventSent, sendWatchEvent]);
 
   // ── Report watch event to backend → BKT update ───────────────────────────
 
-  async function sendWatchEvent(
-    pct: number,
-    quizCorrect: boolean | null
-  ) {
+  async function sendWatchEvent(pct: number, quizCorrect: boolean | null) {
     if (eventSent || !selection) return;
     setEventSent(true);
 
     try {
-      const res = await fetch("/api/ml/playlist/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/ml/playlist/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           skill_id: skillId,
           video_id: selection.primary_video.video_id,
@@ -176,7 +171,7 @@ export function AdaptiveVideoPlayer({
   if (error || !selection) {
     return (
       <div className="flex items-center justify-center h-64 rounded-2xl bg-red-500/10 border border-red-500/20">
-        <p className="text-red-400 text-sm">{error ?? "No video available."}</p>
+        <p className="text-red-400 text-sm">{error ?? 'No video available.'}</p>
       </div>
     );
   }
@@ -221,12 +216,14 @@ export function AdaptiveVideoPlayer({
         </div>
 
         {/* Explainability toggle */}
-        <button
+        <Button
+          variant="link"
+          type="button"
           onClick={() => setShowExplain((v) => !v)}
-          className="shrink-0 text-xs text-violet-400 hover:text-violet-300 underline underline-offset-2 transition"
+          className="shrink-0 h-auto p-0 text-xs text-violet-400 hover:text-violet-300 underline underline-offset-2 transition"
         >
-          {showExplain ? "Hide" : "Why this video?"}
-        </button>
+          {showExplain ? 'Hide' : 'Why this video?'}
+        </Button>
       </div>
 
       {/* ── Explainability Panel ── */}
@@ -235,10 +232,19 @@ export function AdaptiveVideoPlayer({
           <p className="text-violet-200">{selection.reason}</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">
             {[
-              { label: "Mastery", value: `${(selection.ml_signals.mastery_prob * 100).toFixed(0)}%` },
-              { label: "Retention", value: `${(selection.ml_signals.retention_score * 100).toFixed(0)}%` },
-              { label: "Risk Score", value: `${selection.ml_signals.risk_score.toFixed(0)}%` },
-              { label: "AI Ranker", value: selection.ml_signals.neural_ranker_active ? "ON" : "OFF" },
+              {
+                label: 'Mastery',
+                value: `${(selection.ml_signals.mastery_prob * 100).toFixed(0)}%`,
+              },
+              {
+                label: 'Retention',
+                value: `${(selection.ml_signals.retention_score * 100).toFixed(0)}%`,
+              },
+              { label: 'Risk Score', value: `${selection.ml_signals.risk_score.toFixed(0)}%` },
+              {
+                label: 'AI Ranker',
+                value: selection.ml_signals.neural_ranker_active ? 'ON' : 'OFF',
+              },
             ].map(({ label, value }) => (
               <div
                 key={label}
@@ -259,18 +265,22 @@ export function AdaptiveVideoPlayer({
             Quick check — did you understand the key concept from this video?
           </p>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
+              type="button"
               onClick={() => handleQuizAnswer(true)}
-              className="flex-1 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-sm font-semibold border border-emerald-500/30 transition"
+              className="flex-1 h-auto py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-sm font-semibold border border-emerald-500/30 transition"
             >
               Yes, got it
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
               onClick={() => handleQuizAnswer(false)}
-              className="flex-1 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold border border-red-500/20 transition"
+              className="flex-1 h-auto py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold border border-red-500/20 transition"
             >
               Not yet
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -282,7 +292,7 @@ export function AdaptiveVideoPlayer({
           <div>
             <span className="text-emerald-300 font-semibold">Mastery updated: </span>
             <span className="text-white/70">
-              {(mlContext.mastery_prob * 100).toFixed(0)}% →{" "}
+              {(mlContext.mastery_prob * 100).toFixed(0)}% →{' '}
               <span className="text-emerald-300 font-bold">
                 {(updatedMastery * 100).toFixed(0)}%
               </span>

@@ -1,11 +1,8 @@
-import { NextResponse } from "next/server";
-import { requireSuperAdmin, hashPassword } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { hashPassword, requireSuperAdmin } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireSuperAdmin(request);
     const { id } = await params;
@@ -13,19 +10,22 @@ export async function POST(
     const accessRequest = await prisma.accessRequest.findUnique({
       where: { id },
     });
-    
-    if (!accessRequest || accessRequest.status !== "pending") {
+
+    if (accessRequest?.status !== 'pending') {
       return NextResponse.json(
-        { error: { message: "Request not found or already processed" } },
-        { status: 400 }
+        { error: { message: 'Request not found or already processed' } },
+        { status: 400 },
       );
     }
 
     // 1. Create Organization
-    const orgName = accessRequest.company || "Default Organization";
+    const orgName = accessRequest.company || 'Default Organization';
     const orgSlug =
-      orgName.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") +
-      "-" +
+      orgName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '') +
+      '-' +
       Date.now().toString().slice(-4);
 
     const org = await prisma.organization.create({
@@ -33,7 +33,7 @@ export async function POST(
     });
 
     // 2. Create User
-    const rawPassword = Math.random().toString(36).slice(-8) + "A1!";
+    const rawPassword = `${Math.random().toString(36).slice(-8)}A1!`;
     const hashedPassword = await hashPassword(rawPassword);
 
     const user = await prisma.user.create({
@@ -42,25 +42,25 @@ export async function POST(
         email: accessRequest.email,
         fullName: accessRequest.fullName,
         hashedPassword,
-        role: "org_admin", // Give them Org Admin privileges in their new tenant
+        role: 'org_admin', // Give them Org Admin privileges in their new tenant
       },
     });
 
     // 3. Mark request as approved
     await prisma.accessRequest.update({
       where: { id },
-      data: { status: "approved" },
+      data: { status: 'approved' },
     });
 
     // Send back the temporary password so the Super Admin can see it
     return NextResponse.json({
-      message: "Approved successfully",
+      message: 'Approved successfully',
       user: { email: user.email, temporaryPassword: rawPassword },
     });
   } catch (error: any) {
     return NextResponse.json(
       { error: { message: error.message } },
-      { status: error.status || 500 }
+      { status: error.status || 500 },
     );
   }
 }

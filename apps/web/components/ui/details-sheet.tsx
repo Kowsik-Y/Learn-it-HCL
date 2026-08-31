@@ -1,5 +1,11 @@
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import React from "react";
+import type React from 'react';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 interface DetailsSheetProps {
   open: boolean;
@@ -18,7 +24,7 @@ export function DetailsSheet({
   description,
   icon,
   children,
-  className = "sm:max-w-md w-100 overflow-y-auto"
+  className = 'sm:max-w-md w-100 overflow-y-auto',
 }: DetailsSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -30,9 +36,7 @@ export function DetailsSheet({
           </SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}
         </SheetHeader>
-        <div className="space-y-8 px-4">
-          {children}
-        </div>
+        <div className="space-y-8 px-4">{children}</div>
       </SheetContent>
     </Sheet>
   );

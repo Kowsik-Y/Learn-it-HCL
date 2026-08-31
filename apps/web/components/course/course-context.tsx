@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { mockCourseData } from "@/lib/mock-course-data";
-import { api } from "@/lib/api";
+import type React from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 
 type CourseContextType = {
   completedLessons: string[];
@@ -17,12 +17,10 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [totalXp, setTotalXp] = useState(0);
 
-
-
   useEffect(() => {
     async function loadProgress() {
       try {
-        const res = await api.getGamificationProfile() as any;
+        const res = (await api.getGamificationProfile()) as any;
         if (res.completed_lessons) {
           setCompletedLessons(res.completed_lessons);
         }
@@ -30,19 +28,19 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
           setTotalXp(res.total_xp);
         }
       } catch (err) {
-        console.error("Failed to load progress from DB", err);
+        console.error('Failed to load progress from DB', err);
       }
     }
     loadProgress();
   }, []);
 
   return (
-    <CourseContext.Provider 
-      value={{ 
-        completedLessons, 
-        setCompletedLessons, 
-        totalXp, 
-        setTotalXp 
+    <CourseContext.Provider
+      value={{
+        completedLessons,
+        setCompletedLessons,
+        totalXp,
+        setTotalXp,
       }}
     >
       {children}
@@ -52,6 +50,6 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
 
 export function useCourse() {
   const ctx = useContext(CourseContext);
-  if (!ctx) throw new Error("useCourse must be used within CourseProvider");
+  if (!ctx) throw new Error('useCourse must be used within CourseProvider');
   return ctx;
 }

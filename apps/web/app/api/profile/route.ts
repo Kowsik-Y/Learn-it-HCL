@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { getCurrentUser, AuthError, verifyPassword, hashPassword } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, getCurrentUser, hashPassword, verifyPassword } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
 export async function GET(request: Request) {
   try {
@@ -14,13 +14,13 @@ export async function GET(request: Request) {
       where: { userId: user.id },
       include: {
         preferences: true,
-      }
+      },
     });
 
     if (!profileData) {
       return NextResponse.json(
-        { error: { code: "NOT_FOUND", message: "User not found" } },
-        { status: 404 }
+        { error: { code: 'NOT_FOUND', message: 'User not found' } },
+        { status: 404 },
       );
     }
 
@@ -37,14 +37,14 @@ export async function GET(request: Request) {
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Profile GET error:", error);
+    console.error('Profile GET error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred fetching profile" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred fetching profile' } },
+      { status: 500 },
     );
   }
 }
@@ -54,18 +54,35 @@ export async function PUT(request: Request) {
     const user = await getCurrentUser(request);
     const body = await request.json();
 
-    const { fullName, avatarUrl, bio, timezone, language, locale, ageRange, preferences, currentPassword, newPassword } = body;
+    const {
+      fullName,
+      avatarUrl,
+      bio,
+      timezone,
+      language,
+      locale,
+      ageRange,
+      preferences,
+      currentPassword,
+      newPassword,
+    } = body;
 
     // Handle Password Change if requested
     if (currentPassword && newPassword) {
       const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
       if (!dbUser) {
-        return NextResponse.json({ error: { code: "NOT_FOUND", message: "User not found" } }, { status: 404 });
+        return NextResponse.json(
+          { error: { code: 'NOT_FOUND', message: 'User not found' } },
+          { status: 404 },
+        );
       }
 
       const isPasswordValid = await verifyPassword(currentPassword, dbUser.hashedPassword);
       if (!isPasswordValid) {
-        return NextResponse.json({ error: { code: "VALIDATION_ERROR", message: "Incorrect current password" } }, { status: 400 });
+        return NextResponse.json(
+          { error: { code: 'VALIDATION_ERROR', message: 'Incorrect current password' } },
+          { status: 400 },
+        );
       }
 
       const newHashedPassword = await hashPassword(newPassword);
@@ -91,9 +108,9 @@ export async function PUT(request: Request) {
         userId: user.id,
         tenantId: user.tenantId,
         bio: bio || null,
-        timezone: timezone || "UTC",
-        language: language || "en",
-        locale: locale || "en-US",
+        timezone: timezone || 'UTC',
+        language: language || 'en',
+        locale: locale || 'en-US',
         ageRange: ageRange || null,
       },
       update: {
@@ -114,18 +131,31 @@ export async function PUT(request: Request) {
         create: {
           learnerId: updatedProfile.id,
           tenantId: user.tenantId,
-          preferredContentType: preferences.preferredContentType || "mixed",
+          preferredContentType: preferences.preferredContentType || 'mixed',
           preferredStudyDurationMinutes: preferences.preferredStudyDurationMinutes || 30,
-          preferredDifficulty: preferences.preferredDifficulty || "adaptive",
-          projectOriented: preferences.projectOriented !== undefined ? preferences.projectOriented : true,
-          mentorSupported: preferences.mentorSupported !== undefined ? preferences.mentorSupported : false,
+          preferredDifficulty: preferences.preferredDifficulty || 'adaptive',
+          projectOriented:
+            preferences.projectOriented !== undefined ? preferences.projectOriented : true,
+          mentorSupported:
+            preferences.mentorSupported !== undefined ? preferences.mentorSupported : false,
         },
         update: {
-          preferredContentType: preferences.preferredContentType !== undefined ? preferences.preferredContentType : undefined,
-          preferredStudyDurationMinutes: preferences.preferredStudyDurationMinutes !== undefined ? preferences.preferredStudyDurationMinutes : undefined,
-          preferredDifficulty: preferences.preferredDifficulty !== undefined ? preferences.preferredDifficulty : undefined,
-          projectOriented: preferences.projectOriented !== undefined ? preferences.projectOriented : undefined,
-          mentorSupported: preferences.mentorSupported !== undefined ? preferences.mentorSupported : undefined,
+          preferredContentType:
+            preferences.preferredContentType !== undefined
+              ? preferences.preferredContentType
+              : undefined,
+          preferredStudyDurationMinutes:
+            preferences.preferredStudyDurationMinutes !== undefined
+              ? preferences.preferredStudyDurationMinutes
+              : undefined,
+          preferredDifficulty:
+            preferences.preferredDifficulty !== undefined
+              ? preferences.preferredDifficulty
+              : undefined,
+          projectOriented:
+            preferences.projectOriented !== undefined ? preferences.projectOriented : undefined,
+          mentorSupported:
+            preferences.mentorSupported !== undefined ? preferences.mentorSupported : undefined,
         },
       });
     }
@@ -139,19 +169,21 @@ export async function PUT(request: Request) {
         avatarUrl: updatedUser.avatarUrl,
       },
       learnerProfile: updatedProfile,
-      preferences: updatedPreferences || (await prisma.learnerPreferences.findUnique({ where: { learnerId: updatedProfile.id } })),
+      preferences:
+        updatedPreferences ||
+        (await prisma.learnerPreferences.findUnique({ where: { learnerId: updatedProfile.id } })),
     });
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Profile PUT error:", error);
+    console.error('Profile PUT error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred updating profile" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred updating profile' } },
+      { status: 500 },
     );
   }
 }

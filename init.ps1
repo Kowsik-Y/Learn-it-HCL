@@ -1,45 +1,77 @@
-Write-Host "Starting Learn-it HCL project initialization..." -ForegroundColor Cyan
+﻿Write-Host "Starting Learn-it HCL project initialization..." -ForegroundColor Cyan
 Write-Host ""
 
-# 1. Setup Web/Next.js (Frontend + API Gateway)
+$root = $PSScriptRoot
+
+# ============================================================
+# 1. Setup Web / Next.js
+# ============================================================
 Write-Host "Setting up Web (Next.js)..." -ForegroundColor Yellow
-Set-Location apps\web
-corepack enable pnpm
+Set-Location "$root\apps\web"
+
+# corepack enable pnpm  # Skipped: requires Admin. pnpm is already available.
 pnpm install
 
 if (-not (Test-Path .env)) {
-    Copy-Item .env.example .env
-    Write-Host "Created .env for Web" -ForegroundColor Green
+    if (Test-Path .env.example) {
+        Copy-Item .env.example .env
+        Write-Host "Created .env for Web" -ForegroundColor Green
+    } else {
+        Write-Warning ".env.example not found — skipping copy. Please create apps\web\.env manually."
+    }
 }
 
 # Generate Prisma Client
 npx prisma generate
-Set-Location ..\..
+Set-Location $root
 Write-Host ""
 
-# Create Super Admin
+# ============================================================
+# 2. Prisma DB push + Super Admin
+# ============================================================
 Write-Host "Setting up initial Super Admin Account..." -ForegroundColor Yellow
-Write-Host "Temporarily starting database..." -ForegroundColor Cyan
+Write-Host "Starting database container..." -ForegroundColor Cyan
 docker-compose up -d db
-Start-Sleep -Seconds 2
-Set-Location apps\web
-npx prisma db push
-pnpm run create-super-admin
-Set-Location ..\..
+
+# Wait for Postgres to be healthy (up to 60 s)
+Write-Host "Waiting for PostgreSQL to be ready..." -ForegroundColor Cyan
+$maxWait = 60
+$waited  = 0
+$ready   = $false
+while ($waited -lt $maxWait) {
+    $health = docker inspect --format="{{.State.Health.Status}}" learn-it-hcl-db-1 2>$null
+    if ($health -eq "healthy") { $ready = $true; break }
+    Start-Sleep -Seconds 3
+    $waited += 3
+    Write-Host "  ... waited ${waited}s (status: $health)"
+}
+
+if (-not $ready) {
+    Write-Warning "Database did not become healthy within ${maxWait}s. Skipping db push and super-admin creation."
+} else {
+    Write-Host "Database is ready!" -ForegroundColor Green
+    Set-Location "$root\apps\web"
+    npx prisma db push
+    pnpm run create-super-admin
+    Set-Location $root
+}
+
 docker-compose stop db
 Write-Host "Database stopped.`n" -ForegroundColor Green
 
-# 2. Setup Backend/ML Service (Python)
+# ============================================================
+# 3. Setup Python Backend / ML Service
+# ============================================================
 Write-Host "Setting up ML Service (Python)..." -ForegroundColor Yellow
-Set-Location backend
+Set-Location "$root\backend"
 
-# Create and activate virtual environment
 if (-not (Test-Path venv)) {
     python -m venv venv
     Write-Host "Created Python virtual environment" -ForegroundColor Green
 }
 
-.\venv\Scripts\activate
+# Activate venv correctly in PowerShell
+& ".\venv\Scripts\Activate.ps1"
 pip install -e ".[dev]"
 
 if (-not (Test-Path .env)) {
@@ -67,13 +99,14 @@ FF_ADAPTIVE_DIAGNOSTICS=true
 }
 
 deactivate
-Set-Location ..
+Set-Location $root
 Write-Host ""
 
-# 3. Final Instructions
+# ============================================================
+# 4. Done
+# ============================================================
 Write-Host "Initialization complete!" -ForegroundColor Cyan
-Write-Host "To start development, follow these steps:"
-Write-Host "  1. Start the PostgreSQL database: docker-compose up -d db" -ForegroundColor Yellow
-Write-Host "  2. Push the Prisma schema to the DB: cd apps\web; npx prisma db push" -ForegroundColor Yellow
-Write-Host "  3. Start the Next.js dev server: cd apps\web; pnpm dev" -ForegroundColor Yellow
-Write-Host "  4. Start the ML Service: cd backend; .\venv\Scripts\activate; uvicorn app.main:app --port 8001 --reload" -ForegroundColor Yellow
+Write-Host "To start development:" -ForegroundColor White
+Write-Host "  1. docker-compose up -d db" -ForegroundColor Yellow
+Write-Host "  2. cd apps\web  &&  pnpm dev" -ForegroundColor Yellow
+Write-Host "  3. cd backend   &&  .\venv\Scripts\Activate.ps1  &&  uvicorn app.main:app --port 8001 --reload" -ForegroundColor Yellow

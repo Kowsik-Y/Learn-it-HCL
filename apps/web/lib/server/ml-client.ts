@@ -6,11 +6,10 @@
  * Passes user_id and tenant_id via headers (already authenticated by Next.js).
  */
 
-const ML_SERVICE_URL =
-  process.env.ML_SERVICE_URL || "http://localhost:8001";
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8001';
 
 interface MLRequestOptions {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: Record<string, unknown>;
   params?: Record<string, string | number | undefined>;
 }
@@ -30,16 +29,16 @@ class MLClient {
   async request<T = unknown>(
     path: string,
     user: MLUser,
-    options: MLRequestOptions = {}
+    options: MLRequestOptions = {},
   ): Promise<T> {
-    const { method = "GET", body, params } = options;
+    const { method = 'GET', body, params } = options;
 
     let url = `${this.baseUrl}${path}`;
 
     // Add query parameters for GET requests
     if (params) {
       const filteredParams = Object.fromEntries(
-        Object.entries(params).filter(([, v]) => v !== undefined)
+        Object.entries(params).filter(([, v]) => v !== undefined),
       ) as Record<string, string>;
       const query = new URLSearchParams(filteredParams).toString();
       if (query) {
@@ -48,9 +47,9 @@ class MLClient {
     }
 
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "X-User-Id": user.id,
-      "X-Tenant-Id": user.tenantId,
+      'Content-Type': 'application/json',
+      'X-User-Id': user.id,
+      'X-Tenant-Id': user.tenantId,
     };
 
     const fetchOptions: RequestInit = {
@@ -58,7 +57,7 @@ class MLClient {
       headers,
     };
 
-    if (body && method !== "GET") {
+    if (body && method !== 'GET') {
       fetchOptions.body = JSON.stringify(body);
     }
 
@@ -66,8 +65,7 @@ class MLClient {
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
-      const message =
-        errorData?.detail || errorData?.error?.message || "ML service error";
+      const message = errorData?.detail || errorData?.error?.message || 'ML service error';
       throw new MLServiceError(message, res.status);
     }
 
@@ -79,22 +77,19 @@ class MLClient {
   async tutorChat(
     user: MLUser,
     messages: Array<{ role: string; content: string }>,
-    context?: Record<string, unknown>
+    context?: Record<string, unknown>,
   ) {
-    return this.request("/ml/ai/tutor/chat", user, {
-      method: "POST",
+    return this.request('/ml/ai/tutor/chat', user, {
+      method: 'POST',
       body: { messages, context },
     });
   }
 
   // ── Onboarding ────────────────────────────────────────
 
-  async onboardingChat(
-    user: MLUser,
-    messages: Array<{ role: string; content: string }>
-  ) {
-    return this.request("/ml/ai/onboarding/chat", user, {
-      method: "POST",
+  async onboardingChat(user: MLUser, messages: Array<{ role: string; content: string }>) {
+    return this.request('/ml/ai/onboarding/chat', user, {
+      method: 'POST',
       body: { messages },
     });
   }
@@ -103,18 +98,15 @@ class MLClient {
 
   async getRecommendations(
     user: MLUser,
-    params?: { max_results?: number; available_minutes?: number }
+    params?: { max_results?: number; available_minutes?: number },
   ) {
-    return this.request("/ml/recommendations/", user, {
+    return this.request('/ml/recommendations/', user, {
       params: params as Record<string, string | number | undefined>,
     });
   }
 
-  async getDailyMission(
-    user: MLUser,
-    availableMinutes: number = 30
-  ) {
-    return this.request("/ml/recommendations/daily-mission", user, {
+  async getDailyMission(user: MLUser, availableMinutes: number = 30) {
+    return this.request('/ml/recommendations/daily-mission', user, {
       params: { available_minutes: availableMinutes },
     });
   }
@@ -129,10 +121,10 @@ class MLClient {
       source_id: string;
       score: number;
       max_score?: number;
-    }
+    },
   ) {
-    return this.request("/ml/mastery/record-evidence", user, {
-      method: "POST",
+    return this.request('/ml/mastery/record-evidence', user, {
+      method: 'POST',
       body: data,
     });
   }
@@ -142,7 +134,7 @@ export class MLServiceError extends Error {
   status: number;
   constructor(message: string, status: number = 500) {
     super(message);
-    this.name = "MLServiceError";
+    this.name = 'MLServiceError';
     this.status = status;
   }
 }

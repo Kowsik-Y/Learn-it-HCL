@@ -3,96 +3,90 @@
  * Courses, lessons, and resources.
  */
 
-import { NextResponse } from "next/server";
-import { getCurrentUser, AuthError } from "@/lib/server/auth";
-import { prisma } from "@/lib/server/db";
+import { NextResponse } from 'next/server';
+import { AuthError, getCurrentUser } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ route: string[] }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ route: string[] }> }) {
   try {
     const user = await getCurrentUser(request);
     const { route } = await params;
     const url = new URL(request.url);
 
     // GET /api/content/courses
-    if (route[0] === "courses" && route.length === 1) {
+    if (route[0] === 'courses' && route.length === 1) {
       return handleListCourses(user, url);
     }
 
     // GET /api/content/courses/:courseId
-    if (route[0] === "courses" && route.length === 2) {
+    if (route[0] === 'courses' && route.length === 2) {
       return handleGetCourse(user, route[1]);
     }
 
     // GET /api/content/lessons/:lessonId
-    if (route[0] === "lessons" && route.length === 2) {
+    if (route[0] === 'lessons' && route.length === 2) {
       return handleGetLesson(user, route[1]);
     }
 
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Unknown content path" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Unknown content path' } },
+      { status: 404 },
     );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Content error:", error);
+    console.error('Content error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ route: string[] }> }
-) {
+export async function POST(request: Request, { params }: { params: Promise<{ route: string[] }> }) {
   try {
     const user = await getCurrentUser(request);
     const { route } = await params;
 
     // POST /api/content/lessons/:lessonId/complete
-    if (route[0] === "lessons" && route.length === 3 && route[2] === "complete") {
+    if (route[0] === 'lessons' && route.length === 3 && route[2] === 'complete') {
       return handleCompleteLesson(user, route[1]);
     }
 
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Unknown content path" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Unknown content path' } },
+      { status: 404 },
     );
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: error.message } },
-        { status: error.status }
+        { error: { code: 'AUTH_ERROR', message: error.message } },
+        { status: error.status },
       );
     }
-    console.error("Content error:", error);
+    console.error('Content error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: 'An error occurred' } },
+      { status: 500 },
     );
   }
 }
 
 async function handleListCourses(user: { tenantId: string }, url: URL) {
-  const search = url.searchParams.get("search") || undefined;
-  const difficulty = url.searchParams.get("difficulty") || undefined;
-  const page = parseInt(url.searchParams.get("page") || "1", 10);
-  const pageSize = parseInt(url.searchParams.get("page_size") || "20", 10);
+  const search = url.searchParams.get('search') || undefined;
+  const difficulty = url.searchParams.get('difficulty') || undefined;
+  const page = parseInt(url.searchParams.get('page') || '1', 10);
+  const pageSize = parseInt(url.searchParams.get('page_size') || '20', 10);
 
   const where: Record<string, unknown> = {
     tenantId: user.tenantId,
     isPublished: true,
   };
-  if (search) where.title = { contains: search, mode: "insensitive" };
+  if (search) where.title = { contains: search, mode: 'insensitive' };
   if (difficulty) where.difficultyLevel = difficulty;
 
   const courses = await prisma.course.findMany({
@@ -102,18 +96,31 @@ async function handleListCourses(user: { tenantId: string }, url: URL) {
   });
 
   return NextResponse.json({
-    items: courses.map((c: { id: any; title: any; slug: any; shortDescription: any; difficultyLevel: any; estimatedDurationHours: any; thumbnailUrl: any; enrollmentCount: any; rating: any; isFree: any; }) => ({
-      id: c.id,
-      title: c.title,
-      slug: c.slug,
-      short_description: c.shortDescription,
-      difficulty_level: c.difficultyLevel,
-      estimated_duration_hours: c.estimatedDurationHours,
-      thumbnail_url: c.thumbnailUrl,
-      enrollment_count: c.enrollmentCount,
-      rating: c.rating,
-      is_free: c.isFree,
-    })),
+    items: courses.map(
+      (c: {
+        id: any;
+        title: any;
+        slug: any;
+        shortDescription: any;
+        difficultyLevel: any;
+        estimatedDurationHours: any;
+        thumbnailUrl: any;
+        enrollmentCount: any;
+        rating: any;
+        isFree: any;
+      }) => ({
+        id: c.id,
+        title: c.title,
+        slug: c.slug,
+        short_description: c.shortDescription,
+        difficulty_level: c.difficultyLevel,
+        estimated_duration_hours: c.estimatedDurationHours,
+        thumbnail_url: c.thumbnailUrl,
+        enrollment_count: c.enrollmentCount,
+        rating: c.rating,
+        is_free: c.isFree,
+      }),
+    ),
     page,
     page_size: pageSize,
   });
@@ -124,10 +131,15 @@ async function handleGetCourse(user: { tenantId: string }, courseId: string) {
     where: { id: courseId, tenantId: user.tenantId },
     include: {
       modules: {
-        orderBy: { orderIndex: "asc" },
+        orderBy: { orderIndex: 'asc' },
         include: {
           chapters: {
-            orderBy: { orderIndex: "asc" },
+            orderBy: { orderIndex: 'asc' },
+            include: {
+              lessons: {
+                orderBy: { orderIndex: 'asc' },
+              },
+            },
           },
         },
       },
@@ -136,8 +148,8 @@ async function handleGetCourse(user: { tenantId: string }, courseId: string) {
 
   if (!course) {
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Course not found" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Course not found' } },
+      { status: 404 },
     );
   }
 
@@ -147,14 +159,20 @@ async function handleGetCourse(user: { tenantId: string }, courseId: string) {
     description: course.description,
     difficulty_level: course.difficultyLevel,
     estimated_duration_hours: course.estimatedDurationHours,
-    modules: course.modules.map((m: { id: any; title: any; orderIndex: any; chapters: any[]; }) => ({
+    modules: course.modules.map((m: any) => ({
       id: m.id,
       title: m.title,
       order_index: m.orderIndex,
-      chapters: m.chapters.map((ch: { id: any; title: any; orderIndex: any; }) => ({
+      chapters: m.chapters.map((ch: any) => ({
         id: ch.id,
         title: ch.title,
         order_index: ch.orderIndex,
+        lessons: ch.lessons.map((l: any) => ({
+          id: l.id,
+          title: l.title,
+          content_type: l.contentType,
+          order_index: l.orderIndex,
+        })),
       })),
     })),
   });
@@ -167,8 +185,8 @@ async function handleGetLesson(user: { tenantId: string }, lessonId: string) {
 
   if (!lesson) {
     return NextResponse.json(
-      { error: { code: "NOT_FOUND", message: "Lesson not found" } },
-      { status: 404 }
+      { error: { code: 'NOT_FOUND', message: 'Lesson not found' } },
+      { status: 404 },
     );
   }
 
@@ -191,13 +209,13 @@ async function handleCompleteLesson(user: { id: string; tenantId: string }, less
   const existingEvent = await prisma.xPEvent.findFirst({
     where: {
       learnerId: user.id,
-      sourceType: "lesson",
+      sourceType: 'lesson',
       sourceId: lessonId,
     },
   });
 
   if (existingEvent) {
-    return NextResponse.json({ success: true, message: "Already completed" });
+    return NextResponse.json({ success: true, message: 'Already completed' });
   }
 
   // Create XP Event
@@ -206,8 +224,8 @@ async function handleCompleteLesson(user: { id: string; tenantId: string }, less
       tenantId: user.tenantId,
       learnerId: user.id,
       amount: 10,
-      reason: "Completed lesson",
-      sourceType: "lesson",
+      reason: 'Completed lesson',
+      sourceType: 'lesson',
       sourceId: lessonId,
     },
   });

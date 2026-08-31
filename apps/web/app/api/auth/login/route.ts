@@ -2,9 +2,9 @@
  * Auth API — POST /api/auth/login
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/server/db";
-import { verifyPassword, createTokenPair } from "@/lib/server/auth";
+import { NextResponse } from 'next/server';
+import { createTokenPair, verifyPassword } from '@/lib/server/auth';
+import { prisma } from '@/lib/server/db';
 
 export async function POST(request: Request) {
   try {
@@ -12,8 +12,8 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: { code: "VALIDATION_ERROR", message: "Email and password are required" } },
-        { status: 400 }
+        { error: { code: 'VALIDATION_ERROR', message: 'Email and password are required' } },
+        { status: 400 },
       );
     }
 
@@ -23,15 +23,15 @@ export async function POST(request: Request) {
 
     if (!user || !(await verifyPassword(password, user.hashedPassword))) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: "Invalid email or password" } },
-        { status: 401 }
+        { error: { code: 'AUTH_ERROR', message: 'Invalid email or password' } },
+        { status: 401 },
       );
     }
 
     if (!user.isActive) {
       return NextResponse.json(
-        { error: { code: "AUTH_ERROR", message: "Account is deactivated" } },
-        { status: 403 }
+        { error: { code: 'AUTH_ERROR', message: 'Account is deactivated' } },
+        { status: 403 },
       );
     }
 
@@ -59,10 +59,10 @@ export async function POST(request: Request) {
       tokens,
     });
   } catch (error: any) {
-    console.error("Login error:", error);
+    console.error('Login error:', error);
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: error?.message || "An error occurred" } },
-      { status: 500 }
+      { error: { code: 'INTERNAL_ERROR', message: error?.message || 'An error occurred' } },
+      { status: 500 },
     );
   }
 }

@@ -1,26 +1,32 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import { api } from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { toast } from "sonner";
 import {
+  ArrowRight,
+  BarChart3,
   Brain,
   CheckCircle2,
-  XCircle,
-  ArrowRight,
-  Zap,
+  Clock,
+  HelpCircle,
+  Lightbulb,
   Target,
   Trophy,
-  HelpCircle,
-  Clock,
-  Lightbulb,
-  BarChart3,
-} from "lucide-react";
+  XCircle,
+  Zap,
+} from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { api } from '@/lib/api';
 
 type Question = {
   id: string;
@@ -44,12 +50,12 @@ export default function AdaptiveQuizPage() {
 
   const [loading, setLoading] = useState(true);
   const [assessments, setAssessments] = useState<any[]>([]);
-  const [selectedAssessment, setSelectedAssessment] = useState<string | null>(null);
+  const [_selectedAssessment, setSelectedAssessment] = useState<string | null>(null);
 
   // Quiz state
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [answerResult, setAnswerResult] = useState<AnswerResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -63,10 +69,6 @@ export default function AdaptiveQuizPage() {
   const [isComplete, setIsComplete] = useState(false);
   const [responses, setResponses] = useState<any[]>([]);
 
-  useEffect(() => {
-    loadAssessments();
-  }, []);
-
   const loadAssessments = async () => {
     try {
       const res = (await api.getAssessments()) as any;
@@ -75,9 +77,9 @@ export default function AdaptiveQuizPage() {
       // Use demo assessment if API fails
       setAssessments([
         {
-          id: "demo-adaptive",
-          title: "Adaptive Diagnostic Quiz",
-          assessment_type: "adaptive",
+          id: 'demo-adaptive',
+          title: 'Adaptive Diagnostic Quiz',
+          assessment_type: 'adaptive',
           question_count: 10,
           is_adaptive: true,
           passing_score: 0.7,
@@ -87,6 +89,11 @@ export default function AdaptiveQuizPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadAssessments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadAssessments]);
 
   const startQuiz = async (assessmentId: string) => {
     setSelectedAssessment(assessmentId);
@@ -98,15 +105,15 @@ export default function AdaptiveQuizPage() {
       setQuestionNumber(1);
     } catch {
       // Demo mode with sample questions
-      setAttemptId("demo-attempt");
+      setAttemptId('demo-attempt');
       setCurrentQuestion({
-        id: "q1",
-        content: "What is the time complexity of binary search?",
-        question_type: "multiple_choice",
-        difficulty_level: "intermediate",
+        id: 'q1',
+        content: 'What is the time complexity of binary search?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'intermediate',
         estimated_time_seconds: 60,
-        options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
-        hints: ["Think about how the search space is divided at each step."],
+        options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'],
+        hints: ['Think about how the search space is divided at each step.'],
       });
       setQuestionNumber(1);
     } finally {
@@ -127,7 +134,12 @@ export default function AdaptiveQuizPage() {
       // Track response for IRT
       const newResponse = {
         item_id: currentQuestion.id,
-        difficulty: currentQuestion.difficulty_level === "beginner" ? -1 : currentQuestion.difficulty_level === "advanced" ? 1.5 : 0,
+        difficulty:
+          currentQuestion.difficulty_level === 'beginner'
+            ? -1
+            : currentQuestion.difficulty_level === 'advanced'
+              ? 1.5
+              : 0,
         discrimination: 1.0,
         is_correct: result.is_correct,
       };
@@ -139,11 +151,13 @@ export default function AdaptiveQuizPage() {
       setStandardError(Math.max(0.2, 1.0 / Math.sqrt(totalAnswered + 1)));
     } catch {
       // Demo mode
-      const isCorrect = selectedAnswer === "O(log n)" || Math.random() > 0.4;
+      const isCorrect = selectedAnswer === 'O(log n)' || Math.random() > 0.4;
       setAnswerResult({
         is_correct: isCorrect,
-        explanation: isCorrect ? null : "Binary search divides the search space in half each time, giving O(log n).",
-        correct_answer: isCorrect ? null : "O(log n)",
+        explanation: isCorrect
+          ? null
+          : 'Binary search divides the search space in half each time, giving O(log n).',
+        correct_answer: isCorrect ? null : 'O(log n)',
       });
       setTotalAnswered((prev) => prev + 1);
       if (isCorrect) setCorrectCount((prev) => prev + 1);
@@ -154,7 +168,7 @@ export default function AdaptiveQuizPage() {
 
   const nextQuestion = () => {
     setAnswerResult(null);
-    setSelectedAnswer("");
+    setSelectedAnswer('');
     setShowHint(false);
 
     if (questionNumber >= 10 || (standardError < 0.35 && questionNumber >= 3)) {
@@ -164,15 +178,87 @@ export default function AdaptiveQuizPage() {
 
     // Demo: generate next question
     const demoQuestions: Question[] = [
-      { id: "q2", content: "Which data structure uses LIFO ordering?", question_type: "multiple_choice", difficulty_level: "beginner", estimated_time_seconds: 45, options: ["Queue", "Stack", "Array", "Tree"], hints: ["Think: Last In, First Out."] },
-      { id: "q3", content: "What is the space complexity of merge sort?", question_type: "multiple_choice", difficulty_level: "intermediate", estimated_time_seconds: 60, options: ["O(1)", "O(n)", "O(log n)", "O(n²)"], hints: ["Merge sort needs extra space for merging."] },
-      { id: "q4", content: "In a hash table, what is the average time complexity of lookup?", question_type: "multiple_choice", difficulty_level: "intermediate", estimated_time_seconds: 45, options: ["O(n)", "O(1)", "O(log n)", "O(n log n)"], hints: ["Hash functions map directly to indices."] },
-      { id: "q5", content: "Which algorithm is used for finding shortest paths in weighted graphs?", question_type: "multiple_choice", difficulty_level: "advanced", estimated_time_seconds: 60, options: ["BFS", "DFS", "Dijkstra's", "Bubble Sort"], hints: ["Named after a Dutch computer scientist."] },
-      { id: "q6", content: "What is the worst-case time complexity of quicksort?", question_type: "multiple_choice", difficulty_level: "advanced", estimated_time_seconds: 60, options: ["O(n log n)", "O(n²)", "O(n)", "O(log n)"], hints: ["Think about what happens with an already sorted array and poor pivot selection."] },
-      { id: "q7", content: "Which tree data structure ensures O(log n) operations?", question_type: "multiple_choice", difficulty_level: "intermediate", estimated_time_seconds: 45, options: ["Binary Tree", "Balanced BST (AVL/Red-Black)", "Linked List", "Heap"], hints: ["The key property is 'balanced'."] },
-      { id: "q8", content: "What does the 'P' stand for in P vs NP?", question_type: "multiple_choice", difficulty_level: "advanced", estimated_time_seconds: 60, options: ["Polynomial", "Probabilistic", "Parallel", "Primary"], hints: ["Think about time complexity classes."] },
-      { id: "q9", content: "Which sorting algorithm is stable and runs in O(n) for small integer ranges?", question_type: "multiple_choice", difficulty_level: "advanced", estimated_time_seconds: 60, options: ["Quicksort", "Merge Sort", "Counting Sort", "Heap Sort"], hints: ["It counts occurrences rather than comparing elements."] },
-      { id: "q10", content: "What is a trie data structure used for?", question_type: "multiple_choice", difficulty_level: "intermediate", estimated_time_seconds: 45, options: ["Sorting", "String prefix matching", "Graph traversal", "Numerical computation"], hints: ["Also called a 'prefix tree'."] },
+      {
+        id: 'q2',
+        content: 'Which data structure uses LIFO ordering?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'beginner',
+        estimated_time_seconds: 45,
+        options: ['Queue', 'Stack', 'Array', 'Tree'],
+        hints: ['Think: Last In, First Out.'],
+      },
+      {
+        id: 'q3',
+        content: 'What is the space complexity of merge sort?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'intermediate',
+        estimated_time_seconds: 60,
+        options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'],
+        hints: ['Merge sort needs extra space for merging.'],
+      },
+      {
+        id: 'q4',
+        content: 'In a hash table, what is the average time complexity of lookup?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'intermediate',
+        estimated_time_seconds: 45,
+        options: ['O(n)', 'O(1)', 'O(log n)', 'O(n log n)'],
+        hints: ['Hash functions map directly to indices.'],
+      },
+      {
+        id: 'q5',
+        content: 'Which algorithm is used for finding shortest paths in weighted graphs?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'advanced',
+        estimated_time_seconds: 60,
+        options: ['BFS', 'DFS', "Dijkstra's", 'Bubble Sort'],
+        hints: ['Named after a Dutch computer scientist.'],
+      },
+      {
+        id: 'q6',
+        content: 'What is the worst-case time complexity of quicksort?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'advanced',
+        estimated_time_seconds: 60,
+        options: ['O(n log n)', 'O(n²)', 'O(n)', 'O(log n)'],
+        hints: ['Think about what happens with an already sorted array and poor pivot selection.'],
+      },
+      {
+        id: 'q7',
+        content: 'Which tree data structure ensures O(log n) operations?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'intermediate',
+        estimated_time_seconds: 45,
+        options: ['Binary Tree', 'Balanced BST (AVL/Red-Black)', 'Linked List', 'Heap'],
+        hints: ["The key property is 'balanced'."],
+      },
+      {
+        id: 'q8',
+        content: "What does the 'P' stand for in P vs NP?",
+        question_type: 'multiple_choice',
+        difficulty_level: 'advanced',
+        estimated_time_seconds: 60,
+        options: ['Polynomial', 'Probabilistic', 'Parallel', 'Primary'],
+        hints: ['Think about time complexity classes.'],
+      },
+      {
+        id: 'q9',
+        content: 'Which sorting algorithm is stable and runs in O(n) for small integer ranges?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'advanced',
+        estimated_time_seconds: 60,
+        options: ['Quicksort', 'Merge Sort', 'Counting Sort', 'Heap Sort'],
+        hints: ['It counts occurrences rather than comparing elements.'],
+      },
+      {
+        id: 'q10',
+        content: 'What is a trie data structure used for?',
+        question_type: 'multiple_choice',
+        difficulty_level: 'intermediate',
+        estimated_time_seconds: 45,
+        options: ['Sorting', 'String prefix matching', 'Graph traversal', 'Numerical computation'],
+        hints: ["Also called a 'prefix tree'."],
+      },
     ];
 
     const nextIdx = questionNumber - 1;
@@ -185,14 +271,16 @@ export default function AdaptiveQuizPage() {
   const calculateSimpleTheta = (resps: any[]): number => {
     if (resps.length === 0) return 0;
     const correctRate = resps.filter((r) => r.is_correct).length / resps.length;
-    return Math.round(((correctRate - 0.5) * 4) * 100) / 100;
+    return Math.round((correctRate - 0.5) * 4 * 100) / 100;
   };
 
   const getAbilityLevel = (theta: number) => {
-    if (theta >= 1.5) return { label: "Advanced", color: "text-emerald-500", bg: "bg-emerald-500/10" };
-    if (theta >= 0.0) return { label: "Intermediate", color: "text-blue-500", bg: "bg-blue-500/10" };
-    if (theta >= -1.0) return { label: "Beginner", color: "text-amber-500", bg: "bg-amber-500/10" };
-    return { label: "Novice", color: "text-red-500", bg: "bg-red-500/10" };
+    if (theta >= 1.5)
+      return { label: 'Advanced', color: 'text-emerald-500', bg: 'bg-emerald-500/10' };
+    if (theta >= 0.0)
+      return { label: 'Intermediate', color: 'text-blue-500', bg: 'bg-blue-500/10' };
+    if (theta >= -1.0) return { label: 'Beginner', color: 'text-amber-500', bg: 'bg-amber-500/10' };
+    return { label: 'Novice', color: 'text-red-500', bg: 'bg-red-500/10' };
   };
 
   const abilityLevel = getAbilityLevel(abilityEstimate);
@@ -219,19 +307,25 @@ export default function AdaptiveQuizPage() {
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className={`text-4xl font-extrabold ${abilityLevel.color}`}>{abilityEstimate.toFixed(2)}</div>
+              <div className={`text-4xl font-extrabold ${abilityLevel.color}`}>
+                {abilityEstimate.toFixed(2)}
+              </div>
               <p className="text-sm text-muted-foreground mt-1">Ability θ</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-4xl font-extrabold">{correctCount}/{totalAnswered}</div>
+              <div className="text-4xl font-extrabold">
+                {correctCount}/{totalAnswered}
+              </div>
               <p className="text-sm text-muted-foreground mt-1">Correct</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <Badge className={`text-lg px-4 py-1 ${abilityLevel.bg} ${abilityLevel.color} border-0`}>
+              <Badge
+                className={`text-lg px-4 py-1 ${abilityLevel.bg} ${abilityLevel.color} border-0`}
+              >
                 {abilityLevel.label}
               </Badge>
               <p className="text-sm text-muted-foreground mt-1">Skill Level</p>
@@ -256,16 +350,33 @@ export default function AdaptiveQuizPage() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Precision Level</span>
-              <Badge variant={standardError < 0.35 ? "default" : "secondary"}>
-                {standardError < 0.35 ? "High" : "Moderate"}
+              <Badge variant={standardError < 0.35 ? 'default' : 'secondary'}>
+                {standardError < 0.35 ? 'High' : 'Moderate'}
               </Badge>
             </div>
           </CardContent>
           <CardFooter className="flex gap-3">
-            <Button onClick={() => { setIsComplete(false); setQuestionNumber(0); setCorrectCount(0); setTotalAnswered(0); setResponses([]); setAttemptId(null); setSelectedAssessment(null); setAbilityEstimate(0); setStandardError(1.0); }} variant="outline" className="flex-1">
+            <Button
+              onClick={() => {
+                setIsComplete(false);
+                setQuestionNumber(0);
+                setCorrectCount(0);
+                setTotalAnswered(0);
+                setResponses([]);
+                setAttemptId(null);
+                setSelectedAssessment(null);
+                setAbilityEstimate(0);
+                setStandardError(1.0);
+              }}
+              variant="outline"
+              className="flex-1"
+            >
               Retake Quiz
             </Button>
-            <Button onClick={() => window.location.href = `/courses/${courseId}`} className="flex-1">
+            <Button
+              onClick={() => (window.location.href = `/courses/${courseId}`)}
+              className="flex-1"
+            >
               Back to Course
             </Button>
           </CardFooter>
@@ -283,38 +394,50 @@ export default function AdaptiveQuizPage() {
             <Brain className="h-8 w-8 text-primary" /> Adaptive Quiz
           </h1>
           <p className="text-muted-foreground">
-            Take a CAT-powered diagnostic assessment. The quiz adapts to your ability level in real-time,
-            selecting questions that maximise diagnostic precision using Fisher Information.
+            Take a CAT-powered diagnostic assessment. The quiz adapts to your ability level in
+            real-time, selecting questions that maximise diagnostic precision using Fisher
+            Information.
           </p>
         </div>
 
         <div className="grid gap-4">
-          {loading ? (
-            Array.from({ length: 2 }).map((_, i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="h-32" />
-              </Card>
-            ))
-          ) : (
-            assessments.map((a) => (
-              <Card key={a.id} className="hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => startQuiz(a.id)}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="group-hover:text-primary transition-colors">{a.title}</CardTitle>
-                    {a.is_adaptive && <Badge className="bg-violet-500/10 text-violet-500 border-0">CAT Adaptive</Badge>}
-                  </div>
-                  <CardDescription>
-                    {a.question_count} questions · {a.is_adaptive ? "Adapts to your level" : "Fixed difficulty"} · Pass: {(a.passing_score * 100).toFixed(0)}%
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <Button className="gap-2 w-full">
-                    <Zap className="h-4 w-4" /> Start Assessment <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))
-          )}
+          {loading
+            ? Array.from({ length: 2 }).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="h-32" />
+                </Card>
+              ))
+            : assessments.map((a) => (
+                <Card
+                  key={a.id}
+                  className="hover:border-primary/50 transition-colors cursor-pointer group"
+                  onClick={() => startQuiz(a.id)}
+                >
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="group-hover:text-primary transition-colors">
+                        {a.title}
+                      </CardTitle>
+                      {a.is_adaptive && (
+                        <Badge className="bg-violet-500/10 text-violet-500 border-0">
+                          CAT Adaptive
+                        </Badge>
+                      )}
+                    </div>
+                    <CardDescription>
+                      {a.question_count} questions ·{' '}
+                      {a.is_adaptive ? 'Adapts to your level' : 'Fixed difficulty'} · Pass:{' '}
+                      {(a.passing_score * 100).toFixed(0)}%
+                    </CardDescription>
+                  </CardHeader>
+                  <CardFooter>
+                    <Button className="gap-2 w-full">
+                      <Zap className="h-4 w-4" /> Start Assessment{' '}
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
         </div>
       </div>
     );
@@ -328,13 +451,21 @@ export default function AdaptiveQuizPage() {
         <div className="space-y-1">
           <h2 className="text-xl font-bold">Question {questionNumber}</h2>
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1"><Target className="h-3.5 w-3.5" /> {correctCount}/{totalAnswered} correct</span>
-            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> ~{currentQuestion?.estimated_time_seconds}s</span>
+            <span className="flex items-center gap-1">
+              <Target className="h-3.5 w-3.5" /> {correctCount}/{totalAnswered} correct
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" /> ~{currentQuestion?.estimated_time_seconds}s
+            </span>
           </div>
         </div>
         <div className="text-right space-y-1">
-          <div className={`text-lg font-bold font-mono ${abilityLevel.color}`}>θ = {abilityEstimate.toFixed(2)}</div>
-          <Badge variant="outline" className={`${abilityLevel.color} text-xs`}>{abilityLevel.label}</Badge>
+          <div className={`text-lg font-bold font-mono ${abilityLevel.color}`}>
+            θ = {abilityEstimate.toFixed(2)}
+          </div>
+          <Badge variant="outline" className={`${abilityLevel.color} text-xs`}>
+            {abilityLevel.label}
+          </Badge>
         </div>
       </div>
 
@@ -346,8 +477,12 @@ export default function AdaptiveQuizPage() {
         <Card className="border-2">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
-              <Badge variant="outline" className="text-xs uppercase">{currentQuestion.difficulty_level}</Badge>
-              <Badge variant="outline" className="text-xs">{currentQuestion.question_type.replace("_", " ")}</Badge>
+              <Badge variant="outline" className="text-xs uppercase">
+                {currentQuestion.difficulty_level}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {currentQuestion.question_type.replace('_', ' ')}
+              </Badge>
             </div>
             <CardTitle className="text-xl leading-relaxed">{currentQuestion.content}</CardTitle>
           </CardHeader>
@@ -362,43 +497,64 @@ export default function AdaptiveQuizPage() {
                 const isCorrectSelected = showResult && isSelected && answerResult.is_correct;
 
                 return (
-                  <button
-                    key={idx}
+                  <Button
+                    variant="outline"
+                    type="button"
+                    key={`option-${idx}`}
                     onClick={() => !answerResult && setSelectedAnswer(option)}
                     disabled={!!answerResult}
-                    className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-3 ${
-                      isCorrectSelected ? "border-emerald-500 bg-emerald-500/10" :
-                      isWrongSelected ? "border-red-500 bg-red-500/10" :
-                      isCorrectOption ? "border-emerald-500 bg-emerald-500/10" :
-                      isSelected ? "border-primary bg-primary/5" :
-                      "border-border hover:border-primary/30 hover:bg-muted/50"
+                    className={`w-full h-auto text-left p-4 rounded-xl border-2 transition-all flex items-center justify-start gap-3 whitespace-normal ${
+                      isCorrectSelected
+                        ? 'border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20'
+                        : isWrongSelected
+                          ? 'border-red-500 bg-red-500/10 hover:bg-red-500/20'
+                          : isCorrectOption
+                            ? 'border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20'
+                            : isSelected
+                              ? 'border-primary bg-primary/5 hover:bg-primary/10'
+                              : 'border-border hover:border-primary/30 hover:bg-muted/50'
                     }`}
                   >
-                    <span className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold border-2 shrink-0 ${
-                      isCorrectSelected || isCorrectOption ? "border-emerald-500 text-emerald-500" :
-                      isWrongSelected ? "border-red-500 text-red-500" :
-                      isSelected ? "border-primary text-primary bg-primary/10" :
-                      "border-muted-foreground/30 text-muted-foreground"
-                    }`}>
+                    <span
+                      className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold border-2 shrink-0 ${
+                        isCorrectSelected || isCorrectOption
+                          ? 'border-emerald-500 text-emerald-500'
+                          : isWrongSelected
+                            ? 'border-red-500 text-red-500'
+                            : isSelected
+                              ? 'border-primary text-primary bg-primary/10'
+                              : 'border-muted-foreground/30 text-muted-foreground'
+                      }`}
+                    >
                       {String.fromCharCode(65 + idx)}
                     </span>
                     <span className="flex-1 font-medium">{option}</span>
-                    {isCorrectSelected && <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />}
+                    {isCorrectSelected && (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                    )}
                     {isWrongSelected && <XCircle className="h-5 w-5 text-red-500 shrink-0" />}
-                    {isCorrectOption && !isSelected && <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />}
-                  </button>
+                    {isCorrectOption && !isSelected && (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                    )}
+                  </Button>
                 );
               })}
           </CardContent>
 
           {/* Answer feedback */}
           {answerResult && (
-            <div className={`mx-6 mb-4 p-4 rounded-lg ${answerResult.is_correct ? "bg-emerald-500/10 border border-emerald-500/20" : "bg-red-500/10 border border-red-500/20"}`}>
+            <div
+              className={`mx-6 mb-4 p-4 rounded-lg ${answerResult.is_correct ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-red-500/10 border border-red-500/20'}`}
+            >
               <div className="flex items-center gap-2 font-bold mb-1">
                 {answerResult.is_correct ? (
-                  <><CheckCircle2 className="h-5 w-5 text-emerald-500" /> Correct!</>
+                  <>
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500" /> Correct!
+                  </>
                 ) : (
-                  <><XCircle className="h-5 w-5 text-red-500" /> Incorrect</>
+                  <>
+                    <XCircle className="h-5 w-5 text-red-500" /> Incorrect
+                  </>
                 )}
               </div>
               {answerResult.explanation && (
@@ -409,15 +565,30 @@ export default function AdaptiveQuizPage() {
 
           <CardFooter className="flex justify-between gap-3">
             {!answerResult && currentQuestion.hints && (
-              <Button variant="ghost" size="sm" onClick={() => setShowHint(!showHint)} className="gap-1 text-muted-foreground">
-                <Lightbulb className="h-4 w-4" /> {showHint ? "Hide Hint" : "Show Hint"}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowHint(!showHint)}
+                className="gap-1 text-muted-foreground"
+              >
+                <Lightbulb className="h-4 w-4" /> {showHint ? 'Hide Hint' : 'Show Hint'}
               </Button>
             )}
             {answerResult && <div />}
 
             {!answerResult ? (
-              <Button onClick={submitAnswer} disabled={!selectedAnswer || submitting} className="gap-2 min-w-32">
-                {submitting ? "Checking..." : <><CheckCircle2 className="h-4 w-4" /> Submit Answer</>}
+              <Button
+                onClick={submitAnswer}
+                disabled={!selectedAnswer || submitting}
+                className="gap-2 min-w-32"
+              >
+                {submitting ? (
+                  'Checking...'
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" /> Submit Answer
+                  </>
+                )}
               </Button>
             ) : (
               <Button onClick={nextQuestion} className="gap-2 min-w-32">
@@ -434,7 +605,9 @@ export default function AdaptiveQuizPage() {
           <CardContent className="pt-4 flex items-start gap-3">
             <Lightbulb className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
             <div className="text-sm">
-              {Array.isArray(currentQuestion.hints) ? currentQuestion.hints[0] : currentQuestion.hints}
+              {Array.isArray(currentQuestion.hints)
+                ? currentQuestion.hints[0]
+                : currentQuestion.hints}
             </div>
           </CardContent>
         </Card>
@@ -447,9 +620,10 @@ export default function AdaptiveQuizPage() {
             <HelpCircle className="h-4 w-4" /> Why this question?
           </div>
           <p className="text-xs text-muted-foreground">
-            Selected via <strong>Maximum Fisher Information</strong> at θ = {abilityEstimate.toFixed(2)}.
-            This question&apos;s difficulty ({currentQuestion?.difficulty_level}) provides the most diagnostic
-            information at your current estimated ability level. SE = ±{standardError.toFixed(3)}.
+            Selected via <strong>Maximum Fisher Information</strong> at θ ={' '}
+            {abilityEstimate.toFixed(2)}. This question&apos;s difficulty (
+            {currentQuestion?.difficulty_level}) provides the most diagnostic information at your
+            current estimated ability level. SE = ±{standardError.toFixed(3)}.
           </p>
         </CardContent>
       </Card>

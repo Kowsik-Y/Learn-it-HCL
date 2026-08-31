@@ -1,13 +1,9 @@
-import React from "react";
-import Link from "next/link";
-import { Brain } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Brain } from 'lucide-react';
+import Link from 'next/link';
+import type React from 'react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col justify-between relative overflow-hidden">
       {/* Background ambient lighting */}
@@ -23,9 +19,7 @@ export default function AuthLayout({
       </header>
 
       {/* Auth Form Container */}
-      <div className="flex-1 flex items-center justify-center p-4 relative z-10">
-        {children}
-      </div>
+      <div className="flex-1 flex items-center justify-center p-4 relative z-10">{children}</div>
 
       {/* Footer */}
       <footer className="p-6 text-center text-xs text-muted-foreground relative z-10">

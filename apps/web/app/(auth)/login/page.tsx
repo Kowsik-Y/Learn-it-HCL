@@ -1,34 +1,33 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Brain, Mail, Lock, Loader2 } from "lucide-react";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { 
-  InputGroup, 
-  InputGroupAddon, 
+import { Loader2, Lock, Mail } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import {
+  InputGroup,
+  InputGroupAddon,
   InputGroupInput,
-  InputGroupText
-} from "@/components/ui/input-group";
+  InputGroupText,
+} from '@/components/ui/input-group';
+import { useAuth } from '@/lib/auth-context';
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
     try {
       await login(email, password);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : 'Login failed');
       setLoading(false);
     }
   };
@@ -50,7 +49,10 @@ export default function LoginPage() {
 
             <FieldGroup>
               <Field>
-                <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase" htmlFor="email">
+                <FieldLabel
+                  className="text-xs font-semibold text-muted-foreground uppercase"
+                  htmlFor="email"
+                >
                   Email Address
                 </FieldLabel>
                 <InputGroup>
@@ -71,7 +73,10 @@ export default function LoginPage() {
               </Field>
 
               <Field>
-                <FieldLabel className="text-xs font-semibold text-muted-foreground uppercase" htmlFor="password">
+                <FieldLabel
+                  className="text-xs font-semibold text-muted-foreground uppercase"
+                  htmlFor="password"
+                >
                   Password
                 </FieldLabel>
                 <InputGroup>
@@ -94,10 +99,9 @@ export default function LoginPage() {
 
             <Button type="submit" className="w-full font-bold mt-6" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-
         </CardContent>
       </Card>
     </div>

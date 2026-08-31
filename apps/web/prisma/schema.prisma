@@ -14,7 +14,7 @@ datasource db {
 // ── Identity ─────────────────────────────────────────────
 
 model Organization {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid()) @db.Uuid
   name        String   @db.VarChar(255)
   slug        String   @unique @db.VarChar(100)
   tenantType  String   @default("standalone") @map("tenant_type") @db.VarChar(50)
@@ -32,8 +32,8 @@ model Organization {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  tenantId       String    @map("tenant_id")
+  id             String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
   email          String    @db.VarChar(255)
   hashedPassword String    @map("hashed_password") @db.VarChar(255)
   fullName       String    @map("full_name") @db.VarChar(255)
@@ -55,9 +55,9 @@ model User {
 }
 
 model AuditLog {
-  id           String   @id @default(uuid())
-  tenantId     String   @map("tenant_id")
-  userId       String   @map("user_id")
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  userId String   @map("user_id") @db.Uuid
   action       String   @db.VarChar(100)
   resourceType String   @map("resource_type") @db.VarChar(100)
   resourceId   String?  @map("resource_id") @db.VarChar(100)
@@ -71,8 +71,8 @@ model AuditLog {
 }
 
 model CustomRole {
-  id          String   @id @default(uuid())
-  tenantId    String?  @map("tenant_id") // Null means global system role (created by super admin), otherwise scoped to org
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId String?  @map("tenant_id") // Null means global system role (created by super admin), otherwise scoped to org @db.Uuid
   name        String   @db.VarChar(100)
   slug        String   @db.VarChar(100)
   permissions Json?
@@ -83,7 +83,7 @@ model CustomRole {
 }
 
 model AccessRequest {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid
   fullName  String   @map("full_name") @db.VarChar(255)
   email     String   @db.VarChar(255)
   company   String?  @db.VarChar(255)
@@ -98,9 +98,9 @@ model AccessRequest {
 // ── Learners ─────────────────────────────────────────────
 
 model LearnerProfile {
-  id                     String   @id @default(uuid())
-  userId                 String   @unique @map("user_id")
-  tenantId               String   @map("tenant_id")
+  id                     String   @id @default(uuid()) @db.Uuid
+  userId String   @unique @map("user_id") @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   ageRange               String?  @map("age_range") @db.VarChar(20)
   language               String   @default("en") @db.VarChar(10)
   timezone               String   @default("UTC") @db.VarChar(50)
@@ -121,9 +121,9 @@ model LearnerProfile {
 }
 
 model LearnerPreferences {
-  id                            String   @id @default(uuid())
-  learnerId                     String   @unique @map("learner_id")
-  tenantId                      String   @map("tenant_id")
+  id                            String   @id @default(uuid()) @db.Uuid
+  learnerId String   @unique @map("learner_id") @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   preferredContentType          String   @default("mixed") @map("preferred_content_type") @db.VarChar(50)
   preferredStudyDurationMinutes Int      @default(30) @map("preferred_study_duration_minutes")
   availableDays                 Json?    @map("available_days")
@@ -142,14 +142,14 @@ model LearnerPreferences {
 }
 
 model LearnerGoal {
-  id                 String   @id @default(uuid())
-  learnerId          String   @map("learner_id")
-  tenantId           String   @map("tenant_id")
+  id                 String   @id @default(uuid()) @db.Uuid
+  learnerId String   @map("learner_id") @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   title              String   @db.VarChar(500)
   description        String?  @db.Text
   goalType           String   @default("career") @map("goal_type") @db.VarChar(50)
   targetRole         String?  @map("target_role") @db.VarChar(255)
-  targetRoleId       String?  @map("target_role_id")
+  targetRoleId String?  @map("target_role_id") @db.Uuid
   timeHorizonWeeks   Int?     @map("time_horizon_weeks")
   hoursPerWeek       Int?     @map("hours_per_week")
   knownSkills        Json?    @map("known_skills")
@@ -168,13 +168,13 @@ model LearnerGoal {
 // ── Skills ───────────────────────────────────────────────
 
 model Skill {
-  id              String   @id @default(uuid())
-  tenantId        String   @map("tenant_id")
+  id              String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   name            String   @db.VarChar(255)
   slug            String   @db.VarChar(255)
   description     String?  @db.Text
   category        String   @default("general") @db.VarChar(100)
-  parentSkillId   String?  @map("parent_skill_id")
+  parentSkillId String?  @map("parent_skill_id") @db.Uuid
   difficultyLevel Int      @default(1) @map("difficulty_level")
   isActive        Boolean  @default(true) @map("is_active")
   metadata        Json?
@@ -194,10 +194,10 @@ model Skill {
 }
 
 model SkillRelationship {
-  id               String @id @default(uuid())
-  tenantId         String @map("tenant_id")
-  sourceSkillId    String @map("source_skill_id")
-  targetSkillId    String @map("target_skill_id")
+  id               String @id @default(uuid()) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
+  sourceSkillId String @map("source_skill_id") @db.Uuid
+  targetSkillId String @map("target_skill_id") @db.Uuid
   relationshipType String @map("relationship_type") @db.VarChar(50)
   strength         Float  @default(1.0)
 
@@ -211,8 +211,8 @@ model SkillRelationship {
 }
 
 model CareerRole {
-  id          String   @id @default(uuid())
-  tenantId    String   @map("tenant_id")
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   name        String   @db.VarChar(255)
   slug        String   @db.VarChar(255)
   description String?  @db.Text
@@ -228,10 +228,10 @@ model CareerRole {
 }
 
 model RoleSkill {
-  id             String @id @default(uuid())
-  tenantId       String @map("tenant_id")
-  careerRoleId   String @map("career_role_id")
-  skillId        String @map("skill_id")
+  id             String @id @default(uuid()) @db.Uuid
+  tenantId String @map("tenant_id") @db.Uuid
+  careerRoleId String @map("career_role_id") @db.Uuid
+  skillId String @map("skill_id") @db.Uuid
   importance     String @default("important") @db.VarChar(50)
   minimumMastery Float  @default(0.7) @map("minimum_mastery")
 
@@ -246,8 +246,8 @@ model RoleSkill {
 // ── Content ──────────────────────────────────────────────
 
 model Course {
-  id                     String   @id @default(uuid())
-  tenantId               String   @map("tenant_id")
+  id                     String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   title                  String   @db.VarChar(500)
   slug                   String   @db.VarChar(255)
   description            String?  @db.Text
@@ -274,9 +274,9 @@ model Course {
 }
 
 model Module {
-  id                       String   @id @default(uuid())
-  tenantId                 String   @map("tenant_id")
-  courseId                 String   @map("course_id")
+  id                       String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  courseId String   @map("course_id") @db.Uuid
   title                    String   @db.VarChar(500)
   description              String?  @db.Text
   orderIndex               Int      @default(0) @map("order_index")
@@ -292,9 +292,9 @@ model Module {
 }
 
 model Chapter {
-  id                       String   @id @default(uuid())
-  tenantId                 String   @map("tenant_id")
-  moduleId                 String   @map("module_id")
+  id                       String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  moduleId String   @map("module_id") @db.Uuid
   title                    String   @db.VarChar(500)
   description              String?  @db.Text
   orderIndex               Int      @default(0) @map("order_index")
@@ -310,9 +310,9 @@ model Chapter {
 }
 
 model Lesson {
-  id                       String   @id @default(uuid())
-  tenantId                 String   @map("tenant_id")
-  chapterId                String   @map("chapter_id")
+  id                       String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  chapterId String   @map("chapter_id") @db.Uuid
   title                    String   @db.VarChar(500)
   description              String?  @db.Text
   contentType              String   @default("article") @map("content_type") @db.VarChar(50)
@@ -334,8 +334,8 @@ model Lesson {
 }
 
 model Resource {
-  id                       String   @id @default(uuid())
-  tenantId                 String   @map("tenant_id")
+  id                       String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   title                    String   @db.VarChar(500)
   description              String?  @db.Text
   resourceType             String   @map("resource_type") @db.VarChar(50)
@@ -352,8 +352,8 @@ model Resource {
 }
 
 model Project {
-  id                     String   @id @default(uuid())
-  tenantId               String   @map("tenant_id")
+  id                     String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   title                  String   @db.VarChar(500)
   description            String?  @db.Text
   difficultyLevel        String   @default("beginner") @map("difficulty_level") @db.VarChar(50)
@@ -372,8 +372,8 @@ model Project {
 // ── Assessments ──────────────────────────────────────────
 
 model Assessment {
-  id               String   @id @default(uuid())
-  tenantId         String   @map("tenant_id")
+  id               String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   title            String   @db.VarChar(500)
   description      String?  @db.Text
   assessmentType   String   @default("quiz") @map("assessment_type") @db.VarChar(50)
@@ -394,9 +394,9 @@ model Assessment {
 }
 
 model Question {
-  id                   String   @id @default(uuid())
-  tenantId             String   @map("tenant_id")
-  assessmentId         String?  @map("assessment_id")
+  id                   String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  assessmentId String?  @map("assessment_id") @db.Uuid
   content              String   @db.Text
   questionType         String   @default("multiple_choice") @map("question_type") @db.VarChar(50)
   difficultyLevel      Int      @default(1) @map("difficulty_level")
@@ -419,10 +419,10 @@ model Question {
 }
 
 model AssessmentAttempt {
-  id               String    @id @default(uuid())
-  tenantId         String    @map("tenant_id")
-  assessmentId     String    @map("assessment_id")
-  learnerId        String    @map("learner_id")
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  assessmentId String    @map("assessment_id") @db.Uuid
+  learnerId String    @map("learner_id") @db.Uuid
   score            Float     @default(0)
   maxScore         Float     @default(0) @map("max_score")
   percentage       Float     @default(0)
@@ -444,10 +444,10 @@ model AssessmentAttempt {
 // ── Mastery ──────────────────────────────────────────────
 
 model MasteryState {
-  id                 String    @id @default(uuid())
-  tenantId           String    @map("tenant_id")
-  learnerId          String    @map("learner_id")
-  skillId            String    @map("skill_id")
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  learnerId String    @map("learner_id") @db.Uuid
+  skillId String    @map("skill_id") @db.Uuid
   masteryScore       Float     @default(0.0) @map("mastery_score")
   confidence         Float     @default(0.0)
   evidenceCount      Int       @default(0) @map("evidence_count")
@@ -467,11 +467,11 @@ model MasteryState {
 }
 
 model MasteryEvidence {
-  id             String   @id @default(uuid())
-  tenantId       String   @map("tenant_id")
-  masteryStateId String   @map("mastery_state_id")
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  masteryStateId String   @map("mastery_state_id") @db.Uuid
   evidenceType   String   @map("evidence_type") @db.VarChar(50)
-  sourceId       String   @map("source_id")
+  sourceId String   @map("source_id") @db.Uuid
   score          Float
   maxScore       Float    @default(1.0) @map("max_score")
   weight         Float    @default(1.0)
@@ -487,13 +487,13 @@ model MasteryEvidence {
 // ── Gamification ─────────────────────────────────────────
 
 model XPEvent {
-  id             String   @id @default(uuid())
-  tenantId       String   @map("tenant_id")
-  learnerId      String   @map("learner_id")
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  learnerId String   @map("learner_id") @db.Uuid
   amount         Int
   reason         String   @db.VarChar(500)
   sourceType     String   @map("source_type") @db.VarChar(100)
-  sourceId       String   @map("source_id")
+  sourceId String   @map("source_id") @db.Uuid
   idempotencyKey String?  @unique @map("idempotency_key") @db.VarChar(255)
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
 
@@ -503,9 +503,9 @@ model XPEvent {
 }
 
 model Streak {
-  id               String    @id @default(uuid())
-  tenantId         String    @map("tenant_id")
-  learnerId        String    @unique @map("learner_id")
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  learnerId String    @unique @map("learner_id") @db.Uuid
   currentCount     Int       @default(0) @map("current_count")
   longestCount     Int       @default(0) @map("longest_count")
   lastActivityDate DateTime? @map("last_activity_date") @db.Date
@@ -518,8 +518,8 @@ model Streak {
 }
 
 model Badge {
-  id          String   @id @default(uuid())
-  tenantId    String   @map("tenant_id")
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
   name        String   @db.VarChar(255)
   description String?  @db.Text
   iconUrl     String?  @map("icon_url") @db.VarChar(500)
@@ -534,10 +534,10 @@ model Badge {
 }
 
 model LearnerBadge {
-  id        String   @id @default(uuid())
-  tenantId  String   @map("tenant_id")
-  learnerId String   @map("learner_id")
-  badgeId   String   @map("badge_id")
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId String   @map("tenant_id") @db.Uuid
+  learnerId String   @map("learner_id") @db.Uuid
+  badgeId String   @map("badge_id") @db.Uuid
   earnedAt  DateTime @map("earned_at") @db.Timestamptz
   reason    String?  @db.VarChar(500)
 
@@ -548,15 +548,15 @@ model LearnerBadge {
 }
 
 model Quest {
-  id                 String    @id @default(uuid())
-  tenantId           String    @map("tenant_id")
-  learnerId          String    @map("learner_id")
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  learnerId String    @map("learner_id") @db.Uuid
   title              String    @db.VarChar(500)
   description        String?   @db.Text
   questType          String    @default("daily") @map("quest_type") @db.VarChar(50)
   tasks              Json?
   xpReward           Int       @default(50) @map("xp_reward")
-  badgeRewardId      String?   @map("badge_reward_id")
+  badgeRewardId String?   @map("badge_reward_id") @db.Uuid
   progressPercentage Float     @default(0) @map("progress_percentage")
   isCompleted        Boolean   @default(false) @map("is_completed")
   expiresAt          DateTime? @map("expires_at") @db.Timestamptz
@@ -570,10 +570,10 @@ model Quest {
 // ── Attendance ───────────────────────────────────────────
 
 model AttendanceSession {
-  id                 String    @id @default(uuid())
-  tenantId           String    @map("tenant_id")
-  courseId           String?   @map("course_id")
-  teacherId          String    @map("teacher_id")
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  courseId String?   @map("course_id") @db.Uuid
+  teacherId String    @map("teacher_id") @db.Uuid
   title              String    @db.VarChar(500)
   sessionDate        String    @map("session_date") @db.VarChar(20)
   startTime          DateTime  @map("start_time") @db.Timestamptz
@@ -591,10 +591,10 @@ model AttendanceSession {
 }
 
 model AttendanceRecord {
-  id                 String    @id @default(uuid())
-  tenantId           String    @map("tenant_id")
-  sessionId          String    @map("session_id")
-  studentId          String    @map("student_id")
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId String    @map("tenant_id") @db.Uuid
+  sessionId String    @map("session_id") @db.Uuid
+  studentId String    @map("student_id") @db.Uuid
   status             String    @default("absent") @db.VarChar(50)
   checkInTime        DateTime? @map("check_in_time") @db.Timestamptz
   verificationMethod String    @default("otp") @map("verification_method") @db.VarChar(50)

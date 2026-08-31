@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { api } from "@/lib/api";
+import { usePathname, useRouter } from 'next/navigation';
+import type React from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 
 interface User {
   id: string;
@@ -28,21 +29,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const router = useRouter();
-  const pathname = usePathname();
+  const _pathname = usePathname();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("access_token");
-    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem('access_token');
+    const storedUser = localStorage.getItem('user');
 
     if (storedToken && storedUser) {
       try {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
-      } catch (e) {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("user");
+      } catch (_e) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
       }
     }
     setLoading(false);
@@ -54,20 +55,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshToken = res.tokens.refresh_token;
     const userData = res.user;
 
-    localStorage.setItem("access_token", accessToken);
-    localStorage.setItem("refresh_token", refreshToken);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    // biome-ignore lint/suspicious/noDocumentCookie: required for Next.js middleware
     document.cookie = `access_token=${accessToken}; path=/; max-age=604800; samesite=lax`;
 
     setToken(accessToken);
     setUser(userData);
 
-    if (userData.role === "super_admin") {
-      router.push("/admin/users");
-    } else if (userData.role === "org_admin") {
-      router.push("/org/users");
+    if (userData.role === 'super_admin') {
+      router.push('/admin/users');
+    } else if (userData.role === 'org_admin') {
+      router.push('/org/users');
     } else {
-      router.push("/dashboard");
+      router.push('/dashboard');
     }
   };
 
@@ -77,25 +79,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshToken = res.tokens.refresh_token;
     const userData = res.user;
 
-    localStorage.setItem("access_token", accessToken);
-    localStorage.setItem("refresh_token", refreshToken);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    // biome-ignore lint/suspicious/noDocumentCookie: required for Next.js middleware
     document.cookie = `access_token=${accessToken}; path=/; max-age=604800; samesite=lax`;
 
     setToken(accessToken);
     setUser(userData);
 
-    router.push("/onboarding");
+    router.push('/onboarding');
   };
 
   const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
-    document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    // biome-ignore lint/suspicious/noDocumentCookie: required for Next.js middleware
+    document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     setToken(null);
     setUser(null);
-    router.push("/login");
+    router.push('/login');
   };
 
   return (
@@ -108,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

@@ -1,87 +1,312 @@
 {
   "react": {
     "beginner": [
-      {"id": "SqcY0GlETPk", "title": "React Full Course for Beginners 2024 — freeCodeCamp", "channel": "freeCodeCamp", "duration_mins": 120},
-      {"id": "bMknfKXIFA8", "title": "React JS Tutorial for Beginners — Programming with Mosh", "channel": "Programming with Mosh", "duration_mins": 60},
-      {"id": "DLX62G4lc44", "title": "React Crash Course 2024 — Traversy Media", "channel": "Traversy Media", "duration_mins": 90}
+      {
+        "id": "SqcY0GlETPk",
+        "title": "React Full Course for Beginners 2024 — freeCodeCamp",
+        "channel": "freeCodeCamp",
+        "duration_mins": 120
+      },
+      {
+        "id": "bMknfKXIFA8",
+        "title": "React JS Tutorial for Beginners — Programming with Mosh",
+        "channel": "Programming with Mosh",
+        "duration_mins": 60
+      },
+      {
+        "id": "DLX62G4lc44",
+        "title": "React Crash Course 2024 — Traversy Media",
+        "channel": "Traversy Media",
+        "duration_mins": 90
+      }
     ],
     "intermediate": [
-      {"id": "hQAHSlTtVmA", "title": "React Hooks Explained — Web Dev Simplified", "channel": "Web Dev Simplified", "duration_mins": 45},
-      {"id": "3FpK9MMbDJw", "title": "React State Management Deep Dive", "channel": "Lama Dev", "duration_mins": 60},
-      {"id": "O6P86uwfdR0", "title": "useContext & useReducer Full Tutorial — Traversy Media", "channel": "Traversy Media", "duration_mins": 50}
+      {
+        "id": "hQAHSlTtVmA",
+        "title": "React Hooks Explained — Web Dev Simplified",
+        "channel": "Web Dev Simplified",
+        "duration_mins": 45
+      },
+      {
+        "id": "3FpK9MMbDJw",
+        "title": "React State Management Deep Dive",
+        "channel": "Lama Dev",
+        "duration_mins": 60
+      },
+      {
+        "id": "O6P86uwfdR0",
+        "title": "useContext & useReducer Full Tutorial — Traversy Media",
+        "channel": "Traversy Media",
+        "duration_mins": 50
+      }
     ],
     "advanced": [
-      {"id": "XaBZMYxnl94", "title": "React Performance Optimization — Jack Herrington", "channel": "Jack Herrington", "duration_mins": 55},
-      {"id": "NJ_qbsLf52w", "title": "React Design Patterns & Architecture — Fireship", "channel": "Fireship", "duration_mins": 30},
-      {"id": "wo_8QR-qjSU", "title": "React Server Components Deep Dive — Vercel", "channel": "Vercel", "duration_mins": 40}
+      {
+        "id": "XaBZMYxnl94",
+        "title": "React Performance Optimization — Jack Herrington",
+        "channel": "Jack Herrington",
+        "duration_mins": 55
+      },
+      {
+        "id": "NJ_qbsLf52w",
+        "title": "React Design Patterns & Architecture — Fireship",
+        "channel": "Fireship",
+        "duration_mins": 30
+      },
+      {
+        "id": "wo_8QR-qjSU",
+        "title": "React Server Components Deep Dive — Vercel",
+        "channel": "Vercel",
+        "duration_mins": 40
+      }
     ]
   },
   "python": {
     "beginner": [
-      {"id": "rfscVS0vtbw", "title": "Learn Python — Full Course for Beginners — freeCodeCamp", "channel": "freeCodeCamp", "duration_mins": 270},
-      {"id": "_uQrJ0TkZlc", "title": "Python Tutorial for Beginners — Programming with Mosh", "channel": "Programming with Mosh", "duration_mins": 360},
-      {"id": "kqtD5dpn9C8", "title": "Python for Everybody — Complete Course", "channel": "Dr. Chuck", "duration_mins": 180}
+      {
+        "id": "rfscVS0vtbw",
+        "title": "Learn Python — Full Course for Beginners — freeCodeCamp",
+        "channel": "freeCodeCamp",
+        "duration_mins": 270
+      },
+      {
+        "id": "_uQrJ0TkZlc",
+        "title": "Python Tutorial for Beginners — Programming with Mosh",
+        "channel": "Programming with Mosh",
+        "duration_mins": 360
+      },
+      {
+        "id": "kqtD5dpn9C8",
+        "title": "Python for Everybody — Complete Course",
+        "channel": "Dr. Chuck",
+        "duration_mins": 180
+      }
     ],
     "intermediate": [
-      {"id": "HGOBQPFzWKo", "title": "Python Intermediate Tutorial — Tech With Tim", "channel": "Tech With Tim", "duration_mins": 90},
-      {"id": "ZDa-Z5JzLYM", "title": "Python OOP Tutorial — Corey Schafer", "channel": "Corey Schafer", "duration_mins": 120},
-      {"id": "p15xzjzR9j0", "title": "Python Decorators and Generators — Real Python", "channel": "Real Python", "duration_mins": 60}
+      {
+        "id": "HGOBQPFzWKo",
+        "title": "Python Intermediate Tutorial — Tech With Tim",
+        "channel": "Tech With Tim",
+        "duration_mins": 90
+      },
+      {
+        "id": "ZDa-Z5JzLYM",
+        "title": "Python OOP Tutorial — Corey Schafer",
+        "channel": "Corey Schafer",
+        "duration_mins": 120
+      },
+      {
+        "id": "p15xzjzR9j0",
+        "title": "Python Decorators and Generators — Real Python",
+        "channel": "Real Python",
+        "duration_mins": 60
+      }
     ],
     "advanced": [
-      {"id": "8ext9G7xspg", "title": "Python Advanced — Design Patterns", "channel": "ArjanCodes", "duration_mins": 75},
-      {"id": "LrtnLEkOwFE", "title": "Python Async Await & asyncio — Tech With Tim", "channel": "Tech With Tim", "duration_mins": 60},
-      {"id": "K1CkUMzQPao", "title": "Python Type Hints & Pydantic — ArjanCodes", "channel": "ArjanCodes", "duration_mins": 45}
+      {
+        "id": "8ext9G7xspg",
+        "title": "Python Advanced — Design Patterns",
+        "channel": "ArjanCodes",
+        "duration_mins": 75
+      },
+      {
+        "id": "LrtnLEkOwFE",
+        "title": "Python Async Await & asyncio — Tech With Tim",
+        "channel": "Tech With Tim",
+        "duration_mins": 60
+      },
+      {
+        "id": "K1CkUMzQPao",
+        "title": "Python Type Hints & Pydantic — ArjanCodes",
+        "channel": "ArjanCodes",
+        "duration_mins": 45
+      }
     ]
   },
   "data_structures": {
     "beginner": [
-      {"id": "RBSGKlAvoiM", "title": "Data Structures Easy to Advanced — freeCodeCamp", "channel": "freeCodeCamp", "duration_mins": 480},
-      {"id": "zg9ih6SVACc", "title": "Data Structures & Algorithms Beginner Course — Caleb Curry", "channel": "Caleb Curry", "duration_mins": 240},
-      {"id": "09_LlHjoEiY", "title": "Arrays and Linked Lists — CS Dojo", "channel": "CS Dojo", "duration_mins": 45}
+      {
+        "id": "RBSGKlAvoiM",
+        "title": "Data Structures Easy to Advanced — freeCodeCamp",
+        "channel": "freeCodeCamp",
+        "duration_mins": 480
+      },
+      {
+        "id": "zg9ih6SVACc",
+        "title": "Data Structures & Algorithms Beginner Course — Caleb Curry",
+        "channel": "Caleb Curry",
+        "duration_mins": 240
+      },
+      {
+        "id": "09_LlHjoEiY",
+        "title": "Arrays and Linked Lists — CS Dojo",
+        "channel": "CS Dojo",
+        "duration_mins": 45
+      }
     ],
     "intermediate": [
-      {"id": "pkYVOmU3MgA", "title": "Tree Data Structures — HackerRank", "channel": "HackerRank", "duration_mins": 60},
-      {"id": "t0Cq6tVNRBA", "title": "Graph Algorithms — freeCodeCamp", "channel": "freeCodeCamp", "duration_mins": 90},
-      {"id": "KEEKn7Me-ms", "title": "Hash Tables and Hashing — HackerRank", "channel": "HackerRank", "duration_mins": 30}
+      {
+        "id": "pkYVOmU3MgA",
+        "title": "Tree Data Structures — HackerRank",
+        "channel": "HackerRank",
+        "duration_mins": 60
+      },
+      {
+        "id": "t0Cq6tVNRBA",
+        "title": "Graph Algorithms — freeCodeCamp",
+        "channel": "freeCodeCamp",
+        "duration_mins": 90
+      },
+      {
+        "id": "KEEKn7Me-ms",
+        "title": "Hash Tables and Hashing — HackerRank",
+        "channel": "HackerRank",
+        "duration_mins": 30
+      }
     ],
     "advanced": [
-      {"id": "eiC58R16hb8", "title": "Advanced Graph Algorithms — MIT OpenCourseWare", "channel": "MIT OpenCourseWare", "duration_mins": 80},
-      {"id": "HtSuA80QTyo", "title": "Dynamic Programming — neetcode", "channel": "neetcode", "duration_mins": 120},
-      {"id": "9F0Ys6dWKIQ", "title": "Segment Trees & Fenwick Trees — Errichto", "channel": "Errichto", "duration_mins": 90}
+      {
+        "id": "eiC58R16hb8",
+        "title": "Advanced Graph Algorithms — MIT OpenCourseWare",
+        "channel": "MIT OpenCourseWare",
+        "duration_mins": 80
+      },
+      {
+        "id": "HtSuA80QTyo",
+        "title": "Dynamic Programming — neetcode",
+        "channel": "neetcode",
+        "duration_mins": 120
+      },
+      {
+        "id": "9F0Ys6dWKIQ",
+        "title": "Segment Trees & Fenwick Trees — Errichto",
+        "channel": "Errichto",
+        "duration_mins": 90
+      }
     ]
   },
   "sql": {
     "beginner": [
-      {"id": "HXV3zeQKqGY", "title": "SQL Tutorial — Full Database Course for Beginners — freeCodeCamp", "channel": "freeCodeCamp", "duration_mins": 270},
-      {"id": "xiUTqnI6xk8", "title": "SQL for Beginners Tutorial — Kudvenkat", "channel": "Kudvenkat", "duration_mins": 90},
-      {"id": "27axs9dO7AE", "title": "MySQL Crash Course — Traversy Media", "channel": "Traversy Media", "duration_mins": 100}
+      {
+        "id": "HXV3zeQKqGY",
+        "title": "SQL Tutorial — Full Database Course for Beginners — freeCodeCamp",
+        "channel": "freeCodeCamp",
+        "duration_mins": 270
+      },
+      {
+        "id": "xiUTqnI6xk8",
+        "title": "SQL for Beginners Tutorial — Kudvenkat",
+        "channel": "Kudvenkat",
+        "duration_mins": 90
+      },
+      {
+        "id": "27axs9dO7AE",
+        "title": "MySQL Crash Course — Traversy Media",
+        "channel": "Traversy Media",
+        "duration_mins": 100
+      }
     ],
     "intermediate": [
-      {"id": "M-55o_0yize", "title": "SQL Window Functions — Mode Analytics", "channel": "Mode Analytics", "duration_mins": 45},
-      {"id": "2Fn0WAyZV0E", "title": "Advanced SQL Joins — Kudvenkat", "channel": "Kudvenkat", "duration_mins": 60},
-      {"id": "CCTGrosvMjY", "title": "SQL Query Optimization — ByteByteGo", "channel": "ByteByteGo", "duration_mins": 25}
+      {
+        "id": "M-55o_0yize",
+        "title": "SQL Window Functions — Mode Analytics",
+        "channel": "Mode Analytics",
+        "duration_mins": 45
+      },
+      {
+        "id": "2Fn0WAyZV0E",
+        "title": "Advanced SQL Joins — Kudvenkat",
+        "channel": "Kudvenkat",
+        "duration_mins": 60
+      },
+      {
+        "id": "CCTGrosvMjY",
+        "title": "SQL Query Optimization — ByteByteGo",
+        "channel": "ByteByteGo",
+        "duration_mins": 25
+      }
     ],
     "advanced": [
-      {"id": "IXycPq7MnwE", "title": "Database Indexing — CMU Database Group", "channel": "CMU Database Group", "duration_mins": 90},
-      {"id": "W2Z7fbCLSTw", "title": "PostgreSQL Performance Tuning — Hussein Nasser", "channel": "Hussein Nasser", "duration_mins": 75},
-      {"id": "kSRRgOShz3s", "title": "PostgreSQL Advanced — Explain & Analyze", "channel": "Hussein Nasser", "duration_mins": 60}
+      {
+        "id": "IXycPq7MnwE",
+        "title": "Database Indexing — CMU Database Group",
+        "channel": "CMU Database Group",
+        "duration_mins": 90
+      },
+      {
+        "id": "W2Z7fbCLSTw",
+        "title": "PostgreSQL Performance Tuning — Hussein Nasser",
+        "channel": "Hussein Nasser",
+        "duration_mins": 75
+      },
+      {
+        "id": "kSRRgOShz3s",
+        "title": "PostgreSQL Advanced — Explain & Analyze",
+        "channel": "Hussein Nasser",
+        "duration_mins": 60
+      }
     ]
   },
   "machine_learning": {
     "beginner": [
-      {"id": "GwIo3gDZCVQ", "title": "Machine Learning Full Course — Simplilearn", "channel": "Simplilearn", "duration_mins": 360},
-      {"id": "ukzFI9rgwfU", "title": "Machine Learning for Beginners — Microsoft", "channel": "Microsoft", "duration_mins": 180},
-      {"id": "Gv9_4yMHFhI", "title": "Supervised vs Unsupervised Learning — StatQuest", "channel": "StatQuest", "duration_mins": 20}
+      {
+        "id": "GwIo3gDZCVQ",
+        "title": "Machine Learning Full Course — Simplilearn",
+        "channel": "Simplilearn",
+        "duration_mins": 360
+      },
+      {
+        "id": "ukzFI9rgwfU",
+        "title": "Machine Learning for Beginners — Microsoft",
+        "channel": "Microsoft",
+        "duration_mins": 180
+      },
+      {
+        "id": "Gv9_4yMHFhI",
+        "title": "Supervised vs Unsupervised Learning — StatQuest",
+        "channel": "StatQuest",
+        "duration_mins": 20
+      }
     ],
     "intermediate": [
-      {"id": "aircAruvnKk", "title": "Neural Networks — 3Blue1Brown", "channel": "3Blue1Brown", "duration_mins": 45},
-      {"id": "PaCmpygFfXo", "title": "Decision Trees & Random Forests — StatQuest", "channel": "StatQuest", "duration_mins": 40},
-      {"id": "sO4ZirJh9ds", "title": "Feature Engineering for Machine Learning — Abhishek Thakur", "channel": "Abhishek Thakur", "duration_mins": 60}
+      {
+        "id": "aircAruvnKk",
+        "title": "Neural Networks — 3Blue1Brown",
+        "channel": "3Blue1Brown",
+        "duration_mins": 45
+      },
+      {
+        "id": "PaCmpygFfXo",
+        "title": "Decision Trees & Random Forests — StatQuest",
+        "channel": "StatQuest",
+        "duration_mins": 40
+      },
+      {
+        "id": "sO4ZirJh9ds",
+        "title": "Feature Engineering for Machine Learning — Abhishek Thakur",
+        "channel": "Abhishek Thakur",
+        "duration_mins": 60
+      }
     ],
     "advanced": [
-      {"id": "qFJeN9V1ZsI", "title": "Attention Mechanism & Transformers — Andrej Karpathy", "channel": "Andrej Karpathy", "duration_mins": 120},
-      {"id": "vT1JzLTH4G4", "title": "Deep Learning with PyTorch — fast.ai", "channel": "fast.ai", "duration_mins": 240},
-      {"id": "yscqnUI2QZE", "title": "XGBoost Deep Dive — Statquest", "channel": "StatQuest", "duration_mins": 35}
+      {
+        "id": "qFJeN9V1ZsI",
+        "title": "Attention Mechanism & Transformers — Andrej Karpathy",
+        "channel": "Andrej Karpathy",
+        "duration_mins": 120
+      },
+      {
+        "id": "vT1JzLTH4G4",
+        "title": "Deep Learning with PyTorch — fast.ai",
+        "channel": "fast.ai",
+        "duration_mins": 240
+      },
+      {
+        "id": "yscqnUI2QZE",
+        "title": "XGBoost Deep Dive — Statquest",
+        "channel": "StatQuest",
+        "duration_mins": 35
+      }
     ]
   }
 }

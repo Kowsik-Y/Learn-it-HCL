@@ -1,31 +1,30 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { api } from "@/lib/api";
-import { PageHeader } from "@/components/ui/page-header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Zap,
-  Flame,
-  Brain,
-  Target,
-  Trophy,
-  BookOpen,
   ArrowRight,
-  Clock,
+  Brain,
+  Flame,
+  Map as MapIcon,
   RotateCcw,
   Sparkles,
-  Award,
-  BarChart3,
-  Map,
-  PlayCircle,
-  ChevronRight,
-} from "lucide-react";
+  Target,
+  Trophy,
+  Zap,
+  Sprout,
+  Compass,
+  Hammer,
+  Rocket,
+  Crown,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { api } from '@/lib/api';
 
 type DashboardData = {
   gamification: {
@@ -78,22 +77,18 @@ type DashboardData = {
   }>;
 };
 
-const LEVEL_ICONS: Record<string, string> = {
-  Novice: "🌱",
-  Explorer: "🔍",
-  Builder: "🔨",
-  Practitioner: "⚡",
-  Advanced: "🚀",
-  Expert: "👑",
+const LEVEL_ICONS: Record<string, React.ComponentType<any>> = {
+  Novice: Sprout,
+  Explorer: Compass,
+  Builder: Hammer,
+  Practitioner: Zap,
+  Advanced: Rocket,
+  Expert: Crown,
 };
 
 export default function LearnerDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
 
   const loadDashboard = async () => {
     try {
@@ -102,33 +97,121 @@ export default function LearnerDashboardPage() {
     } catch {
       // Demo data
       setData({
-        gamification: { current_xp: 2350, next_level_xp: 3500, level: 3, level_name: "Builder", streak_days: 7 },
-        learner: { full_name: "Learner", email: "student@learnit.dev", avatar_url: "", role: "student" },
+        gamification: {
+          current_xp: 2350,
+          next_level_xp: 3500,
+          level: 3,
+          level_name: 'Builder',
+          streak_days: 7,
+        },
+        learner: {
+          full_name: 'Learner',
+          email: 'student@learnit.dev',
+          avatar_url: '',
+          role: 'student',
+        },
         goals: [
-          { id: "g1", title: "Become a Full-Stack Developer", goal_type: "career", target_role: "Full-Stack Developer", progress_percentage: 42 },
+          {
+            id: 'g1',
+            title: 'Become a Full-Stack Developer',
+            goal_type: 'career',
+            target_role: 'Full-Stack Developer',
+            progress_percentage: 42,
+          },
         ],
         mastery_summary: [
-          { skill_id: "1", skill_name: "Python Fundamentals", score: 0.92, confidence: 0.88, status: "mastered" },
-          { skill_id: "2", skill_name: "Data Structures", score: 0.78, confidence: 0.72, status: "practiced" },
-          { skill_id: "3", skill_name: "Algorithms", score: 0.55, confidence: 0.60, status: "learning" },
-          { skill_id: "4", skill_name: "SQL & Databases", score: 0.88, confidence: 0.85, status: "mastered" },
-          { skill_id: "5", skill_name: "REST APIs", score: 0.42, confidence: 0.50, status: "learning" },
+          {
+            skill_id: '1',
+            skill_name: 'Python Fundamentals',
+            score: 0.92,
+            confidence: 0.88,
+            status: 'mastered',
+          },
+          {
+            skill_id: '2',
+            skill_name: 'Data Structures',
+            score: 0.78,
+            confidence: 0.72,
+            status: 'practiced',
+          },
+          {
+            skill_id: '3',
+            skill_name: 'Algorithms',
+            score: 0.55,
+            confidence: 0.6,
+            status: 'learning',
+          },
+          {
+            skill_id: '4',
+            skill_name: 'SQL & Databases',
+            score: 0.88,
+            confidence: 0.85,
+            status: 'mastered',
+          },
+          {
+            skill_id: '5',
+            skill_name: 'REST APIs',
+            score: 0.42,
+            confidence: 0.5,
+            status: 'learning',
+          },
         ],
         daily_mission: {
           activities: [
-            { title: "Practice: Algorithm Design", type: "lesson", explanation: "Your mastery is at 55% — practice sessions will push it past 70%." },
-            { title: "Review: REST API Basics", type: "review", explanation: "Memory retention is at 45%. A quick review will reinforce this skill." },
-            { title: "Quiz: SQL Fundamentals", type: "challenge", explanation: "Scoring above 60% will unlock the System Design module." },
+            {
+              title: 'Practice: Algorithm Design',
+              type: 'lesson',
+              explanation: 'Your mastery is at 55% — practice sessions will push it past 70%.',
+            },
+            {
+              title: 'Review: REST API Basics',
+              type: 'review',
+              explanation: 'Memory retention is at 45%. A quick review will reinforce this skill.',
+            },
+            {
+              title: 'Quiz: SQL Fundamentals',
+              type: 'challenge',
+              explanation: 'Scoring above 60% will unlock the System Design module.',
+            },
           ],
         },
         active_quests: [
-          { id: "q1", title: "Daily Explorer", description: "Complete 3 lessons today", reward_xp: 50, progress: 66, target: 100 },
-          { id: "q2", title: "Review Champion", description: "Review 5 skills", reward_xp: 150, progress: 40, target: 100 },
+          {
+            id: 'q1',
+            title: 'Daily Explorer',
+            description: 'Complete 3 lessons today',
+            reward_xp: 50,
+            progress: 66,
+            target: 100,
+          },
+          {
+            id: 'q2',
+            title: 'Review Champion',
+            description: 'Review 5 skills',
+            reward_xp: 150,
+            progress: 40,
+            target: 100,
+          },
         ],
         recent_xp: [
-          { id: "x1", amount: 25, reason: "Completed lesson: Python Basics", created_at: new Date(Date.now() - 1 * 3600000).toISOString() },
-          { id: "x2", amount: 50, reason: "Quiz score: 90%", created_at: new Date(Date.now() - 2 * 3600000).toISOString() },
-          { id: "x3", amount: 10, reason: "Daily login streak bonus", created_at: new Date(Date.now() - 5 * 3600000).toISOString() },
+          {
+            id: 'x1',
+            amount: 25,
+            reason: 'Completed lesson: Python Basics',
+            created_at: new Date(Date.now() - 1 * 3600000).toISOString(),
+          },
+          {
+            id: 'x2',
+            amount: 50,
+            reason: 'Quiz score: 90%',
+            created_at: new Date(Date.now() - 2 * 3600000).toISOString(),
+          },
+          {
+            id: 'x3',
+            amount: 10,
+            reason: 'Daily login streak bonus',
+            created_at: new Date(Date.now() - 5 * 3600000).toISOString(),
+          },
         ],
       });
     } finally {
@@ -136,18 +219,27 @@ export default function LearnerDashboardPage() {
     }
   };
 
+  useEffect(() => {
+    loadDashboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getMasteryColor = (score: number) => {
-    if (score >= 0.65) return "text-emerald-500";
-    if (score >= 0.30) return "text-amber-500";
-    return "text-red-500";
+    if (score >= 0.65) return 'text-emerald-500';
+    if (score >= 0.3) return 'text-amber-500';
+    return 'text-red-500';
   };
 
   const getMissionIcon = (type: string) => {
     switch (type) {
-      case "lesson": return "📚";
-      case "review": return "🔄";
-      case "challenge": return "⚡";
-      default: return "🎯";
+      case 'lesson':
+        return '📚';
+      case 'review':
+        return '🔄';
+      case 'challenge':
+        return '⚡';
+      default:
+        return '🎯';
     }
   };
 
@@ -156,10 +248,14 @@ export default function LearnerDashboardPage() {
       <div className="container max-w-6xl py-8 space-y-8">
         <Skeleton className="h-12 w-64" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={`stat-skel-${i}`} className="h-32 rounded-xl" />
+          ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)}
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={`card-skel-${i}`} className="h-64 rounded-xl" />
+          ))}
         </div>
       </div>
     );
@@ -167,11 +263,12 @@ export default function LearnerDashboardPage() {
 
   if (!data) return null;
 
-  const levelProgress = ((data.gamification.current_xp - 0) / (data.gamification.next_level_xp - 0)) * 100;
-  const levelIcon = LEVEL_ICONS[data.gamification.level_name] || "🌱";
+  const levelProgress =
+    ((data.gamification.current_xp - 0) / (data.gamification.next_level_xp - 0)) * 100;
+  const LevelIconComponent = LEVEL_ICONS[data.gamification.level_name] || Sprout;
 
   return (
-    <div className="container max-w-6xl py-8 space-y-8">
+    <div className="container mx-auto max-w-6xl py-8 space-y-8">
       <PageHeader
         title={`Welcome back, ${data.learner.full_name}!`}
         description="Here's your learning progress, daily missions, and personalized recommendations."
@@ -183,23 +280,29 @@ export default function LearnerDashboardPage() {
         <Card className="bg-gradient-to-br from-primary/5 to-violet-500/5 border-primary/20">
           <CardContent className="pt-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">
-                {levelIcon}
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <LevelIconComponent className="h-6 w-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-extrabold">{data.gamification.level_name}</span>
-                  <Badge className="bg-primary/10 text-primary border-0 text-xs">Lvl {data.gamification.level}</Badge>
+                  <Badge className="bg-primary/10 text-primary border-0 text-xs">
+                    Lvl {data.gamification.level}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Zap className="h-3.5 w-3.5 text-amber-500" />
-                  <span className="font-bold text-foreground">{data.gamification.current_xp.toLocaleString()}</span> XP
+                  <span className="font-bold text-foreground">
+                    {data.gamification.current_xp.toLocaleString()}
+                  </span>{' '}
+                  XP
                 </div>
               </div>
             </div>
             <Progress value={levelProgress} className="h-2" />
             <p className="text-[11px] text-muted-foreground mt-1">
-              {(data.gamification.next_level_xp - data.gamification.current_xp).toLocaleString()} XP to next level
+              {(data.gamification.next_level_xp - data.gamification.current_xp).toLocaleString()} XP
+              to next level
             </p>
           </CardContent>
         </Card>
@@ -207,14 +310,20 @@ export default function LearnerDashboardPage() {
         {/* Streak */}
         <Card>
           <CardContent className="pt-4 flex items-center gap-4">
-            <div className={`h-14 w-14 rounded-full flex items-center justify-center shrink-0 ${data.gamification.streak_days > 0 ? "bg-orange-500/10" : "bg-muted"}`}>
-              <Flame className={`h-8 w-8 ${data.gamification.streak_days > 0 ? "text-orange-500 animate-pulse" : "text-muted-foreground/30"}`} />
+            <div
+              className={`h-14 w-14 rounded-full flex items-center justify-center shrink-0 ${data.gamification.streak_days > 0 ? 'bg-orange-500/10' : 'bg-muted'}`}
+            >
+              <Flame
+                className={`h-8 w-8 ${data.gamification.streak_days > 0 ? 'text-orange-500 animate-pulse' : 'text-muted-foreground/30'}`}
+              />
             </div>
             <div>
               <div className="text-3xl font-extrabold">{data.gamification.streak_days}</div>
               <p className="text-sm text-muted-foreground">Day Streak</p>
               {data.gamification.streak_days >= 7 && (
-                <Badge className="bg-orange-500/10 text-orange-500 border-0 text-[10px] mt-1">🔥 On fire!</Badge>
+                <Badge className="bg-orange-500/10 text-orange-500 border-0 text-[10px] mt-1 gap-1 items-center">
+                  <Flame className="h-3 w-3 fill-orange-500" /> On fire!
+                </Badge>
               )}
             </div>
           </CardContent>
@@ -229,7 +338,9 @@ export default function LearnerDashboardPage() {
                 <h3 className="text-sm font-bold">{data.goals[0].title}</h3>
               </div>
               <Progress value={data.goals[0].progress_percentage} className="h-2 mb-1" />
-              <p className="text-xs text-muted-foreground">{data.goals[0].progress_percentage}% complete</p>
+              <p className="text-xs text-muted-foreground">
+                {data.goals[0].progress_percentage}% complete
+              </p>
             </CardContent>
           </Card>
         )}
@@ -237,18 +348,22 @@ export default function LearnerDashboardPage() {
 
       {/* Main content grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* Daily Mission */}
         <Card className="md:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-amber-500" /> Today&apos;s Mission
             </CardTitle>
-            <CardDescription>AI-recommended activities based on your mastery and goals.</CardDescription>
+            <CardDescription>
+              AI-recommended activities based on your mastery and goals.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {data.daily_mission.activities.map((activity, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div
+                key={`mission-${idx}`}
+                className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+              >
                 <span className="text-xl mt-0.5">{getMissionIcon(activity.type)}</span>
                 <div className="space-y-0.5">
                   <h4 className="text-sm font-semibold">{activity.title}</h4>
@@ -346,16 +461,25 @@ export default function LearnerDashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { href: "/skills", icon: Brain, label: "Skill Map", color: "text-primary" },
-          { href: "/review", icon: RotateCcw, label: "Review Queue", color: "text-orange-500" },
-          { href: "/learning-paths", icon: Map, label: "Learning Path", color: "text-violet-500" },
-          { href: "/achievements", icon: Trophy, label: "Achievements", color: "text-amber-500" },
+          { href: '/skills', icon: Brain, label: 'Skill Map', color: 'text-primary' },
+          { href: '/review', icon: RotateCcw, label: 'Review Queue', color: 'text-orange-500' },
+          {
+            href: '/learning-paths',
+            icon: MapIcon,
+            label: 'Learning Path',
+            color: 'text-violet-500',
+          },
+          { href: '/achievements', icon: Trophy, label: 'Achievements', color: 'text-amber-500' },
         ].map((action) => (
           <Link key={action.href} href={action.href}>
             <Card className="hover:border-primary/30 transition-all cursor-pointer group h-full">
               <CardContent className="pt-4 text-center">
-                <action.icon className={`h-7 w-7 mx-auto mb-2 ${action.color} group-hover:scale-110 transition-transform`} />
-                <p className="text-sm font-semibold group-hover:text-primary transition-colors">{action.label}</p>
+                <action.icon
+                  className={`h-7 w-7 mx-auto mb-2 ${action.color} group-hover:scale-110 transition-transform`}
+                />
+                <p className="text-sm font-semibold group-hover:text-primary transition-colors">
+                  {action.label}
+                </p>
               </CardContent>
             </Card>
           </Link>

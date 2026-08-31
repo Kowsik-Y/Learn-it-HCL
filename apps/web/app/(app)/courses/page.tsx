@@ -1,20 +1,46 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { api } from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Search, BookOpen, Clock, Star, Users, PlayCircle, ArrowRight, ChevronRight, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  ChevronRight,
+  Clock,
+  PlayCircle,
+  Search,
+  Sparkles,
+  Star,
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { api } from '@/lib/api';
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
+
+  const loadCourseDetail = async (id: string) => {
+    try {
+      const detail = (await api.getCourse(id)) as any;
+      setSelectedCourse({ ...detail, id });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     async function loadCourses() {
@@ -31,19 +57,11 @@ export default function CoursesPage() {
       }
     }
     loadCourses();
+    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, []);
 
-  const loadCourseDetail = async (id: string) => {
-    try {
-      const detail = (await api.getCourse(id)) as any;
-      setSelectedCourse({ ...detail, id });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const filteredCourses = courses.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase())
+    c.title.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -80,7 +98,7 @@ export default function CoursesPage() {
           <div className="w-full lg:w-5/12 space-y-4">
             <Skeleton className="h-6 w-1/3 mb-4" />
             {Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="p-4">
+              <Card key={`skeleton-${i}`} className="p-4">
                 <Skeleton className="h-6 w-3/4 mb-2" />
                 <Skeleton className="h-4 w-full mb-4" />
                 <div className="flex justify-between">
@@ -91,23 +109,25 @@ export default function CoursesPage() {
             ))}
           </div>
           <div className="w-full lg:w-7/12">
-             <Skeleton className="h-[600px] w-full rounded-xl" />
+            <Skeleton className="h-[600px] w-full rounded-xl" />
           </div>
         </div>
       ) : (
-        <div className="gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Course List Column */}
-          <div >
+          <div className="lg:col-span-5 space-y-4">
             <h2 className="text-lg font-bold flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" /> Available Courses ({filteredCourses.length})
+              <BookOpen className="h-5 w-5 text-primary" /> Available Courses (
+              {filteredCourses.length})
             </h2>
 
-            <div className="space-y-4 grid grid-cols-1 lg:grid-cols-12 w-full">
+            <div className="space-y-4">
               {filteredCourses.map((course) => (
                 <Card
                   key={course.id}
-                  className={`cursor-pointer transition-all hover:border-primary/50 ${selectedCourse?.id === course.id ? "border-primary bg-primary/5" : ""
-                    }`}
+                  className={`cursor-pointer transition-all hover:border-primary/50 ${
+                    selectedCourse?.id === course.id ? 'border-primary bg-primary/5' : ''
+                  }`}
                   onClick={() => loadCourseDetail(course.id)}
                 >
                   <CardHeader className="pb-2">
@@ -147,10 +167,14 @@ export default function CoursesPage() {
                     <Badge className="bg-primary text-primary-foreground font-semibold">
                       {selectedCourse.difficulty_level}
                     </Badge>
-                    <Badge variant="secondary">{selectedCourse.estimated_duration_hours} Hours</Badge>
+                    <Badge variant="secondary">
+                      {selectedCourse.estimated_duration_hours} Hours
+                    </Badge>
                   </div>
                   <CardTitle className="text-2xl font-extrabold">{selectedCourse.title}</CardTitle>
-                  <CardDescription className="text-sm mt-2">{selectedCourse.description}</CardDescription>
+                  <CardDescription className="text-sm mt-2">
+                    {selectedCourse.description}
+                  </CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -161,7 +185,10 @@ export default function CoursesPage() {
                   {selectedCourse.modules && selectedCourse.modules.length > 0 ? (
                     <div className="space-y-4">
                       {selectedCourse.modules.map((mod: any, mIdx: number) => (
-                        <div key={mod.id} className="border border-border/70 rounded-lg p-4 bg-card">
+                        <div
+                          key={mod.id}
+                          className="border border-border/70 rounded-lg p-4 bg-card"
+                        >
                           <h4 className="font-bold text-base mb-3 flex items-center gap-2">
                             <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-bold">
                               {mIdx + 1}
@@ -170,25 +197,26 @@ export default function CoursesPage() {
                           </h4>
 
                           <div className="space-y-2 pl-8">
-                            {mod.chapters &&
-                              mod.chapters.map((ch: any) => (
-                                <div
-                                  key={ch.id}
-                                  className="flex items-center justify-between p-2.5 rounded-md bg-muted/40 hover:bg-muted text-sm font-medium transition-colors cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <PlayCircle className="h-4 w-4 text-primary" />
-                                    <span>{ch.title}</span>
-                                  </div>
-                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            {mod.chapters?.map((ch: any) => (
+                              <div
+                                key={ch.id}
+                                className="flex items-center justify-between p-2.5 rounded-md bg-muted/40 hover:bg-muted text-sm font-medium transition-colors cursor-pointer"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <PlayCircle className="h-4 w-4 text-primary" />
+                                  <span>{ch.title}</span>
                                 </div>
-                              ))}
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            ))}
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No modules loaded for this course.</p>
+                    <p className="text-sm text-muted-foreground">
+                      No modules loaded for this course.
+                    </p>
                   )}
                 </CardContent>
 

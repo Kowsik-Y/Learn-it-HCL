@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Ghost, Home, ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ArrowLeft, Ghost, Home } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function NotFound() {
   const router = useRouter();
@@ -18,7 +18,10 @@ export default function NotFound() {
         <div className="relative inline-block group">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
           <div className="relative bg-background ring-1 ring-border/50 rounded-full p-8 flex items-center justify-center">
-            <Ghost className="h-24 w-24 text-primary shadow-primary/20 drop-shadow-xl" strokeWidth={1.5} />
+            <Ghost
+              className="h-24 w-24 text-primary shadow-primary/20 drop-shadow-xl"
+              strokeWidth={1.5}
+            />
           </div>
         </div>
 
@@ -28,13 +31,17 @@ export default function NotFound() {
           </h1>
           <h2 className="text-3xl font-bold  ">Page Not Found</h2>
           <p className="text-muted-foreground text-lg max-w-[500px] mx-auto leading-relaxed px-4">
-            Oops! It seems you&apos;ve ventured into uncharted territory. The page you&apos;re looking for has vanished into the digital void.
+            Oops! It seems you&apos;ve ventured into uncharted territory. The page you&apos;re
+            looking for has vanished into the digital void.
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 px-4">
           <Link href="/" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full gap-2 font-bold h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 rounded-full transition-all">
+            <Button
+              size="lg"
+              className="w-full gap-2 font-bold h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 rounded-full transition-all"
+            >
               <Home className="h-5 w-5" />
               Return Home
             </Button>
