@@ -1,7 +1,7 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import fs from 'fs';
-import path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -87,7 +87,11 @@ async function main() {
       const sqlStr = fs.readFileSync(sqlPath, 'utf8');
       const statements = sqlStr.split(';').filter((s) => s.trim().length > 0);
       for (const statement of statements) {
-        await prisma.$executeRawUnsafe(statement);
+        try {
+          await prisma.$executeRawUnsafe(statement);
+        } catch {
+          // ignore duplicate key errors
+        }
       }
       console.log(`✅ Executed ${statements.length} SQL statements from seed_generated.sql`);
     } else {

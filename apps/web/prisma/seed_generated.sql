@@ -1,5 +1,4 @@
-Successfully generated seed_generated.sql with 281 statements
-ive, created_at, updated_at) VALUES ('612b9ed9-634b-4156-ba06-09c6f226816c', 'Learn-it HCL Demo', 'learnit-demo', 'standalone', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO organizations (id, name, slug, tenant_type, is_active, created_at, updated_at) VALUES ('612b9ed9-634b-4156-ba06-09c6f226816c', 'Learn-it HCL Demo', 'learnit-demo', 'standalone', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO organizations (id, name, slug, tenant_type, is_active, created_at, updated_at) VALUES ('5759ef02-c15d-426b-b43a-ba1f8365345c', 'HCL Technologies Ltd', 'hcl-tech', 'standalone', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO organizations (id, name, slug, tenant_type, is_active, created_at, updated_at) VALUES ('2ded7297-54e2-46a1-9d87-9b78480684c1', 'Google Cloud Academy', 'google-cloud', 'standalone', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO organizations (id, name, slug, tenant_type, is_active, created_at, updated_at) VALUES ('af7ecffb-ce54-4a9c-9d44-dba3c3963060', 'Microsoft Learning Center', 'microsoft-org', 'standalone', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
