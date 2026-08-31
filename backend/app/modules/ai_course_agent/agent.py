@@ -27,8 +27,9 @@ def get_openai_llm(temperature: float = 0.7):
     if not settings.openai_api_key or settings.openai_api_key == "sk-your-openai-key-here":
         return None
     return ChatOpenAI(
-        model="gpt-4o-mini",
+        model=settings.ai_default_model if settings.ai_default_model and "gpt-oss" not in settings.ai_default_model else "gpt-4o-mini",
         api_key=settings.openai_api_key,
+        base_url=settings.openai_base_url,
         temperature=temperature
     )
 

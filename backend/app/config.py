@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     groq_api_key: str | None = None
     groq_base_url: str = "https://api.groq.com/openai/v1"
     openai_api_key: str | None = None
+    openai_base_url: str | None = None
     anthropic_api_key: str | None = None
     google_ai_api_key: str | None = None
     ai_default_provider: str = "groq"

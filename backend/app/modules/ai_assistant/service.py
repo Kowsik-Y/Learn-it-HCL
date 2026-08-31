@@ -139,15 +139,18 @@ class AIService:
                 base_url=settings.groq_base_url,
             )
         elif settings.ai_default_provider == "openai":
-            return OpenAIProvider(api_key=settings.openai_api_key)
+            return OpenAIProvider(
+                api_key=settings.openai_api_key or "",
+                base_url=settings.openai_base_url,
+            )
         elif settings.ai_default_provider == "local":
             return OpenAIProvider(
                 api_key="local", base_url=settings.local_model_base_url
             )
         # Default to OpenAI-compatible
         return OpenAIProvider(
-            api_key=settings.groq_api_key or settings.openai_api_key,
-            base_url=settings.groq_base_url if settings.groq_api_key else None
+            api_key=settings.groq_api_key or settings.openai_api_key or "",
+            base_url=settings.groq_base_url if settings.groq_api_key else settings.openai_base_url
         )
 
     def _get_model_for_task(self, task: str) -> str:
