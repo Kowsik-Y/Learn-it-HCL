@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn-it HCL — Solution Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --primary: #111827;
+      --secondary: #374151;
+      --muted: #6B7280;
+      --accent: #2563EB;
+      --accent-light: #EFF6FF;
+      --border: #E5E7EB;
+      --bg: #FFFFFF;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    @page {
+      size: A4;
+      margin: 20mm 18mm;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--primary);
+      background: var(--bg);
+      line-height: 1.65;
+      font-size: 10.5pt;
+      padding: 40px 60px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media print {
+      body { padding: 0; max-width: 100%; }
+      .no-print { display: none; }
+    }
+
+    /* ── Cover ── */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cover-badge {
+      display: inline-block;
+      font-size: 9pt;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .cover h1 {
+      font-size: 32pt;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .cover-sub {
+      font-size: 13pt;
+      color: var(--muted);
+      font-weight: 400;
+      margin-bottom: 40px;
+    }
+    .cover-meta {
+      font-size: 9pt;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex;
+      gap: 40px;
+    }
+    .cover-meta dt { font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; font-size: 8pt; margin-bottom: 2px; }
+    .cover-meta dd { font-weight: 400; }
+
+    /* ── Section Headings ── */
+    h2 {
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 48px;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    h2 .num {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+    h3 {
+      font-size: 11pt;
+      font-weight: 600;
+      color: var(--secondary);
+      margin-top: 24px;
+      margin-bottom: 6px;
+    }
+    .section-rule {
+      width: 40px;
+      height: 3px;
+      background: var(--accent);
+      border: none;
+      margin-bottom: 20px;
+    }
+
+    p { margin-bottom: 12px; color: var(--secondary); }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 9.5pt;
+    }
+    thead th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--primary);
+    }
+    tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--secondary);
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 9pt; color: var(--accent); }
+
+    /* ── Lists ── */
+    ul, ol { padding-left: 20px; margin-bottom: 12px; color: var(--secondary); }
+    li { margin-bottom: 6px; }
+    li strong { color: var(--primary); }
+
+    /* ── Architecture Box ── */
+    .arch-box {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 20px 0;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 8.5pt;
+      line-height: 1.8;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--secondary);
+    }
+
+    /* ── Callout Box ── */
+    .callout {
+      background: var(--accent-light);
+      border-left: 3px solid var(--accent);
+      padding: 14px 18px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 9.5pt;
+    }
+    .callout strong { color: var(--accent); }
+
+    /* ── Flow Steps ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+      font-size: 9pt;
+      font-weight: 500;
+    }
+    .flow-step {
+      background: #F3F4F6;
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: var(--secondary);
+    }
+    .flow-arrow { color: var(--muted); font-size: 14pt; }
+
+    /* ── Footer ── */
+    .doc-footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 8.5pt;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ── Print Button ── */
+    .print-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10pt;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      transition: transform 0.2s;
+    }
+    .print-btn:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════ COVER ══════════════ -->
+  <div class="cover">
+    <span class="cover-badge">Solution Documentation</span>
+    <h1>Learn-it HCL</h1>
+    <p class="cover-sub">AI-Powered Personalized Learning Path Recommender</p>
+    <div class="cover-meta">
+    </div>
+  </div>
+
+  <!-- ══════════════ 1. EXECUTIVE SUMMARY ══════════════ -->
+  <h2><span class="num">01</span> Executive Summary</h2>
+  <hr class="section-rule">
+  <p>
+    <strong>Learn-it HCL</strong> is an evidence-based, AI-powered learning platform that delivers personalized learning experiences tailored to each individual's knowledge state, interests, learning patterns, and career goals.
+  </p>
+  <p>
+    Unlike traditional platforms that equate video completion with competence, Learn-it HCL quantifies true mastery using probabilistic Bayesian models, predicts memory retention through spaced repetition scheduling, detects dropout risk before it happens, and explains every recommendation it makes.
+  </p>
+  <div class="callout">
+    <strong>Core Mission:</strong> Understand the learner → Quantify true mastery → Predict memory retention & dropout risk → Deliver adaptive personalized learning → Explain every decision.
+  </div>
+
+  <!-- ══════════════ 2. PROBLEM STATEMENT ══════════════ -->
+  <h2><span class="num">02</span> Problem Statement</h2>
+  <hr class="section-rule">
+  <p>
+    Online learning platforms offer thousands of courses across diverse domains. While basic recommendation systems can suggest relevant courses, learners face critical challenges:
+  </p>
+  <ul>
+    <li><strong>Sequencing Gap</strong> — Difficulty identifying the right sequence of resources to achieve a specific goal</li>
+    <li><strong>One-Size-Fits-All</strong> — Different learners have different skill levels, interests, and career aspirations</li>
+    <li><strong>False Mastery</strong> — Traditional platforms treat watching a video as competence, without measuring true understanding</li>
+    <li><strong>Retention Decay</strong> — Without spaced repetition, learners forget up to 80% of material within a week</li>
+    <li><strong>Silent Dropout</strong> — Platforms lack early warning systems for learner disengagement</li>
+    <li><strong>Black-Box Recommendations</strong> — Learners don't understand why certain resources are recommended</li>
+  </ul>
+
+  <!-- ══════════════ 3. SOLUTION OVERVIEW ══════════════ -->
+  <h2><span class="num">03</span> Solution Overview</h2>
+  <hr class="section-rule">
+  <p>
+    Learn-it HCL addresses these gaps through six integrated components:
+  </p>
+
+  <h3>3.1 Conversational AI Onboarding</h3>
+  <p>
+    An LLM-powered conversational interface where learners describe their goals in natural language. The system diagnoses background knowledge, career aspirations, and preferred learning style through a multi-turn dialogue.
+  </p>
+
+  <h3>3.2 Learner Profiling Engine</h3>
+  <p>
+    Captures and continuously updates a rich learner profile encompassing interests, experience level, completed courses, skill mastery states (via BKT), memory retention curves (via FSRS), and learning objectives.
+  </p>
+
+  <h3>3.3 AI Recommendation Engine</h3>
+  <p>
+    An 11-stage recommendation pipeline that interprets goals, identifies prerequisite skill gaps, filters and ranks resources, and generates a personalized learning path with courses, projects, and assessments.
+  </p>
+
+  <h3>3.4 Personalized Learning Path Generator</h3>
+  <p>
+    Produces structured roadmaps with prerequisite ordering as a Directed Acyclic Graph (DAG), duration estimates, and milestone markers. Paths adapt dynamically based on learner progress and feedback.
+  </p>
+
+  <h3>3.5 Explainable AI Assistant</h3>
+  <p>
+    Every recommendation, video selection, quiz question, and risk flag comes with a human-readable "Why this?" explanation. The AI tutor assistant answers follow-up queries and provides contextual guidance.
+  </p>
+
+  <h3>3.6 Progress Dashboard</h3>
+  <p>
+    A unified dashboard visualizing skill development through mastery rings, XP progression, daily missions, active quests, spaced review queues, streak tracking, and next recommended actions.
+  </p>
+
+  <!-- ══════════════ 4. SYSTEM ARCHITECTURE ══════════════ -->
+  <h2><span class="num">04</span> System Architecture</h2>
+  <hr class="section-rule">
+
+  <div class="arch-box">┌──────────────────────────────────────────────────────────────────────────────┐
+│                      LEARN-IT HCL PLATFORM ARCHITECTURE                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+ ┌─────────────────────────────────────┐     ┌─────────────────────────────────────┐
+ │        NEXT.JS 15 FRONTEND          │     │       FASTAPI ML MICROSERVICE       │
+ │  • Adaptive Quiz & Live θ Gauge     │     │  • BKT — Bayesian Knowledge Tracing │
+ │  • Skill Mastery Map (Visual Rings) │◄───►│  • FSRS v4 Spaced Repetition        │
+ │  • FSRS Spaced Review Queue         │     │  • 2PL IRT + CAT Adaptive Engine    │
+ │  • Gamification (XP/Streaks/Quests) │     │  • Dropout & Churn Risk Predictor   │
+ │  • Teacher Attrition Radar          │     │  • Neural Video Ranker (PyTorch)    │
+ │  • Prerequisite Learning Paths DAG  │     │  • 11-Stage Recommendation Pipeline │
+ └─────────────────────────────────────┘     └─────────────────────────────────────┘
+                    │                                          │
+                    ▼                                          ▼
+ ┌─────────────────────────────────────┐     ┌─────────────────────────────────────┐
+ │     APACHE APISIX GATEWAY & AUTH    │     │    POSTGRESQL + PGVECTOR + REDIS    │
+ │  • Multi-Tenant Row Security        │     │  • BKT / FSRS / IRT state per user  │
+ │  • RBAC (5 Roles: Student to Admin) │     │  • Curated adaptive video catalogue │
+ └─────────────────────────────────────┘     └─────────────────────────────────────┘</div>
+
+  <h3>Architectural Principles</h3>
+  <ul>
+    <li><strong>Separation of Concerns</strong> — Frontend handles UI/Auth/CRUD; ML Microservice handles all AI/ML computations</li>
+    <li><strong>Multi-Tenant Isolation</strong> — Row-level <code>tenant_id</code> security via Apache APISIX gateway</li>
+    <li><strong>Role-Based Access</strong> — Five roles (Student, Teacher, Org Admin, Tenant Admin, Super Admin)</li>
+    <li><strong>Stateless ML Service</strong> — All ML state persisted in PostgreSQL; service is horizontally scalable</li>
+  </ul>
+
+  <!-- ══════════════ 5. TECHNOLOGY STACK ══════════════ -->
+  <h2><span class="num">05</span> Technology Stack</h2>
+  <hr class="section-rule">
+
+  <table>
+    <thead>
+      <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend</strong></td>
+        <td>Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui</td>
+        <td>Server-rendered UI, routing, authentication, and API gateway</td>
+      </tr>
+      <tr>
+        <td><strong>ML Backend</strong></td>
+        <td>Python 3.12, FastAPI, PyTorch, scikit-learn</td>
+        <td>All AI/ML model inference, recommendation pipeline, adaptive testing</td>
+      </tr>
+      <tr>
+        <td><strong>AI/LLM</strong></td>
+        <td>OpenAI, Anthropic, Google GenAI, LangChain, LangGraph</td>
+        <td>Conversational onboarding, AI tutor, course generation</td>
+      </tr>
+      <tr>
+        <td><strong>Database</strong></td>
+        <td>PostgreSQL 16, pgvector, Prisma (Node), SQLAlchemy Async (Python)</td>
+        <td>Relational data, vector embeddings, dual ORM access</td>
+      </tr>
+      <tr>
+        <td><strong>Caching</strong></td>
+        <td>Redis</td>
+        <td>Session caching, rate limiting, real-time state</td>
+      </tr>
+      <tr>
+        <td><strong>Gateway</strong></td>
+        <td>Apache APISIX</td>
+        <td>API routing, multi-tenant auth propagation, rate limiting</td>
+      </tr>
+      <tr>
+        <td><strong>DevOps</strong></td>
+        <td>Docker Compose, Turborepo, pnpm workspaces, Alembic</td>
+        <td>Containerization, monorepo management, database migrations</td>
+      </tr>
+      <tr>
+        <td><strong>Quality</strong></td>
+        <td>Biome, Ruff, mypy, pytest, ESLint, Husky</td>
+        <td>Linting, type checking, testing, pre-commit hooks</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 6. CORE ML ENGINES ══════════════ -->
+  <h2><span class="num">06</span> Core ML Engines</h2>
+  <hr class="section-rule">
+
+  <table>
+    <thead>
+      <tr><th>Engine</th><th>Algorithm</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>BKT</strong></td>
+        <td>Bayesian Knowledge Tracing (HMM)</td>
+        <td>Updates latent mastery probability P(L<sub>t</sub>) from quiz attempts, practice sessions, and watch events</td>
+      </tr>
+      <tr>
+        <td><strong>FSRS v4</strong></td>
+        <td>Free Spaced Repetition Scheduler</td>
+        <td>Calculates memory retention R(t, S) and schedules optimal review intervals before forgetting occurs</td>
+      </tr>
+      <tr>
+        <td><strong>2PL IRT + CAT</strong></td>
+        <td>Item Response Theory + Fisher Information</td>
+        <td>Selects next quiz question maximizing information gain; estimates learner ability θ — reduces question count by ~60%</td>
+      </tr>
+      <tr>
+        <td><strong>Dropout Predictor</strong></td>
+        <td>Logistic Churn Regression</td>
+        <td>Predicts attrition risk (0–100%) from streaks, inactivity, pass rates, and consecutive failures</td>
+      </tr>
+      <tr>
+        <td><strong>Neural Video Ranker</strong></td>
+        <td>PyTorch 3-Layer MLP</td>
+        <td>Re-ranks curated YouTube video tutorials per lesson by matching learner ability, video duration, and topic difficulty</td>
+      </tr>
+      <tr>
+        <td><strong>Recommendation Engine</strong></td>
+        <td>11-Stage Pipeline</td>
+        <td>End-to-end goal interpretation → prerequisite filtering → skill gap analysis → personalized ranking</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Recommendation Pipeline Flow</h3>
+  <div class="flow">
+    <span class="flow-step">Goal Parsing</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Skill Extraction</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Gap Analysis</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Prerequisite DAG</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Course Matching</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Neural Ranking</span><span class="flow-arrow">→</span>
+    <span class="flow-step">Explainability</span>
+  </div>
+
+  <!-- ══════════════ 7. ML MODELS DEEP DIVE ══════════════ -->
+  <h2><span class="num">07</span> ML Models — Technical Deep Dive</h2>
+  <hr class="section-rule">
+
+  <!-- ── BKT ── -->
+  <h3>7.1 Bayesian Knowledge Tracing (BKT)</h3>
+  <p>BKT is a probabilistic Hidden Markov Model (HMM) that tracks the latent mastery state of a learner for each skill. Unlike simple quiz scores, BKT maintains a probability distribution over whether a learner truly "knows" a skill.</p>
+
+  <h3>Parameters</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th>Symbol</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Initial Prior</td><td>P(L<sub>0</sub>)</td><td class="mono">0.10</td><td>Probability the learner already knows the skill before any observation</td></tr>
+      <tr><td>Learning Rate</td><td>P(T)</td><td class="mono">0.15</td><td>Probability of transitioning from "not mastered" to "mastered" after an attempt</td></tr>
+      <tr><td>Slip Rate</td><td>P(S)</td><td class="mono">0.10</td><td>Probability of an incorrect response despite knowing the skill</td></tr>
+      <tr><td>Guess Rate</td><td>P(G)</td><td class="mono">0.20</td><td>Probability of a correct response despite not knowing the skill</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Update Algorithm</h3>
+  <p>For each learner attempt (correct or incorrect), a two-step Bayesian update is performed:</p>
+  <ol>
+    <li><strong>Posterior Calculation</strong> — Given the observation, compute the posterior probability of mastery:
+      <br>If correct: P(L<sub>t</sub> | correct) = P(L) × (1 − P(S)) / [P(L) × (1 − P(S)) + (1 − P(L)) × P(G)]
+      <br>If incorrect: P(L<sub>t</sub> | incorrect) = P(L) × P(S) / [P(L) × P(S) + (1 − P(L)) × (1 − P(G))]
+    </li>
+    <li><strong>Learning Transition</strong> — Account for the learner potentially learning from the attempt:
+      <br>P(L<sub>t+1</sub>) = P(L<sub>t</sub> | obs) + (1 − P(L<sub>t</sub> | obs)) × P(T)
+    </li>
+  </ol>
+  <p>The model also outputs a <strong>confidence score</strong> (how certain the estimate is) and <strong>information gain</strong> (KL-divergence from previous estimate). Item difficulty weighting adjusts slip, guess, and transition parameters per-question.</p>
+
+  <!-- ── FSRS ── -->
+  <h3>7.2 Free Spaced Repetition Scheduler (FSRS v4)</h3>
+  <p>FSRS v4 is a machine-learning spaced repetition algorithm that outperforms SM-2 and Leitner systems. It models two hidden variables per skill card: <strong>Difficulty (D)</strong> [1–10 scale] and <strong>Stability (S)</strong> [in days], then calculates <strong>Retrievability (R)</strong> — the probability of recalling the material at any point in time.</p>
+
+  <h3>Memory Decay Formula</h3>
+  <div class="callout">
+    <strong>R(t, S) = (1 + t / (9 × S))<sup>−1</sup></strong>
+    <br>Where <em>t</em> = elapsed days since last review, <em>S</em> = memory stability in days.
+  </div>
+
+  <h3>Optimal Review Interval</h3>
+  <p>The next review is scheduled at the precise moment retrievability drops to the desired retention target (default 90%):</p>
+  <div class="callout">
+    <strong>Interval = 9 × S × (R<sub>desired</sub><sup>−1</sup> − 1)</strong>
+  </div>
+
+  <h3>Rating System</h3>
+  <table>
+    <thead><tr><th>Rating</th><th>Meaning</th><th>Effect on Stability</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">1 — Again</td><td>Forgotten</td><td>Stability drops sharply (lapse formula)</td></tr>
+      <tr><td class="mono">2 — Hard</td><td>Recalled with major effort</td><td>Stability increases slightly (hard penalty applied)</td></tr>
+      <tr><td class="mono">3 — Good</td><td>Recalled successfully</td><td>Stability increases normally</td></tr>
+      <tr><td class="mono">4 — Easy</td><td>Recalled effortlessly</td><td>Stability increases substantially (easy bonus applied)</td></tr>
+    </tbody>
+  </table>
+  <p>The model uses <strong>17 trained weights</strong> controlling initial stabilities, difficulty dynamics, recall/forget stability curves, and hard/easy bonus multipliers. Stability is clamped between 0.1 and 3,650 days (10 years).</p>
+
+  <!-- ── IRT + CAT ── -->
+  <h3>7.3 2-Parameter Logistic IRT + Computerized Adaptive Testing</h3>
+  <p>Item Response Theory (IRT) models the interaction between learner ability (θ) and question characteristics. The platform uses the 2-Parameter Logistic (2PL) model.</p>
+
+  <h3>2PL Probability Function</h3>
+  <div class="callout">
+    <strong>P(correct | θ, a, b) = 1 / (1 + e<sup>−a(θ − b)</sup>)</strong>
+    <br>Where <em>a</em> = discrimination [0.2–3.0], <em>b</em> = difficulty [−3.0 to +3.0], <em>θ</em> = learner ability [−4.0 to +4.0]
+  </div>
+
+  <h3>Fisher Information</h3>
+  <p>Each question provides a measurable amount of diagnostic information about the learner's ability:</p>
+  <div class="callout">
+    <strong>I(θ) = a² × P(θ) × (1 − P(θ))</strong>
+    <br>Questions where the learner has a ~50% chance of answering correctly provide the <em>most</em> information.
+  </div>
+
+  <h3>Ability Estimation</h3>
+  <p>Learner ability θ is estimated via <strong>Newton-Raphson Maximum Likelihood Estimation (MLE)</strong> — an iterative optimization that converges on the most likely ability given the response pattern. Standard error SE(θ) = 1 / √(ΣI(θ)) quantifies estimation precision.</p>
+
+  <h3>Adaptive Question Selection (CAT)</h3>
+  <p>The CAT engine selects the next question that maximizes Fisher Information at the learner's current estimated θ. Stopping criteria:</p>
+  <ul>
+    <li><strong>Precision achieved</strong> — SE(θ) drops below target (default 0.35)</li>
+    <li><strong>Min/max bounds</strong> — Between 3 and 10 questions administered</li>
+    <li><strong>Pool exhausted</strong> — No more unasked questions available</li>
+  </ul>
+  <p>This reduces required question count by <strong>~60%</strong> compared to fixed-length assessments while maintaining diagnostic accuracy.</p>
+
+  <!-- ── Dropout Risk ── -->
+  <h3>7.4 Dropout Risk Predictor</h3>
+  <p>A logistic regression model that scores learner churn probability (0–100%) from behavioral telemetry signals. Trained via SGD on historical student outcome data (churned vs. active).</p>
+
+  <h3>Input Signals &amp; Trained Coefficients</h3>
+  <table>
+    <thead><tr><th>Signal</th><th>Weight</th><th>Direction</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Days Inactive</td><td class="mono">+0.45</td><td>↑ Risk</td><td>Days since last completed activity (capped at 30)</td></tr>
+      <tr><td>Current Streak</td><td class="mono">−0.35</td><td>↓ Risk</td><td>Active daily streak length (capped at 14)</td></tr>
+      <tr><td>Pass Rate</td><td class="mono">−1.80</td><td>↓ Risk</td><td>Assessment pass rate [0.0–1.0]</td></tr>
+      <tr><td>Retention Score</td><td class="mono">−1.50</td><td>↓ Risk</td><td>Average FSRS memory retention [0.0–1.0]</td></tr>
+      <tr><td>Failed Attempts</td><td class="mono">+0.60</td><td>↑ Risk</td><td>Consecutive quiz failures (capped at 5)</td></tr>
+      <tr><td>Bias</td><td class="mono">−1.20</td><td>—</td><td>Base log-odds intercept</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Risk Classification &amp; Automated Nudges</h3>
+  <table>
+    <thead><tr><th>Score Range</th><th>Level</th><th>Automated Nudge</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">75–100%</td><td><strong>Critical</strong></td><td>Direct mentor intervention alert + simplified review mission</td></tr>
+      <tr><td class="mono">50–74%</td><td><strong>High</strong></td><td>Push notification with 5-minute bite-sized quiz to recover streak</td></tr>
+      <tr><td class="mono">25–49%</td><td><strong>Moderate</strong></td><td>Personalized review path + gamified XP boost</td></tr>
+      <tr><td class="mono">0–24%</td><td><strong>Low</strong></td><td>Encourage progression to next milestone skill</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── Video Ranker ── -->
+  <h3>7.5 Neural Video Ranker</h3>
+  <p>A PyTorch 3-layer MLP that re-ranks curated YouTube video tutorials for each lesson by matching learner ability level with video characteristics. Automatically uses CUDA GPU if available.</p>
+
+  <h3>Architecture</h3>
+  <div class="arch-box">VideoRankerNet(
+  Linear(7, 32) → ReLU →
+  Linear(32, 16) → ReLU →
+  Linear(16, 1) → Sigmoid
+)
+
+Input Features (7 dimensions):
+  [0] ability_norm      — Learner ability θ mapped to [0, 1]
+  [1] duration_norm     — Video duration / 480 min
+  [2-6] topic_onehot    — 5-class topic encoding (react, python, data_structures, sql, ml)</div>
+
+  <h3>Training Pipeline</h3>
+  <table>
+    <thead><tr><th>Aspect</th><th>Configuration</th></tr></thead>
+    <tbody>
+      <tr><td>Loss Function</td><td>MSE Loss (more stable than BCE for small datasets)</td></tr>
+      <tr><td>Optimizer</td><td>Adam (lr=5×10⁻³, weight_decay=1×10⁻³)</td></tr>
+      <tr><td>Scheduler</td><td>Cosine Annealing (T_max = epochs)</td></tr>
+      <tr><td>Epochs</td><td>300 with early stopping on best loss</td></tr>
+      <tr><td>Data Augmentation</td><td>4× Gaussian noise (σ=0.03) on scalar features → 540 from 135 samples</td></tr>
+      <tr><td>Gradient Clipping</td><td>Max norm = 1.0</td></tr>
+      <tr><td>Device</td><td>Auto-detect CUDA GPU, fallback to CPU</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 11-Stage Pipeline ── -->
+  <h3>7.6 Eleven-Stage Recommendation Pipeline</h3>
+  <p>The recommendation engine uses a deterministic, weighted scoring pipeline — <em>not</em> LLMs for ranking decisions. LLMs are used only for explanation generation.</p>
+
+  <table>
+    <thead><tr><th>Stage</th><th>Name</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">1</td><td><strong>Learner State Builder</strong></td><td>Aggregates mastery states, preferences, goals, and progress from database</td></tr>
+      <tr><td class="mono">2</td><td><strong>Goal Interpreter</strong></td><td>Maps learner goals to required skill sets via role-skill relationships</td></tr>
+      <tr><td class="mono">3</td><td><strong>Skill Gap Analyzer</strong></td><td>Computes gap between current BKT mastery and required mastery per skill</td></tr>
+      <tr><td class="mono">4</td><td><strong>Candidate Generator</strong></td><td>Retrieves candidate courses/lessons that teach the required skills</td></tr>
+      <tr><td class="mono">5</td><td><strong>Prerequisite Filter</strong></td><td>Removes candidates whose prerequisites are not met (DAG traversal)</td></tr>
+      <tr><td class="mono">6</td><td><strong>Mastery Filter</strong></td><td>Removes resources for already-mastered skills (avoids redundancy)</td></tr>
+      <tr><td class="mono">7</td><td><strong>Personalization Ranker</strong></td><td>Scores candidates using weighted formula across 10 scoring dimensions</td></tr>
+      <tr><td class="mono">8</td><td><strong>Diversity Re-Ranker</strong></td><td>Ensures variety across skill areas and content types</td></tr>
+      <tr><td class="mono">9</td><td><strong>Path Constraint Solver</strong></td><td>Applies time budget and max-item constraints to final selection</td></tr>
+      <tr><td class="mono">10</td><td><strong>Explanation Generator</strong></td><td>Produces human-readable "Why this?" reason strings for each recommendation</td></tr>
+      <tr><td class="mono">11</td><td><strong>Feedback Recorder</strong></td><td>Logs recommendation + learner response for model improvement</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Scoring Weights (Stage 7)</h3>
+  <table>
+    <thead><tr><th>Factor</th><th>Weight</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Goal Match</td><td class="mono">0.20</td><td>How well the resource aligns with stated learning goals</td></tr>
+      <tr><td>Skill Gap Match</td><td class="mono">0.20</td><td>How directly the resource addresses identified skill gaps</td></tr>
+      <tr><td>Prerequisite Fit</td><td class="mono">0.15</td><td>Whether the learner has the prerequisite foundation</td></tr>
+      <tr><td>Mastery Fit</td><td class="mono">0.10</td><td>Appropriate difficulty given current mastery level</td></tr>
+      <tr><td>Preference Fit</td><td class="mono">0.10</td><td>Match with learner's content format preferences</td></tr>
+      <tr><td>Difficulty Fit</td><td class="mono">0.08</td><td>Optimal challenge level (not too easy, not too hard)</td></tr>
+      <tr><td>Time Fit</td><td class="mono">0.07</td><td>Fits within learner's available time budget</td></tr>
+      <tr><td>Content Quality</td><td class="mono">0.05</td><td>Resource quality rating and completeness</td></tr>
+      <tr><td>Novelty</td><td class="mono">0.03</td><td>Preference for new/unseen content types</td></tr>
+      <tr><td>Redundancy Penalty</td><td class="mono">−0.02</td><td>Penalizes overlap with already-completed content</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 8. APPLICATION FEATURES ══════════════ -->
+  <h2><span class="num">08</span> Application Features</h2>
+  <hr class="section-rule">
+
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Route</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Learner Dashboard</strong></td>
+        <td class="mono">/dashboard</td>
+        <td>Unified metrics: level/XP progression, daily missions, active quests, and mastery highlights</td>
+      </tr>
+      <tr>
+        <td><strong>Courses & Curriculum</strong></td>
+        <td class="mono">/courses</td>
+        <td>Course catalog with AI course generator, interactive video player, and module navigation</td>
+      </tr>
+      <tr>
+        <td><strong>Adaptive Quiz</strong></td>
+        <td class="mono">/courses/[id]/quiz</td>
+        <td>Real-time CAT quiz with live ability θ gauge, Fisher Info reason panel, and completion stats</td>
+      </tr>
+      <tr>
+        <td><strong>Skill Mastery Map</strong></td>
+        <td class="mono">/skills</td>
+        <td>Evidence-based skill map with circular SVG progress rings, confidence, and retention status</td>
+      </tr>
+      <tr>
+        <td><strong>Spaced Review Queue</strong></td>
+        <td class="mono">/review</td>
+        <td>FSRS v4 daily card queue sorted by urgency with Again/Hard/Good/Easy rating flow</td>
+      </tr>
+      <tr>
+        <td><strong>Gamification & Quests</strong></td>
+        <td class="mono">/achievements</td>
+        <td>Level hero banner, day streak with freeze protection, categorized badges, quests, and XP log</td>
+      </tr>
+      <tr>
+        <td><strong>Learning Path Roadmap</strong></td>
+        <td class="mono">/learning-paths</td>
+        <td>Prerequisite-ordered DAG timeline with active node pulsing and duration estimates</td>
+      </tr>
+      <tr>
+        <td><strong>Teacher Analytics Radar</strong></td>
+        <td class="mono">/teacher/analytics</td>
+        <td>Class attrition radar, skill mastery heatmap, and AI remediation suggestions</td>
+      </tr>
+      <tr>
+        <td><strong>AI Onboarding</strong></td>
+        <td class="mono">/onboarding</td>
+        <td>Conversational LLM onboarding diagnosing user goals and background</td>
+      </tr>
+      <tr>
+        <td><strong>Admin Panel</strong></td>
+        <td class="mono">/admin</td>
+        <td>Platform administration: user management, course management, organization oversight, and role assignments</td>
+      </tr>
+      <tr>
+        <td><strong>Organization Management</strong></td>
+        <td class="mono">/org</td>
+        <td>Organization-level user and role management for tenant administrators</td>
+      </tr>
+      <tr>
+        <td><strong>Learner Profile</strong></td>
+        <td class="mono">/profile</td>
+        <td>Personal profile settings, preferences, and learning history overview</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 8. DATA MODEL ══════════════ -->
+  <h2><span class="num">09</span> Data Model</h2>
+  <hr class="section-rule">
+  <p>The platform uses a PostgreSQL database with Prisma (frontend) and SQLAlchemy Async (backend) as dual ORMs. Key entity groups:</p>
+
+  <h3>User & Identity</h3>
+  <ul>
+    <li><strong>User</strong> — Profile, credentials, preferences, and role assignments</li>
+    <li><strong>Tenant / Organization</strong> — Multi-tenant isolation with row-level security</li>
+    <li><strong>Session</strong> — JWT-based authentication state</li>
+  </ul>
+
+  <h3>Learning Content</h3>
+  <ul>
+    <li><strong>Course → Module → Lesson</strong> — Hierarchical curriculum structure</li>
+    <li><strong>Video</strong> — Curated YouTube resources linked to lessons with difficulty metadata</li>
+    <li><strong>Quiz / Question</strong> — Assessment items with IRT parameters (discrimination, difficulty)</li>
+  </ul>
+
+  <h3>Learner State</h3>
+  <ul>
+    <li><strong>BKT State</strong> — Per-skill mastery probability P(L<sub>t</sub>), prior, transition, slip, and guess parameters</li>
+    <li><strong>FSRS Card</strong> — Stability, difficulty, interval, and next review date per skill</li>
+    <li><strong>IRT Ability</strong> — Estimated learner ability θ from adaptive testing</li>
+    <li><strong>Progress Tracking</strong> — Course enrollment, lesson completion, XP, streaks, and achievements</li>
+  </ul>
+
+  <h3>Analytics</h3>
+  <ul>
+    <li><strong>Dropout Risk Score</strong> — Computed attrition probability with feature breakdown</li>
+    <li><strong>Recommendation Log</strong> — Audit trail of recommendations with explainability strings</li>
+  </ul>
+
+  <!-- ══════════════ 9. API DESIGN ══════════════ -->
+  <h2><span class="num">10</span> API Design</h2>
+  <hr class="section-rule">
+
+  <p>The ML microservice exposes RESTful endpoints under the <code>/ml</code> prefix, called internally by the Next.js API gateway:</p>
+
+  <table>
+    <thead>
+      <tr><th>Module</th><th>Endpoint Prefix</th><th>Key Operations</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>AI Assistant</strong></td>
+        <td class="mono">/ml/ai</td>
+        <td>Conversational tutor, onboarding dialogue, query answering</td>
+      </tr>
+      <tr>
+        <td><strong>Recommendations</strong></td>
+        <td class="mono">/ml/recommendations</td>
+        <td>Learning path generation, course suggestions, video re-ranking</td>
+      </tr>
+      <tr>
+        <td><strong>Mastery</strong></td>
+        <td class="mono">/ml/mastery</td>
+        <td>BKT state updates, FSRS scheduling, retention calculations</td>
+      </tr>
+      <tr>
+        <td><strong>Assessments</strong></td>
+        <td class="mono">/ml/assessments</td>
+        <td>Adaptive question selection, ability estimation, quiz scoring</td>
+      </tr>
+      <tr>
+        <td><strong>Analytics</strong></td>
+        <td class="mono">/ml/analytics</td>
+        <td>Dropout risk prediction, class-level analytics, remediation</td>
+      </tr>
+      <tr>
+        <td><strong>Course Agent</strong></td>
+        <td class="mono">/ml/course_agent</td>
+        <td>AI-powered course content generation via LangGraph agents</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 11. INSTALLATION & SETUP ══════════════ -->
+  <h2><span class="num">11</span> Installation &amp; Setup Guide</h2>
+  <hr class="section-rule">
+
+  <h3>11.1 Prerequisites</h3>
+  <p>Ensure the following are installed on your machine before proceeding:</p>
+  <table>
+    <thead><tr><th>Dependency</th><th>Minimum Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Node.js</strong></td><td class="mono">≥ 20.0.0</td><td>Next.js frontend runtime</td></tr>
+      <tr><td><strong>pnpm</strong></td><td class="mono">≥ 9.0.0</td><td>Package manager (enable via <code>corepack enable pnpm</code>)</td></tr>
+      <tr><td><strong>Python</strong></td><td class="mono">≥ 3.12</td><td>FastAPI ML microservice runtime</td></tr>
+      <tr><td><strong>Docker &amp; Docker Compose</strong></td><td>Latest</td><td>PostgreSQL container &amp; production deployment</td></tr>
+      <tr><td><strong>Git</strong></td><td>Latest</td><td>Source control</td></tr>
+    </tbody>
+  </table>
+
+  <h3>11.2 Clone the Repository</h3>
+  <div class="arch-box">git clone https://github.com/Kowsik-Y/Learn-it-HCL.git
+cd Learn-it-HCL</div>
+
+  <h3>11.3 Automated Quick Setup (Recommended)</h3>
+  <p>The project includes initialization scripts that set up both Node.js and Python environments, install all dependencies, generate Prisma client, create the super admin account, and produce <code>.env</code> files automatically.</p>
+
+  <div class="callout">
+    <strong>One Command Setup:</strong> The init script handles everything — dependency installation, virtual environment creation, Prisma generation, database schema push, and super admin account creation.
+  </div>
+
+  <table>
+    <thead><tr><th>Platform</th><th>Command</th></tr></thead>
+    <tbody>
+      <tr><td><strong>macOS / Linux</strong></td><td class="mono">chmod +x init.sh &amp;&amp; ./init.sh</td></tr>
+      <tr><td><strong>Windows (PowerShell)</strong></td><td class="mono">.\init.ps1</td></tr>
+    </tbody>
+  </table>
+
+  <p>The init script performs the following steps automatically:</p>
+  <ol>
+    <li>Enables pnpm via Corepack and runs <code>pnpm install</code> for the Next.js frontend</li>
+    <li>Copies <code>.env.example</code> → <code>.env</code> for both web and backend</li>
+    <li>Generates the Prisma client (<code>npx prisma generate</code>)</li>
+    <li>Temporarily starts the database container to push the schema and create the Super Admin account</li>
+    <li>Creates a Python virtual environment and installs all ML dependencies (<code>pip install -e ".[dev]"</code>)</li>
+  </ol>
+
+  <h3>11.4 Manual Setup (Step-by-Step)</h3>
+  <p>If you prefer manual control, follow these steps:</p>
+
+  <h3>Step 1 — Install Frontend Dependencies</h3>
+  <div class="arch-box"># From project root
+corepack enable pnpm
+pnpm install
+
+# Setup frontend environment
+cd apps/web
+cp .env.example .env
+npx prisma generate
+cd ../..</div>
+
+  <h3>Step 2 — Install Backend Dependencies</h3>
+  <div class="arch-box"># From project root
+cd backend
+
+# Create Python virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate        # macOS/Linux
+# .\venv\Scripts\activate       # Windows
+
+# Install all dependencies (including dev tools)
+pip install -e ".[dev]"
+
+# Create backend .env (if not exists)
+cp .env.example .env            # Or use the defaults
+
+deactivate
+cd ..</div>
+
+  <h3>Step 3 — Start the Database</h3>
+  <div class="arch-box"># Start PostgreSQL via Docker (port 5433 → internal 5432)
+docker-compose up -d db
+
+# Verify it's running
+docker-compose ps</div>
+
+  <h3>Step 4 — Initialize Database Schema &amp; Seed Data</h3>
+  <div class="arch-box"># Push Prisma schema to database
+cd apps/web
+npx prisma db push
+
+# Seed the database with the Super Admin, organizations, and roles
+npx prisma db seed
+
+# Return to root
+cd ../..
+
+# Seed ML-related data (learners, courses, BKT/FSRS states, quiz items)
+cd backend
+source venv/bin/activate
+python -m scripts.seed
+deactivate
+cd ..</div>
+
+  <div class="callout">
+    <strong>Two-Phase Seeding:</strong> The Prisma seed creates the foundational schema (organizations, roles, super admin). The backend seed populates all ML-related data — learners, courses, skill trees, BKT mastery states, FSRS cards, IRT question banks, and demo progress.
+  </div>
+
+  <h3>Step 5 — Train ML Models (Optional)</h3>
+  <p>Pre-trained model artifacts are included in <code>backend/saved_models/</code>. To retrain from scratch:</p>
+  <div class="arch-box">cd backend
+source venv/bin/activate
+
+# Train BKT, FSRS, IRT, and Risk Predictor models
+python -m scripts.train_and_save_models
+
+# Train the PyTorch Neural Video Ranker separately
+python -m scripts.train_video_ranker
+
+deactivate
+cd ..</div>
+
+  <table>
+    <thead><tr><th>Model Artifact</th><th>Format</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">bkt_model.joblib</td><td>scikit-learn / joblib</td><td>BKT HMM parameters (prior, transition, slip, guess)</td></tr>
+      <tr><td class="mono">fsrs_model.joblib</td><td>scikit-learn / joblib</td><td>FSRS v4 scheduler weights</td></tr>
+      <tr><td class="mono">irt_model.joblib</td><td>scikit-learn / joblib</td><td>2PL IRT item discrimination &amp; difficulty parameters</td></tr>
+      <tr><td class="mono">risk_predictor.joblib</td><td>scikit-learn / joblib</td><td>Logistic regression dropout predictor coefficients</td></tr>
+      <tr><td class="mono">video_ranker.pt</td><td>PyTorch checkpoint</td><td>3-layer MLP neural video ranker weights</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 12. RUNNING ══════════════ -->
+  <h2><span class="num">12</span> Running the Application</h2>
+  <hr class="section-rule">
+
+  <h3>12.1 Development Mode (Individual Services)</h3>
+  <p>Start each service in a separate terminal:</p>
+
+  <table>
+    <thead><tr><th>Terminal</th><th>Command</th><th>Service</th><th>URL</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Terminal 1</strong></td>
+        <td class="mono">docker-compose up -d db</td>
+        <td>PostgreSQL Database</td>
+        <td class="mono">localhost:5433</td>
+      </tr>
+      <tr>
+        <td><strong>Terminal 2</strong></td>
+        <td class="mono">cd apps/web &amp;&amp; pnpm dev</td>
+        <td>Next.js Web App</td>
+        <td class="mono">localhost:3000</td>
+      </tr>
+      <tr>
+        <td><strong>Terminal 3</strong></td>
+        <td class="mono">cd backend &amp;&amp; source venv/bin/activate &amp;&amp; uvicorn app.main:app --port 8001 --reload</td>
+        <td>FastAPI ML Service</td>
+        <td class="mono">localhost:8001</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>12.2 Development Mode (Single Command)</h3>
+  <p>The <code>run.sh</code> script starts all three services simultaneously and handles graceful shutdown on <code>Ctrl+C</code>:</p>
+  <div class="arch-box"># macOS / Linux
+chmod +x run.sh
+./run.sh
+
+# This will:
+# 1. Start PostgreSQL via Docker
+# 2. Push Prisma schema to database
+# 3. Start Next.js dev server (background)
+# 4. Start FastAPI ML service (background)
+# Press Ctrl+C to stop all services gracefully</div>
+
+  <h3>12.3 Production Mode (Docker Compose)</h3>
+  <p>To run the entire stack containerized:</p>
+  <div class="arch-box"># Build and start all services
+docker-compose up --build -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down</div>
+
+  <p>Docker Compose spins up three containers:</p>
+  <table>
+    <thead><tr><th>Container</th><th>Image</th><th>Port</th><th>Depends On</th></tr></thead>
+    <tbody>
+      <tr><td><strong>db</strong></td><td class="mono">postgres:15-alpine</td><td class="mono">5433:5432</td><td>—</td></tr>
+      <tr><td><strong>web</strong></td><td>Custom (Next.js 15)</td><td class="mono">3000:3000</td><td>db (healthy), ml-service</td></tr>
+      <tr><td><strong>ml-service</strong></td><td>Custom (FastAPI)</td><td class="mono">8001:8001</td><td>db (healthy)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Auto-Migration:</strong> The web container automatically runs <code>npx prisma db push</code> on startup before serving the application.
+  </div>
+
+  <h3>12.4 Access Points</h3>
+  <table>
+    <thead><tr><th>Service</th><th>URL</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Web Application</td><td class="mono">http://localhost:3000</td><td>Main UI — dashboard, courses, skills, quizzes</td></tr>
+      <tr><td>ML API Documentation</td><td class="mono">http://localhost:8001/docs</td><td>Interactive Swagger/OpenAPI docs</td></tr>
+      <tr><td>ML API ReDoc</td><td class="mono">http://localhost:8001/redoc</td><td>Alternative API documentation</td></tr>
+      <tr><td>Health Check</td><td class="mono">http://localhost:8001/health</td><td>Service health status endpoint</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 13. ENVIRONMENT VARIABLES ══════════════ -->
+  <h2><span class="num">13</span> Environment Variables</h2>
+  <hr class="section-rule">
+
+  <h3>13.1 Root Configuration (<code>.env</code>)</h3>
+  <table>
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">DATABASE_URL</td><td class="mono" style="font-size:8pt">postgresql+asyncpg://learnit:learnit_dev@localhost:5432/learnit</td><td>Async database connection (backend)</td></tr>
+      <tr><td class="mono">DATABASE_URL_SYNC</td><td class="mono" style="font-size:8pt">postgresql://learnit:learnit_dev@localhost:5432/learnit</td><td>Sync database connection (migrations)</td></tr>
+      <tr><td class="mono">POSTGRES_USER</td><td class="mono">learnit</td><td>PostgreSQL username</td></tr>
+      <tr><td class="mono">POSTGRES_PASSWORD</td><td class="mono">learnit_dev</td><td>PostgreSQL password</td></tr>
+      <tr><td class="mono">POSTGRES_DB</td><td class="mono">learnit</td><td>Database name</td></tr>
+      <tr><td class="mono">REDIS_URL</td><td class="mono">redis://localhost:6379/0</td><td>Redis connection string</td></tr>
+      <tr><td class="mono">JWT_SECRET_KEY</td><td>—</td><td>Secret for signing JWT tokens</td></tr>
+      <tr><td class="mono">CORS_ORIGINS</td><td class="mono">http://localhost:3000</td><td>Allowed CORS origins</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.2 AI Provider Configuration</h3>
+  <table>
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">OPENAI_API_KEY</td><td>—</td><td>OpenAI API key (for GPT models)</td></tr>
+      <tr><td class="mono">ANTHROPIC_API_KEY</td><td>—</td><td>Anthropic API key (for Claude models)</td></tr>
+      <tr><td class="mono">GOOGLE_AI_API_KEY</td><td>—</td><td>Google AI API key (for Gemini models)</td></tr>
+      <tr><td class="mono">AI_DEFAULT_PROVIDER</td><td class="mono">openai</td><td>Default AI provider: openai | anthropic | google | local</td></tr>
+      <tr><td class="mono">AI_DEFAULT_MODEL</td><td class="mono">gpt-4o-mini</td><td>Default model for AI tutor &amp; onboarding</td></tr>
+      <tr><td class="mono">LOCAL_MODEL_BASE_URL</td><td class="mono">http://localhost:11434/v1</td><td>Ollama local model endpoint</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.3 Frontend Configuration (<code>apps/web/.env</code>)</h3>
+  <table>
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">DATABASE_URL</td><td class="mono" style="font-size:8pt">postgresql://learnit:learnit_dev@localhost:5432/learnit</td><td>Prisma database connection (sync)</td></tr>
+      <tr><td class="mono">JWT_SECRET_KEY</td><td>—</td><td>Must match root JWT secret</td></tr>
+      <tr><td class="mono">JWT_ACCESS_TOKEN_EXPIRE_MINUTES</td><td class="mono">30</td><td>Access token expiry</td></tr>
+      <tr><td class="mono">JWT_REFRESH_TOKEN_EXPIRE_DAYS</td><td class="mono">7</td><td>Refresh token expiry</td></tr>
+      <tr><td class="mono">ML_SERVICE_URL</td><td class="mono">http://localhost:8001</td><td>ML microservice endpoint</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.4 Feature Flags</h3>
+  <table>
+    <thead><tr><th>Flag</th><th>Default</th><th>Controls</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">FF_AI_TUTOR</td><td class="mono">true</td><td>AI tutor chat &amp; onboarding features</td></tr>
+      <tr><td class="mono">FF_GAMIFICATION</td><td class="mono">true</td><td>XP, streaks, badges, and quests</td></tr>
+      <tr><td class="mono">FF_ADAPTIVE_DIAGNOSTICS</td><td class="mono">true</td><td>CAT adaptive quiz engine</td></tr>
+      <tr><td class="mono">FF_CAREER_PATH_MODE</td><td class="mono">true</td><td>Career-oriented learning path suggestions</td></tr>
+      <tr><td class="mono">FF_ATTENDANCE</td><td class="mono">true</td><td>Attendance tracking features</td></tr>
+      <tr><td class="mono">FF_SHORT_VIDEO_MODE</td><td class="mono">true</td><td>Short-form video content mode</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 14. SEED ACCOUNTS ══════════════ -->
+  <h2><span class="num">14</span> Demo Credentials &amp; Seed Accounts</h2>
+  <hr class="section-rule">
+  <p>The following accounts are created by the database seed scripts. All student accounts include pre-populated progress, mastery states, and learning goals.</p>
+
+  <h3>14.1 Administrator Accounts</h3>
+  <table>
+    <thead><tr><th>Role</th><th>Email</th><th>Password</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Super Admin</strong></td><td class="mono">superadmin@learnit.com</td><td class="mono">Admin@1234</td><td>Global platform administrator</td></tr>
+      <tr><td><strong>Org Admin</strong></td><td class="mono">admin@learnit.dev</td><td class="mono">Password1!</td><td>Primary HCL org admin</td></tr>
+      <tr><td><strong>Org Admin</strong></td><td class="mono">admin2@learnit.dev</td><td class="mono">Password1!</td><td>Secondary HCL org admin</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.2 Teacher Accounts</h3>
+  <table>
+    <thead><tr><th>Role</th><th>Email</th><th>Password</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Teacher</strong></td><td class="mono">teacher@learnit.dev</td><td class="mono">Password1!</td><td>Primary instructor (Smith)</td></tr>
+      <tr><td><strong>Teacher</strong></td><td class="mono">teacher2@learnit.dev</td><td class="mono">Password1!</td><td>Secondary instructor (Doe)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.3 Student Accounts</h3>
+  <table>
+    <thead><tr><th>Email</th><th>Password</th><th>Name</th><th>Goal</th><th>Progress</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">student@learnit.dev</td><td class="mono">Password1!</td><td>Alice Johnson</td><td>Full-Stack Python Engineer</td><td>35%</td></tr>
+      <tr><td class="mono">student2@learnit.dev</td><td class="mono">Password1!</td><td>Bob Miller</td><td>Master Frontend with React &amp; TS</td><td>45%</td></tr>
+      <tr><td class="mono">student3@learnit.dev</td><td class="mono">Password1!</td><td>Charlie Davis</td><td>Cloud &amp; DevOps Architect</td><td>20%</td></tr>
+      <tr><td class="mono">student4@learnit.dev</td><td class="mono">Password1!</td><td>Diana Prince</td><td>Data Scientist &amp; ML Engineer</td><td>15%</td></tr>
+      <tr><td class="mono">student5@learnit.dev</td><td class="mono">Password1!</td><td>Ethan Hunt</td><td>FastAPI Microservices Developer</td><td>60%</td></tr>
+      <tr><td class="mono">student6@learnit.dev</td><td class="mono">Password1!</td><td>Fiona Gallagher</td><td>Database Administrator</td><td>50%</td></tr>
+      <tr><td class="mono">student7@learnit.dev</td><td class="mono">Password1!</td><td>George Clark</td><td>Software Test Automation Lead</td><td>75%</td></tr>
+      <tr><td class="mono">student8@learnit.dev</td><td class="mono">Password1!</td><td>Hannah Abbott</td><td>Next.js Product Engineer</td><td>30%</td></tr>
+    </tbody>
+  </table>
+
+  <h3>14.4 Re-Seeding the Database</h3>
+  <p>After resetting the database or recreating Docker volumes, re-seed with:</p>
+  <div class="arch-box"># Step 1: Re-seed core schema (organizations, roles, super admin)
+cd apps/web
+npx prisma db push
+npx prisma db seed
+
+# Step 2: Re-seed ML data (learners, courses, mastery, questions)
+cd ../../backend
+source venv/bin/activate
+python -m scripts.seed
+deactivate</div>
+
+  <!-- ══════════════ 15. SECURITY ══════════════ -->
+  <h2><span class="num">15</span> Security &amp; Multi-Tenancy</h2>
+  <hr class="section-rule">
+  <ul>
+    <li><strong>Authentication</strong> — JWT-based session management via Next.js API gateway with bcrypt password hashing</li>
+    <li><strong>Authorization</strong> — Five-tier RBAC: Student, Teacher, Org Admin, Tenant Admin, Super Admin</li>
+    <li><strong>Multi-Tenancy</strong> — Row-level <code>tenant_id</code> isolation enforced at gateway and database level</li>
+    <li><strong>Gateway Auth</strong> — ML microservice validates <code>X-User-Id</code> and <code>X-Tenant-Id</code> headers from the gateway</li>
+    <li><strong>Secrets Management</strong> — Environment-based configuration with <code>.env</code> files excluded from version control</li>
+    <li><strong>Token Lifecycle</strong> — Configurable access token expiry (default 30 min) and refresh tokens (default 7 days)</li>
+  </ul>
+
+  <!-- ══════════════ 16. COMPETITIVE DIFFERENTIATION ══════════════ -->
+  <h2><span class="num">16</span> Competitive Differentiation</h2>
+  <hr class="section-rule">
+
+  <table>
+    <thead>
+      <tr><th>Capability</th><th>Coursera / Udemy</th><th>Khan Academy</th><th>Duolingo</th><th>Learn-it HCL</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Mastery Tracking</strong></td>
+        <td>Video Completion</td>
+        <td>Quiz Scores</td>
+        <td>Streak Count</td>
+        <td><strong>BKT Probabilistic P(L<sub>t</sub>)</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Spaced Repetition</strong></td>
+        <td>None</td>
+        <td>Basic</td>
+        <td>Leitner System</td>
+        <td><strong>FSRS v4 ML Scheduler</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Diagnostic Testing</strong></td>
+        <td>Fixed Length</td>
+        <td>Static Quizzes</td>
+        <td>Fixed Tests</td>
+        <td><strong>2PL IRT + CAT</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Video Curation</strong></td>
+        <td>Static / Manual</td>
+        <td>Static</td>
+        <td>N/A</td>
+        <td><strong>Neural MLP Ranker</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Dropout Detection</strong></td>
+        <td>None</td>
+        <td>None</td>
+        <td>None</td>
+        <td><strong>Churn Risk Predictor</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Explainability</strong></td>
+        <td>None</td>
+        <td>Partial</td>
+        <td>None</td>
+        <td><strong>Full "Why this?" Reasons</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════ 17. REPOSITORY STRUCTURE ══════════════ -->
+  <h2><span class="num">17</span> Repository Structure</h2>
+  <hr class="section-rule">
+
+  <div class="arch-box">Learn-it-HCL/
+├── apps/
+│   └── web/                          Next.js 15 Frontend
+│       ├── app/                      App Router (pages, API routes)
+│       │   ├── (app)/                Protected application routes
+│       │   │   ├── dashboard/        Metrics &amp; daily missions
+│       │   │   ├── courses/          Courses &amp; adaptive quiz
+│       │   │   ├── skills/           Skill mastery map
+│       │   │   ├── review/           FSRS spaced review queue
+│       │   │   ├── achievements/     XP, badges, and quests
+│       │   │   ├── learning-paths/   Prerequisite DAG timeline
+│       │   │   ├── teacher/          Teacher analytics radar
+│       │   │   ├── admin/            Platform admin (users, courses, orgs, roles)
+│       │   │   ├── org/              Organization user &amp; role management
+│       │   │   ├── onboarding/       AI conversational onboarding
+│       │   │   └── profile/          Learner profile &amp; settings
+│       │   ├── (auth)/               Authentication routes
+│       │   │   ├── login/            Login page
+│       │   │   └── request-access/   Access request flow
+│       │   └── api/                  Next.js API routes (proxy to ML service)
+│       │       ├── auth/             Authentication endpoints
+│       │       ├── admin/            Admin CRUD endpoints
+│       │       ├── ai/               AI tutor proxy
+│       │       ├── analytics/        Analytics proxy
+│       │       ├── assessments/      Adaptive testing proxy
+│       │       ├── content/          Course &amp; module content
+│       │       ├── gamification/     XP, badges, quests
+│       │       ├── learners/         Learner data &amp; progress
+│       │       ├── mastery/          Mastery state endpoints
+│       │       ├── org/              Organization management
+│       │       ├── profile/          Profile endpoints
+│       │       ├── recommendations/  Learning path endpoints
+│       │       ├── skills/           Skill data endpoints
+│       │       └── tutor/            AI tutor endpoints
+│       ├── components/               UI &amp; interactive components
+│       │   ├── ui/                   shadcn/ui base components
+│       │   ├── ai-tutor-chat.tsx     Conversational AI tutor panel
+│       │   ├── ai-course-generator/  AI course creation wizard
+│       │   └── adaptive-video-player Ability-matched video player
+│       ├── lib/                      API client, auth &amp; db utilities
+│       └── prisma/                   Database schema &amp; seeds
+├── backend/
+│   ├── app/                          FastAPI ML Microservice
+│   │   ├── core/                     RBAC, security, and errors
+│   │   ├── middleware/               Gateway auth &amp; tenant propagation
+│   │   └── modules/
+│   │       ├── ai_assistant/         LLM-powered AI tutor
+│   │       ├── ai_course_agent/      LangGraph course generator
+│   │       ├── assessments/          2PL IRT + CAT adaptive engine
+│   │       │   ├── irt.py            2-Parameter Logistic IRT model
+│   │       │   └── cat_engine.py     Computerized Adaptive Testing
+│   │       ├── analytics/            Dropout risk predictor
+│   │       │   └── risk_predictor.py Logistic churn regression model
+│   │       ├── mastery/              BKT &amp; FSRS v4 engines
+│   │       │   ├── bkt.py            Bayesian Knowledge Tracing HMM
+│   │       │   ├── fsrs.py           Free Spaced Repetition Scheduler
+│   │       │   └── service.py        Mastery calculation orchestrator
+│   │       └── recommendations/      11-stage pipeline &amp; video ranker
+│   │           ├── engine.py         Full recommendation pipeline
+│   │           ├── video_ranker.py   PyTorch 3-layer MLP ranker
+│   │           └── playlist_engine.py Adaptive playlist generator
+│   ├── saved_models/                 Serialized ML model artifacts
+│   │   ├── bkt_model.joblib          Trained BKT parameters
+│   │   ├── fsrs_model.joblib         FSRS scheduler weights
+│   │   ├── irt_model.joblib          IRT item parameters
+│   │   ├── risk_predictor.joblib     Dropout predictor coefficients
+│   │   └── video_ranker.pt           PyTorch video ranker checkpoint
+│   ├── scripts/                      Model training &amp; data seeding
+│   │   ├── train_and_save_models.py  Train all ML models
+│   │   ├── train_video_ranker.py     PyTorch video ranker training
+│   │   └── seed.py                   Database seed data
+│   └── alembic/                      Database migrations
+├── infra/
+│   ├── docker/                       Docker Compose definitions
+│   └── apisix/                       Gateway configuration
+└── packages/
+    └── types/                        Shared TypeScript contracts</div>
+
+  <!-- Print Button -->
+  <button class="print-btn no-print" onclick="window.print()">⬇ Save as PDF</button>
+
+</body>
+</html>
